@@ -10,4 +10,11 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    server: {
+        watch: {
+            // Native file events can miss saves in some macOS/Cursor setups.
+            usePolling: true,
+            interval: 100,
+        },
+    },
 });
