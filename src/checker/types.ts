@@ -3,7 +3,7 @@
  *
  * `CheckerAnswers` is the raw, flat state we collect one question at a time.
  * `CapturedData` is the structured shape that the (later) documentation tool
- * consumes — built from the answers so the user never re-enters anything.
+ * consumes, built from the answers so the user never re-enters anything.
  */
 
 export type DismissalKind =
@@ -25,8 +25,77 @@ export type SizeEstimate = "under_15" | "15_plus" | "still_unsure";
 
 export type ReasonCategory = "performance" | "conduct" | "redundancy" | "none_given";
 
-/** yes / no / not sure — "not sure" is routed optimistically. */
+/** yes / no / not sure ("not sure" is routed optimistically). */
 export type YesNoUnsure = "yes" | "no" | "unsure";
+
+/* ----------------------------- general protections -------------------------- */
+
+/**
+ * The candidate claims a single case can carry. A case is never one global
+ * outcome. It is a list of these, each independently assessed.
+ */
+export type ClaimType =
+    | "unfair_dismissal"
+    | "general_protections_dismissal"
+    | "general_protections_non_dismissal";
+
+/** Kinds of workplace right / protected activity exercised (s.341, s.340). */
+export type WorkplaceRightKind =
+    | "complaint_or_inquiry"
+    | "entitlement_benefit"
+    | "leave"
+    | "safety_or_discrimination"
+    | "industrial_activity";
+
+/** How a protected act was communicated. */
+export type WorkplaceRightForm = "verbal" | "email" | "written" | "formal_complaint" | "other";
+
+/**
+ * A workplace right / protected activity event, structured for the case file.
+ * The checker captures `kind` and `decisionMakerAware`; the documentation flow
+ * later enriches the optional detail (description, date, recipient, form).
+ */
+export interface WorkplaceRightEvent {
+    id: string;
+    kind: WorkplaceRightKind;
+    description: string;
+    date?: string;
+    recipient?: string;
+    form?: WorkplaceRightForm;
+    decisionMakerAware: YesNoUnsure;
+}
+
+/** A protected attribute under s.351 the user believes was a factor. */
+export interface ProtectedAttribute {
+    /** Label from the s.351 list (config-driven). */
+    attribute: string;
+    decisionMakerKnew: YesNoUnsure;
+}
+
+/** Per-claim status. */
+export type ClaimStatus = "likely" | "possible_complex" | "unlikely" | "time_barred";
+
+export interface ClaimDeadline {
+    /** Plain-language basis, e.g. "21 days from dismissal". */
+    basis: string;
+    /** ISO date the window closes. */
+    date: string;
+    daysRemaining: number;
+}
+
+/**
+ * The assessment of a single candidate claim. Never a verdict, score, or dollar
+ * value. Only the user's own documented facts that tend to support or weaken it.
+ */
+export interface ClaimAssessment {
+    claimType: ClaimType;
+    status: ClaimStatus;
+    deadline: ClaimDeadline | null;
+    /** Jurisdictional gates not met (drives "unlikely"). */
+    unmetGates: string[];
+    supportingFacts: string[];
+    weakeningFacts: string[];
+}
 
 export type CheckerFlag =
     | "constructive_dismissal"
@@ -37,7 +106,17 @@ export type CheckerFlag =
     | "employer_size_uncertain"
     | "sham_contracting"
     | "below_minimum_period"
-    | "coverage_uncertain";
+    | "coverage_uncertain"
+    // General protections
+    | "workplace_right_exercised"
+    | "complaint_or_inquiry_made"
+    | "protected_attribute_present"
+    | "temporal_proximity_short"
+    | "decision_maker_knew"
+    | "decision_maker_knowledge_unclear"
+    | "multiple_actions_election_required"
+    | "gp_non_dismissal_path"
+    | "industrial_activity";
 
 /** 1 = looks eligible, 2 = possibly eligible/complex, 3 = other claims, 4 = time-barred. */
 export type OutcomeBucket = 1 | 2 | 3 | 4;
@@ -66,7 +145,15 @@ export interface CheckerAnswers {
     // Q8
     reason?: ReasonCategory;
 
-    // Optional identity fields — not asked in the checker MVP, reserved so the
+    // General protections screening (asked of every dismissal-based case).
+    /** Workplace rights / protected activity exercised before the dismissal ("none" = sentinel). */
+    workplace_rights?: (WorkplaceRightKind | "none")[];
+    /** Protected attributes (s.351) the user believes were a factor. */
+    protected_attributes?: string[];
+    /** Did the decision-maker know about the protected act/attribute? (reverse onus crux) */
+    decision_maker_aware?: YesNoUnsure;
+
+    // Optional identity fields, not asked in the checker MVP, reserved so the
     // documentation flow can populate them without a schema change.
     name?: string;
     role?: string;
@@ -96,7 +183,14 @@ export interface CapturedData {
         redundancy_claimed: boolean;
         days_remaining: number | null;
     };
+    /** Structured workplace-right events for the case file (general protections). */
+    workplace_rights: WorkplaceRightEvent[];
+    /** Structured protected attributes for the case file (general protections). */
+    protected_attributes: ProtectedAttribute[];
+    /** Per-claim assessments, replacing the single outcome bucket. */
+    candidate_claims: ClaimAssessment[];
     flags: CheckerFlag[];
+    /** Retained for back-compat; mirrors the unfair dismissal claim status. */
     outcome_bucket: OutcomeBucket;
 }
 
@@ -114,4 +208,8 @@ export type StepId =
     | "award"
     | "eba"
     | "salary"
-    | "reason";
+    | "reason"
+    // General protections screening
+    | "workplace_rights"
+    | "protected_attributes"
+    | "decision_maker_aware";

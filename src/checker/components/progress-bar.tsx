@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 
 interface ProgressBarProps {
-    /** 0–1. */
+    /** 0 to 1. */
     value: number;
 }
 

@@ -1,16 +1,38 @@
-import {
-    getHighIncomeThreshold,
-    MIN_EMPLOYMENT_MONTHS,
-    UNFAIR_DISMISSAL_TIME_LIMIT_DAYS,
-} from "@/config/fair-work";
-import type {
-    CapturedData,
-    CheckerAnswers,
-    CheckerFlag,
-    EmployerSize,
-    OutcomeBucket,
-    StepId,
-} from "@/checker/types";
+import { getLegalConstants } from "@/config/legal-constants";
+import { getHighIncomeThreshold, MIN_EMPLOYMENT_MONTHS } from "@/config/fair-work";
+import type { CapturedData, CheckerAnswers, CheckerFlag, EmployerSize, StepId, WorkplaceRightKind } from "@/checker/types";
+
+/* ----------------------------- shared constants ----------------------------- */
+
+/** Sentinel multiselect values that mean "nothing applies". */
+export const NONE_VALUE = "none";
+/** Sentinel value on the protected-attributes question. */
+export const PREFER_NOT_TO_SAY = "prefer_not_to_say";
+
+/** Dismissal kinds where the employer ended the employment (a "dismissal"). */
+export function isDismissalBased(a: CheckerAnswers): boolean {
+    return (
+        a.dismissed === "terminated" ||
+        a.dismissed === "forced_resignation" ||
+        a.dismissed === "redundancy" ||
+        a.dismissed === "fixed_term_ended"
+    );
+}
+
+/** Real workplace rights selected (excludes the "none" sentinel). */
+export function selectedWorkplaceRights(a: CheckerAnswers): WorkplaceRightKind[] {
+    return (a.workplace_rights ?? []).filter((v): v is WorkplaceRightKind => v !== NONE_VALUE);
+}
+
+/** Real protected attributes selected (excludes "none" / "prefer not to say"). */
+export function selectedProtectedAttributes(a: CheckerAnswers): string[] {
+    return (a.protected_attributes ?? []).filter((v) => v !== NONE_VALUE && v !== PREFER_NOT_TO_SAY);
+}
+
+/** Whether the case has at least one candidate prohibited reason for general protections. */
+export function hasProtectedReason(a: CheckerAnswers): boolean {
+    return selectedWorkplaceRights(a).length > 0 || selectedProtectedAttributes(a).length > 0;
+}
 
 /* ----------------------------------- dates ---------------------------------- */
 
@@ -47,21 +69,30 @@ function diffInDays(a: Date, b: Date): number {
 }
 
 /**
- * Days left to lodge, out of 21. The application must be made within 21 days
- * after the dismissal took effect (counting starts the day after), so the
- * deadline is `effective_date + 21 days`. Returns a value that can go negative
- * once the window has closed; `null` when there is no dismissal date yet.
+ * Days left to lodge within a `limitDays` window. The application must be made
+ * within the window after the dismissal took effect (counting starts the day
+ * after), so the deadline is `effective_date + limitDays`. Returns a value that
+ * can go negative once the window has closed; `null` when there is no date yet.
  */
-export function daysRemaining(effectiveDate?: string): number | null {
+export function daysRemainingForDate(effectiveDate: string | undefined, limitDays: number): number | null {
     const effective = parseISODate(effectiveDate);
     if (!effective) return null;
-    const deadline = addDays(effective, UNFAIR_DISMISSAL_TIME_LIMIT_DAYS);
+    const deadline = addDays(effective, limitDays);
     return diffInDays(deadline, startOfToday());
 }
 
-export function deadlineDate(effectiveDate?: string): Date | null {
+export function deadlineDateForDays(effectiveDate: string | undefined, limitDays: number): Date | null {
     const effective = parseISODate(effectiveDate);
-    return effective ? addDays(effective, UNFAIR_DISMISSAL_TIME_LIMIT_DAYS) : null;
+    return effective ? addDays(effective, limitDays) : null;
+}
+
+/** Days left to lodge an unfair dismissal application (21-day window). */
+export function daysRemaining(effectiveDate?: string): number | null {
+    return daysRemainingForDate(effectiveDate, getLegalConstants(parseISODate(effectiveDate)).timeLimits.unfairDismissalDays);
+}
+
+export function deadlineDate(effectiveDate?: string): Date | null {
+    return deadlineDateForDays(effectiveDate, getLegalConstants(parseISODate(effectiveDate)).timeLimits.unfairDismissalDays);
 }
 
 /* ------------------------------- derivations -------------------------------- */
@@ -139,71 +170,23 @@ export function computeFlags(a: CheckerAnswers): CheckerFlag[] {
         if (ratio >= 0.9 && (ratio <= 1.1 || noModernCoverage)) flags.add("high_income_borderline");
     }
 
+    /* ---- general protections presence flags (derived straight from answers) ---- */
+
+    // Still-employed but being targeted (PIP / show-cause): a non-dismissal path.
+    if (a.dismissed === "not_yet") flags.add("gp_non_dismissal_path");
+
+    const rights = selectedWorkplaceRights(a);
+    if (rights.length > 0) flags.add("workplace_right_exercised");
+    if (rights.includes("complaint_or_inquiry")) flags.add("complaint_or_inquiry_made");
+    if (rights.includes("industrial_activity")) flags.add("industrial_activity");
+    if (selectedProtectedAttributes(a).length > 0) flags.add("protected_attribute_present");
+
+    if (hasProtectedReason(a)) {
+        if (a.decision_maker_aware === "yes") flags.add("decision_maker_knew");
+        if (a.decision_maker_aware === "unsure") flags.add("decision_maker_knowledge_unclear");
+    }
+
     return [...flags];
-}
-
-/* --------------------------------- outcome ---------------------------------- */
-
-export function computeOutcome(a: CheckerAnswers): OutcomeBucket {
-    // Other claims — unfair dismissal does not apply, but something else might.
-    if (a.dismissed === "resigned") return 3;
-    if (a.employee_status === "volunteer") return 3;
-
-    // Time-barred (standard window). Still routed to a lawyer for the
-    // exceptional-circumstances extension — never "no claim".
-    const remaining = daysRemaining(a.effective_date);
-    if (remaining !== null && remaining < 0) return 4;
-
-    // Not yet dismissed — there is no claim *yet*; treat as "prepare now".
-    if (a.dismissed === "not_yet") return 2;
-
-    const flags = computeFlags(a);
-    const complexFlags: CheckerFlag[] = [
-        "constructive_dismissal",
-        "fixed_term_complexity",
-        "casual_question",
-        "redundancy_to_review",
-        "employer_size_uncertain",
-        "high_income_borderline",
-        "sham_contracting",
-        "below_minimum_period",
-    ];
-    const isComplex = flags.some((f) => complexFlags.includes(f));
-
-    // Coverage / income gate or any complexity → possibly eligible, complex.
-    if (!coverageSatisfied(a) || isComplex) return 2;
-
-    return 1;
-}
-
-/* ----------------------------- captured data -------------------------------- */
-
-export function toCapturedData(a: CheckerAnswers): CapturedData {
-    return {
-        employee: {
-            name: a.name,
-            role: a.role,
-            employment_type: a.employment_type,
-            start_date: a.start_date,
-            end_date: a.dismissed === "not_yet" ? undefined : a.effective_date,
-            salary: a.salary,
-            award_or_eba: awardOrEba(a),
-        },
-        employer: {
-            legal_name: a.employer_legal_name,
-            abn: a.employer_abn,
-            size_bucket: sizeBucket(a),
-            has_associated_entities: a.has_associated_entities,
-        },
-        dismissal: {
-            effective_date: a.dismissed === "not_yet" ? undefined : a.effective_date,
-            reason_category: a.reason,
-            redundancy_claimed: a.dismissed === "redundancy" || a.reason === "redundancy",
-            days_remaining: daysRemaining(a.effective_date),
-        },
-        flags: computeFlags(a),
-        outcome_bucket: computeOutcome(a),
-    };
 }
 
 /* ------------------------------ flow sequence ------------------------------- */
@@ -220,8 +203,13 @@ export function stepSequence(a: CheckerAnswers): StepId[] {
     if (!a.dismissed) return steps;
     if (a.dismissed === "resigned") return steps; // → result (other claims)
 
-    const hasDismissalDate = a.dismissed !== "not_yet";
-    if (hasDismissalDate) steps.push("dismissal_date");
+    // Still employed but being targeted (PIP / show-cause). We do NOT run the
+    // dismissal flow. We detect a possible general-protections non-dismissal
+    // situation (different 6-year limit) and route to a lawyer from the result.
+    if (a.dismissed === "not_yet") return steps;
+
+    // From here on the employer ended the employment (a "dismissal").
+    steps.push("dismissal_date");
 
     steps.push("employee_status");
     if (!a.employee_status) return steps;
@@ -245,13 +233,27 @@ export function stepSequence(a: CheckerAnswers): StepId[] {
     steps.push("award");
     steps.push("eba");
     steps.push("salary");
-    if (hasDismissalDate) steps.push("reason");
+    steps.push("reason");
+
+    // General protections screening runs for EVERY dismissal-based case, both
+    // when unfair dismissal looks viable (GP may be the stronger/additional
+    // claim) and when it doesn't (GP has no minimum period or income gate, so
+    // it catches the people UD rejects). This is never a dead end.
+    steps.push("workplace_rights");
+    if (!a.workplace_rights) return steps;
+
+    steps.push("protected_attributes");
+    if (!a.protected_attributes) return steps;
+
+    // The decision-maker's knowledge is the crux of the reverse onus, so we only
+    // ask it once there is a candidate prohibited reason to attach it to.
+    if (hasProtectedReason(a)) steps.push("decision_maker_aware");
 
     return steps;
 }
 
 /** Heuristic denominator so the progress bar stays smooth and forward-moving. */
-const TYPICAL_STEP_COUNT = 11;
+const TYPICAL_STEP_COUNT = 14;
 
 export function progressFor(currentStep: StepId, a: CheckerAnswers): number {
     const seq = stepSequence(a);

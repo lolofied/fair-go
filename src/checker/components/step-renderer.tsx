@@ -33,7 +33,24 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
     }, [def.kind, step]);
 
     const optionValues: string[] =
-        def.kind === "choice" ? def.options.map((o) => o.value) : def.kind === "boolean" ? ["__yes", "__no"] : [];
+        def.kind === "choice" || def.kind === "multiselect"
+            ? def.options.map((o) => o.value)
+            : def.kind === "boolean"
+              ? ["__yes", "__no"]
+              : [];
+
+    const toggleMulti = (value: string) => {
+        if (def.kind !== "multiselect") return;
+        const current = (answers[def.field] as string[] | undefined) ?? [];
+        let next: string[];
+        if (def.exclusiveValue && value === def.exclusiveValue) {
+            next = current.includes(value) ? [] : [value];
+        } else {
+            const without = def.exclusiveValue ? current.filter((v) => v !== def.exclusiveValue) : current;
+            next = without.includes(value) ? without.filter((v) => v !== value) : [...without, value];
+        }
+        set(def.field, next as CheckerAnswers[keyof CheckerAnswers]);
+    };
 
     const selectByIndex = (index: number) => {
         if (def.kind === "choice") {
@@ -41,6 +58,9 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
             if (opt) answerAndAdvance(def.field, opt.value as CheckerAnswers[keyof CheckerAnswers]);
         } else if (def.kind === "boolean") {
             answerAndAdvance(def.field, (index === 0) as CheckerAnswers[keyof CheckerAnswers]);
+        } else if (def.kind === "multiselect") {
+            const opt = def.options[index];
+            if (opt) toggleMulti(opt.value);
         }
     };
 
@@ -105,6 +125,24 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
                 </div>
             )}
 
+            {def.kind === "multiselect" && (
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-3">
+                        {def.options.map((opt, i) => (
+                            <OptionCard
+                                key={opt.value}
+                                letter={OPTION_LETTERS[i]}
+                                label={opt.label}
+                                description={opt.description}
+                                selected={((answers[def.field] as string[] | undefined) ?? []).includes(opt.value)}
+                                onSelect={() => toggleMulti(opt.value)}
+                            />
+                        ))}
+                    </div>
+                    <ContinueRow answered={answered} onContinue={advance} />
+                </div>
+            )}
+
             {def.kind === "date" && (
                 <div className="flex flex-col gap-4">
                     <input
@@ -150,6 +188,12 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
             {(def.kind === "choice" || def.kind === "boolean") && (
                 <p className="text-sm text-tertiary">
                     Tap an option or press its letter. <EnterHint /> to use a highlighted answer.
+                </p>
+            )}
+
+            {def.kind === "multiselect" && (
+                <p className="text-sm text-tertiary">
+                    Select all that apply (or press each letter), then <EnterHint /> to continue.
                 </p>
             )}
         </div>

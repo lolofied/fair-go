@@ -1,3 +1,5 @@
+import { getLegalConstants } from "@/config/legal-constants";
+import { NONE_VALUE, PREFER_NOT_TO_SAY } from "@/checker/logic";
 import type { CheckerAnswers, StepId } from "@/checker/types";
 
 export interface ChoiceOption {
@@ -38,7 +40,14 @@ export interface NumberStepDef extends BaseStep {
     placeholder?: string;
 }
 
-export type StepDef = ChoiceStepDef | BooleanStepDef | DateStepDef | NumberStepDef;
+export interface MultiSelectStepDef extends BaseStep {
+    kind: "multiselect";
+    options: ChoiceOption[];
+    /** A value that, when chosen, clears all others (e.g. "none"). */
+    exclusiveValue?: string;
+}
+
+export type StepDef = ChoiceStepDef | BooleanStepDef | DateStepDef | NumberStepDef | MultiSelectStepDef;
 
 const YES_NO_UNSURE: ChoiceOption[] = [
     { value: "yes", label: "Yes" },
@@ -178,6 +187,58 @@ export const STEPS: Record<StepId, StepDef> = {
             { value: "none_given", label: "No reason was given" },
         ],
     },
+    workplace_rights: {
+        kind: "multiselect",
+        field: "workplace_rights",
+        title: "In the lead-up to your dismissal, did you do any of these?",
+        subtitle: "Select all that apply. These can point to a second, often stronger claim (general protections).",
+        exclusiveValue: NONE_VALUE,
+        options: [
+            {
+                value: "complaint_or_inquiry",
+                label: "Made a complaint or inquiry about your job",
+                description: "About pay, hours, safety, or conditions.",
+            },
+            {
+                value: "entitlement_benefit",
+                label: "Asked about or asserted an entitlement",
+                description: "Wages, leave, super, or allowances.",
+            },
+            {
+                value: "leave",
+                label: "Took or proposed to take leave",
+                description: "Sick, carer's, or parental leave.",
+            },
+            {
+                value: "safety_or_discrimination",
+                label: "Raised a discrimination, bullying, or safety concern",
+            },
+            {
+                value: "industrial_activity",
+                label: "Were involved in a union or industrial activity",
+            },
+            { value: NONE_VALUE, label: "None of these" },
+        ],
+    },
+    protected_attributes: {
+        kind: "multiselect",
+        field: "protected_attributes",
+        title: "Do you believe any of these was a factor in how you were treated?",
+        subtitle: "This is optional and never required to continue. Select any that apply.",
+        exclusiveValue: NONE_VALUE,
+        options: [
+            ...getLegalConstants().protectedAttributes.map((attribute) => ({ value: attribute, label: attribute })),
+            { value: PREFER_NOT_TO_SAY, label: "Prefer not to say" },
+            { value: NONE_VALUE, label: "None of these" },
+        ],
+    },
+    decision_maker_aware: {
+        kind: "choice",
+        field: "decision_maker_aware",
+        title: "Did the person who decided to dismiss you know about this?",
+        subtitle: "This is the crux: general protections puts the onus on the employer to prove the reason.",
+        options: YES_NO_UNSURE,
+    },
 };
 
 export const OPTION_LETTERS = "ABCDEFGHIJ".split("");
@@ -188,5 +249,6 @@ export function isStepAnswered(step: StepId, a: CheckerAnswers): boolean {
     const value = a[def.field];
     if (def.kind === "number") return typeof value === "number" && !Number.isNaN(value);
     if (def.kind === "boolean") return typeof value === "boolean";
+    if (def.kind === "multiselect") return Array.isArray(value) && value.length > 0;
     return value !== undefined && value !== "";
 }

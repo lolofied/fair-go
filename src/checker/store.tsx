@@ -103,7 +103,7 @@ export const CheckerProvider = ({ children }: PropsWithChildren) => {
         try {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch {
-            /* storage may be unavailable (private mode) — fail silently */
+            /* storage may be unavailable (private mode), so fail silently */
         }
     }, [state]);
 
