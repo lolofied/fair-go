@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
+import { CaseModule } from "@/case/case-module";
 import { CheckerFlow } from "@/checker/checker-flow";
 import { PrivacyPolicy } from "@/pages/legal/privacy-policy";
 import { TermsOfService } from "@/pages/legal/terms-of-service";
@@ -16,6 +17,7 @@ createRoot(document.getElementById("root")!).render(
                 <RouteProvider>
                     <Routes>
                         <Route path="/" element={<CheckerFlow />} />
+                        <Route path="/case/*" element={<CaseModule />} />
                         <Route path="/privacy" element={<PrivacyPolicy />} />
                         <Route path="/terms" element={<TermsOfService />} />
                         <Route path="*" element={<NotFound />} />

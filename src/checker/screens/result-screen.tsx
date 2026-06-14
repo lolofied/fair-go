@@ -246,10 +246,10 @@ export const ResultScreen = () => {
                             without re-entering anything you've told us.
                         </p>
                         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-                            <Button size="xl" color="primary" iconTrailing={ArrowRight}>
+                            <Button size="xl" color="primary" href="/case" iconTrailing={ArrowRight}>
                                 Start documenting
                             </Button>
-                            <span className="text-sm text-tertiary">One-off export when you're ready · launching soon</span>
+                            <span className="text-sm text-tertiary">Private to your device · nothing leaves your browser</span>
                         </div>
                     </section>
 

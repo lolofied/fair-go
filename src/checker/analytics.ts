@@ -41,6 +41,16 @@ function persist(event: ClaimOutcomeEvent): void {
     }
 }
 
+/** Remove buffered analytics (used by the case module's right-to-erasure). */
+export function clearAnalytics(): void {
+    if (typeof window === "undefined") return;
+    try {
+        window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+        /* storage may be unavailable; nothing to clear */
+    }
+}
+
 /** Record the (anonymised) outcome of a completed assessment. */
 export function trackClaimOutcome(claims: ClaimAssessment[], flags: CheckerFlag[]): void {
     persist({

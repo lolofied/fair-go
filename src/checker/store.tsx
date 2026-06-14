@@ -80,6 +80,21 @@ function loadPersisted(): CheckerState {
     }
 }
 
+/** The persisted checker answers, for the documentation module's zero re-entry seeding. */
+export function loadCheckerAnswers(): CheckerAnswers {
+    return loadPersisted().answers;
+}
+
+/** Remove the persisted checker state (used by the case module's right-to-erasure). */
+export function clearCheckerStorage(): void {
+    if (typeof window === "undefined") return;
+    try {
+        window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+        /* storage may be unavailable; nothing to clear */
+    }
+}
+
 interface CheckerContextValue {
     state: CheckerState;
     answers: CheckerAnswers;
