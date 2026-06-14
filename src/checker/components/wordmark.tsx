@@ -7,8 +7,8 @@ export const FairGoLogo = ({ className }: { className?: string }) => (
 );
 
 export const FairGoWordmark = ({ className }: { className?: string }) => (
-    <span className={cx("inline-flex items-center gap-2 text-md font-semibold text-primary select-none", className)}>
-        <FairGoLogo />
-        Fair Go
+    <span className={cx("inline-flex items-center gap-2.5 select-none", className)}>
+        <FairGoLogo className="size-7" />
+        <span className="font-wordmark text-xl font-bold lowercase leading-none tracking-tight text-primary">fair go</span>
     </span>
 );
