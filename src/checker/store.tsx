@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, type PropsWithChildren } from "react";
-import { nextStep } from "@/checker/logic";
+import { nextStep, resumeHistory, resumeScreen, stepSequence } from "@/checker/logic";
 import type { CheckerAnswers, StepId } from "@/checker/types";
 
 export type Screen = "intro" | "result" | StepId;
@@ -13,6 +13,7 @@ interface CheckerState {
 
 type Action =
     | { type: "start" }
+    | { type: "resume" }
     | { type: "set"; field: keyof CheckerAnswers; value: CheckerAnswers[keyof CheckerAnswers] }
     | { type: "advance" }
     | { type: "back" }
@@ -27,6 +28,14 @@ function reducer(state: CheckerState, action: Action): CheckerState {
     switch (action.type) {
         case "start":
             return { ...state, screen: "dismissed", history: [] };
+
+        case "resume": {
+            const screen = resumeScreen(state.answers);
+            if (screen === "result") {
+                return { ...state, screen: "result", history: stepSequence(state.answers) };
+            }
+            return { ...state, screen, history: resumeHistory(state.answers, screen) };
+        }
 
         case "set":
             return { ...state, answers: { ...state.answers, [action.field]: action.value } };
@@ -101,6 +110,7 @@ interface CheckerContextValue {
     screen: Screen;
     canGoBack: boolean;
     start: () => void;
+    resume: () => void;
     set: (field: keyof CheckerAnswers, value: CheckerAnswers[keyof CheckerAnswers]) => void;
     advance: () => void;
     answerAndAdvance: (field: keyof CheckerAnswers, value: CheckerAnswers[keyof CheckerAnswers]) => void;
@@ -129,6 +139,7 @@ export const CheckerProvider = ({ children }: PropsWithChildren) => {
             screen: state.screen,
             canGoBack: state.screen !== "intro",
             start: () => dispatch({ type: "start" }),
+            resume: () => dispatch({ type: "resume" }),
             set: (field, val) => dispatch({ type: "set", field, value: val }),
             advance: () => dispatch({ type: "advance" }),
             answerAndAdvance: (field, val) => {

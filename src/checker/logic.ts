@@ -269,3 +269,46 @@ export function nextStep(currentStep: StepId, a: CheckerAnswers): StepId | "resu
     if (index === -1 || index + 1 >= seq.length) return "result";
     return seq[index + 1];
 }
+
+const STEP_FIELD: Record<StepId, keyof CheckerAnswers> = {
+    dismissed: "dismissed",
+    dismissal_date: "effective_date",
+    employee_status: "employee_status",
+    employment_type: "employment_type",
+    casual_regular: "casual_regular",
+    casual_expectation: "casual_expectation",
+    employer_size: "employer_size",
+    size_estimate: "size_estimate",
+    size_associated: "has_associated_entities",
+    start_date: "start_date",
+    award: "award_covered",
+    eba: "eba_applies",
+    salary: "salary",
+    reason: "reason",
+    workplace_rights: "workplace_rights",
+    protected_attributes: "protected_attributes",
+    decision_maker_aware: "decision_maker_aware",
+};
+
+export function isStepAnswered(step: StepId, a: CheckerAnswers): boolean {
+    const value = a[STEP_FIELD[step]];
+    if (value === undefined) return false;
+    if (Array.isArray(value)) return value.length > 0;
+    return true;
+}
+
+/** Where to land when resuming a partially completed check from the intro screen. */
+export function resumeScreen(a: CheckerAnswers): StepId | "result" {
+    const seq = stepSequence(a);
+    const frontier = seq[seq.length - 1];
+    if (!isStepAnswered(frontier, a)) return frontier;
+    return nextStep(frontier, a);
+}
+
+/** Back-stack for a resumed question step. */
+export function resumeHistory(a: CheckerAnswers, target: StepId): StepId[] {
+    const seq = stepSequence(a);
+    const index = seq.indexOf(target);
+    if (index <= 0) return [];
+    return seq.slice(0, index);
+}

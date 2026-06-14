@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getLegalConstants } from "@/config/legal-constants";
-import { daysRemainingForDate, deadlineDateForDays, stepSequence } from "@/checker/logic";
+import { daysRemainingForDate, deadlineDateForDays, resumeScreen, stepSequence } from "@/checker/logic";
 import type { CheckerAnswers } from "@/checker/types";
 
 /** ISO date `n` days before today (local). */
@@ -112,5 +112,31 @@ describe("flow routing", () => {
             protected_attributes: ["none"],
         };
         expect(stepSequence(a)).not.toContain("decision_maker_aware");
+    });
+});
+
+describe("resumeScreen", () => {
+    it("returns the first unanswered step in the current sequence", () => {
+        const a: CheckerAnswers = {
+            dismissed: "terminated",
+            effective_date: daysAgoISO(3),
+            employee_status: "employee",
+        };
+        expect(resumeScreen(a)).toBe("employment_type");
+    });
+
+    it("returns the next step after the last answered frontier", () => {
+        const a: CheckerAnswers = {
+            dismissed: "terminated",
+            effective_date: daysAgoISO(3),
+            employee_status: "employee",
+            employment_type: "permanent",
+        };
+        expect(resumeScreen(a)).toBe("employer_size");
+    });
+
+    it("returns result for short-circuit paths that are already complete", () => {
+        expect(resumeScreen({ dismissed: "resigned" })).toBe("result");
+        expect(resumeScreen({ dismissed: "not_yet" })).toBe("result");
     });
 });

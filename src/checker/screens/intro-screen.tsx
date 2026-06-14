@@ -6,7 +6,7 @@ import { FairGoWordmark } from "@/checker/components/wordmark";
 import { useChecker } from "@/checker/store";
 
 export const IntroScreen = () => {
-    const { start, answers } = useChecker();
+    const { start, resume, answers } = useChecker();
     const hasProgress = Object.keys(answers).length > 0;
 
     return (
@@ -35,7 +35,7 @@ export const IntroScreen = () => {
                     </p>
 
                     <div className="mt-8 flex flex-col items-center gap-3">
-                        <Button size="xl" color="primary" iconTrailing={ArrowRight} onClick={start}>
+                        <Button size="xl" color="primary" iconTrailing={ArrowRight} onClick={hasProgress ? resume : start}>
                             {hasProgress ? "Resume my check" : "Start my free check"}
                         </Button>
                         <span className="text-sm text-tertiary">
