@@ -1,23 +1,38 @@
-import { useState } from "react";
-import { AlertTriangle, CheckCircle, Download01, UploadCloud02 } from "@untitledui/icons";
+import { useState, type ReactNode } from "react";
+import { AlertTriangle, CheckCircle, ChevronDown, Download01, LogIn01, UploadCloud02 } from "@untitledui/icons";
+import { Link, useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
+import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { useCase } from "@/case/store";
+import type { CaseFile } from "@/case/types";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
+import { cx } from "@/utils/cx";
 
 function needsBackup(lastBackupAt: string | undefined, updatedAt: string): boolean {
     if (!lastBackupAt) return true;
     return new Date(updatedAt).getTime() > new Date(lastBackupAt).getTime();
 }
 
-/**
- * Combined back-up + create-account callout for the overview dashboard.
- * Create account opens in a modal; sign-in stays in Settings.
- */
-export const SaveCasePromo = () => {
+function hasCaseChanges(file: CaseFile): boolean {
+    return new Date(file.meta.updatedAt).getTime() > new Date(file.meta.createdAt).getTime();
+}
+
+function formatHeaderTimestamp(iso: string): string {
+    return new Date(iso).toLocaleString("en-AU", {
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+}
+
+/** Compact save / sync / backup status for the case header (visible on every tab). */
+export const HeaderSaveStatus = () => {
     const { file } = useCase();
+    const navigate = useNavigate();
     const { configured, loading, user, dekUnlocked, syncStatus, lastSyncedAt, signUp, syncNow } = useSync();
 
     const [createOpen, setCreateOpen] = useState(false);
@@ -33,7 +48,14 @@ export const SaveCasePromo = () => {
 
     const hasBackup = Boolean(file.meta.lastBackupAt);
     const backupStale = needsBackup(file.meta.lastBackupAt, file.meta.updatedAt);
-    const isSaved = configured && user && dekUnlocked;
+    const isSaved = configured && Boolean(user && dekUnlocked);
+    const unsavedChanges = hasCaseChanges(file);
+
+    const onSaveMenuAction = (key: React.Key) => {
+        if (key === "create-account") setCreateOpen(true);
+        if (key === "sign-in") navigate("/case/settings#sync");
+        if (key === "backup") navigate("/case/settings");
+    };
 
     const resetCreateForm = () => {
         setEmail("");
@@ -72,89 +94,99 @@ export const SaveCasePromo = () => {
         }
     };
 
-    if (isSaved) {
-        return (
-            <section className="rounded-2xl border border-success bg-success-primary p-4 sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex gap-3">
-                        <CheckCircle className="size-5 shrink-0 text-fg-success-primary sm:size-6" aria-hidden="true" />
-                        <div>
-                            <h2 className="text-md font-semibold text-primary">Your case is saved</h2>
-                            <p className="mt-1 text-sm text-tertiary">
-                                Signed in as <span className="font-medium text-secondary">{user.email}</span>
-                                {lastSyncedAt && <> · Last synced {new Date(lastSyncedAt).toLocaleString("en-AU")}</>}
-                            </p>
-                            {!hasBackup && backupStale && (
-                                <p className="mt-2 text-sm text-tertiary">
-                                    Download an encrypted backup from Settings for an extra copy on your device.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 sm:items-end">
-                        <Button
-                            color="secondary"
-                            size="md"
-                            iconLeading={UploadCloud02}
-                            isLoading={syncStatus === "syncing"}
-                            onClick={() => syncNow(file)}
-                            className="w-full sm:w-auto"
-                        >
-                            Sync now
-                        </Button>
-                        {!hasBackup && (
-                            <Button color="link-gray" size="sm" href="/case/settings" className="w-full sm:w-auto">
-                                Download backup
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </section>
+    const onRetrySync = async () => {
+        try {
+            await syncNow(file);
+        } catch {
+            /* surfaced via syncStatus */
+        }
+    };
+
+    const statusPill = (className: string, children: ReactNode, onClick?: () => void) => {
+        const shared = cx(
+            "inline-flex max-w-[min(100vw-8rem,20rem)] items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition duration-100 ease-linear",
+            className,
         );
-    }
+        if (onClick) {
+            return (
+                <button type="button" className={cx(shared, "cursor-pointer hover:opacity-90")} onClick={onClick}>
+                    {children}
+                </button>
+            );
+        }
+        return (
+            <Link to="/case/settings#sync" className={cx(shared, "hover:opacity-90")}>
+                {children}
+            </Link>
+        );
+    };
 
     return (
         <>
-            <section className="rounded-2xl border border-warning bg-warning-primary p-4 sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex gap-3">
-                        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-fg-warning-primary" aria-hidden="true" />
-                        <div>
-                            <h2 className="text-md font-semibold text-primary">Back up your case</h2>
-                            <p className="mt-1 text-sm text-tertiary">
-                                Your case lives only on this device until you save it.
-                                {configured
-                                    ? " Create a free encrypted sync account to retrieve it from anywhere, or download a local backup file."
-                                    : " Download an encrypted backup so you don't lose it if your browser is cleared."}
-                            </p>
-                            {hasBackup && backupStale && (
-                                <p className="mt-2 text-sm font-medium text-secondary">
-                                    You have changes since your last backup — save again when you can.
-                                </p>
-                            )}
-                            {user && !dekUnlocked && (
-                                <p className="mt-2 text-sm text-tertiary">
-                                    Already have an account?{" "}
-                                    <a href="/case/settings#sync" className="font-medium text-brand-secondary underline-offset-2 hover:underline">
-                                        Sign in via Settings
-                                    </a>{" "}
-                                    to unlock sync on this device.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 sm:min-w-44">
-                        {configured && !user && (
-                            <Button color="primary" size="md" iconLeading={UploadCloud02} className="w-full" onClick={() => setCreateOpen(true)}>
-                                Create account
+            <div className="flex flex-wrap items-center justify-end gap-3 sm:gap-4">
+                {isSaved ? (
+                    syncStatus === "error" ? (
+                        statusPill("bg-error-secondary text-fg-error-primary", <>Sync failed — tap to retry</>, onRetrySync)
+                    ) : (
+                        statusPill(
+                            "bg-success-secondary text-fg-success-primary",
+                            <>
+                                <CheckCircle className="size-3.5 shrink-0" aria-hidden="true" />
+                                <span className="truncate">
+                                    {syncStatus === "syncing"
+                                        ? "Syncing…"
+                                        : lastSyncedAt
+                                          ? `Synced ${formatHeaderTimestamp(lastSyncedAt)}`
+                                          : "Saved"}
+                                </span>
+                            </>,
+                        )
+                    )
+                ) : hasBackup && !backupStale ? (
+                    <Link
+                        to="/case/settings"
+                        className="inline-flex max-w-[min(100vw-8rem,20rem)] items-center gap-1.5 rounded-full bg-success-secondary px-2.5 py-1 text-xs font-semibold text-fg-success-primary transition duration-100 ease-linear hover:opacity-90"
+                    >
+                        <CheckCircle className="size-3.5 shrink-0" aria-hidden="true" />
+                        <span className="truncate">Backed up {formatHeaderTimestamp(file.meta.lastBackupAt!)}</span>
+                    </Link>
+                ) : (
+                    <>
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-fg-warning-primary">
+                            <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
+                            <span className="truncate">{unsavedChanges ? "Unsaved changes" : "Not saved"}</span>
+                        </span>
+                        <Dropdown.Root>
+                            <Button
+                                size="xs"
+                                color="primary"
+                                iconTrailing={ChevronDown}
+                                className="group *:data-icon:size-3.5 *:data-icon:stroke-[2.25px]!"
+                            >
+                                Save
                             </Button>
-                        )}
-                        <Button color="secondary" size="md" iconLeading={Download01} href="/case/settings" className="w-full">
-                            Download backup
-                        </Button>
-                    </div>
-                </div>
-            </section>
+                            <Dropdown.Popover className="w-52">
+                                <Dropdown.Menu onAction={onSaveMenuAction}>
+                                    {configured && !user && (
+                                        <Dropdown.Item id="create-account" icon={UploadCloud02}>
+                                            Create account
+                                        </Dropdown.Item>
+                                    )}
+                                    {user && !dekUnlocked && (
+                                        <Dropdown.Item id="sign-in" icon={LogIn01}>
+                                            Sign in
+                                        </Dropdown.Item>
+                                    )}
+                                    {(configured && !user) || (user && !dekUnlocked) ? <Dropdown.Separator /> : null}
+                                    <Dropdown.Item id="backup" icon={Download01}>
+                                        Download backup
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown.Root>
+                    </>
+                )}
+            </div>
 
             <ModalOverlay isOpen={createOpen} onOpenChange={(open) => !open && closeCreateModal()} isDismissable={!recoveryKey}>
                 <Modal className="max-w-md">

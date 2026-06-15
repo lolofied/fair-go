@@ -9,11 +9,10 @@ import {
     User01,
     Users01,
 } from "@untitledui/icons";
-import { Link, NavLink } from "react-router";
-import { daysRemaining } from "@/checker/logic";
-import { FairGoWordmark } from "@/checker/components/wordmark";
+import { NavLink } from "react-router";
 import { CaseOnboarding } from "@/case/components/case-onboarding";
-import { useCase } from "@/case/store";
+import { HeaderSaveStatus } from "@/case/components/header-save-status";
+import { ShellHeaderBrand } from "@/components/layout/shell";
 import { cx } from "@/utils/cx";
 
 const NAV = [
@@ -27,35 +26,14 @@ const NAV = [
     { to: "/case/settings", label: "Settings", icon: Settings01, end: false },
 ];
 
-const DeadlinePill = ({ effectiveDate }: { effectiveDate?: string }) => {
-    const remaining = daysRemaining(effectiveDate);
-    if (remaining === null) return null;
-    const overdue = remaining < 0;
-    return (
-        <span
-            className={cx(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
-                overdue ? "bg-error-secondary text-fg-error-primary" : remaining <= 7 ? "bg-warning-secondary text-fg-warning-primary" : "bg-brand-secondary text-fg-brand-primary",
-            )}
-        >
-            <Clock className="size-3.5" aria-hidden="true" />
-            {overdue ? `Window closed ${Math.abs(remaining)}d ago` : `${remaining} days left to lodge`}
-        </span>
-    );
-};
-
 export const CaseLayout = ({ children }: { children: ReactNode }) => {
-    const { file } = useCase();
-
     return (
         <div className="flex min-h-dvh flex-col bg-secondary">
             <CaseOnboarding />
             <header className="sticky top-0 z-10 border-b border-secondary bg-primary print:hidden">
                 <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 fg-shell-x py-2.5 sm:gap-3 sm:py-3">
-                    <Link to="/" aria-label="Fair Go home">
-                        <FairGoWordmark />
-                    </Link>
-                    <DeadlinePill effectiveDate={file?.profile.dismissal.effective_date} />
+                    <ShellHeaderBrand />
+                    <HeaderSaveStatus />
                 </div>
                 <nav className="mx-auto w-full max-w-5xl overflow-x-auto fg-shell-x">
                     <ul className="flex min-w-max items-end gap-1 sm:gap-2">

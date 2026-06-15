@@ -24,13 +24,13 @@ export const SyncSettingsCard = () => {
 
     const syncStatusLabel =
         syncStatus === "syncing"
-            ? "Syncing encrypted copy…"
+            ? "Syncing your latest changes…"
             : syncStatus === "error"
               ? syncError ?? "Sync failed"
               : lastSyncedAt
-                ? `Last synced ${new Date(lastSyncedAt).toLocaleString("en-AU")}`
+                ? `Last synced ${new Date(lastSyncedAt).toLocaleString("en-AU")} · changes sync automatically`
                 : dekUnlocked
-                  ? "Waiting to sync"
+                  ? "Changes sync automatically when you edit your case"
                   : null;
 
     const onSyncNow = async () => {
@@ -135,21 +135,22 @@ export const SyncSettingsCard = () => {
                             Unlock encryption
                         </Button>
                     )}
-                    {dekUnlocked && (
-                        <Button
-                            color="secondary"
-                            size="md"
-                            iconLeading={UploadCloud02}
-                            className="mt-4"
-                            isLoading={syncBusy || syncStatus === "syncing"}
-                            onClick={onSyncNow}
-                        >
-                            Sync now
+                    <div className="mt-4 flex flex-wrap gap-3">
+                        {dekUnlocked && syncStatus === "error" && (
+                            <Button
+                                color="secondary"
+                                size="md"
+                                iconLeading={UploadCloud02}
+                                isLoading={syncBusy}
+                                onClick={onSyncNow}
+                            >
+                                Retry sync
+                            </Button>
+                        )}
+                        <Button color="secondary" size="md" iconLeading={LogOut01} onClick={() => signOut()}>
+                            Sign out
                         </Button>
-                    )}
-                    <Button color="secondary" size="md" iconLeading={LogOut01} className="mt-4 ml-0 sm:ml-3" onClick={() => signOut()}>
-                        Sign out
-                    </Button>
+                    </div>
                 </div>
             ) : (
                 <div className="mt-4">

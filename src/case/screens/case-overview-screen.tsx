@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, Circle, Clock } from "@untitledui/icons";
 import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { PageHeading } from "@/case/components/case-layout";
-import { SaveCasePromo } from "@/case/components/save-case-promo";
+import { DeadlinePill } from "@/case/components/deadline-pill";
 import { computeDocumentationProgress, type DocProgressStatus, type DocSectionProgress } from "@/case/documentation-progress";
 import { useCase } from "@/case/store";
 import { useSync } from "@/case/sync/sync-provider";
@@ -75,11 +75,10 @@ export const CaseOverviewScreen = () => {
             <PageHeading
                 title="Documentation overview"
                 description="Track what's done and what still needs your attention."
+                action={<DeadlinePill effectiveDate={file.profile.dismissal.effective_date} />}
             />
 
             <div className="flex flex-col gap-6">
-                <SaveCasePromo />
-
                 <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
                     <div className="flex flex-wrap items-end justify-between gap-3">
                         <div>

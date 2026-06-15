@@ -1,4 +1,6 @@
 import type { PropsWithChildren } from "react";
+import { Link } from "react-router";
+import { FairGoWordmark } from "@/checker/components/wordmark";
 import { cx } from "@/utils/cx";
 
 type ShellTone = "primary" | "secondary";
@@ -15,6 +17,13 @@ export const Shell = ({
 
 export const ShellHeader = ({ className, children }: PropsWithChildren<{ className?: string }>) => (
     <header className={cx("fg-shell-header flex items-center justify-between gap-3", className)}>{children}</header>
+);
+
+/** Home link with flex alignment matching an unwrapped FairGoWordmark in ShellHeader. */
+export const ShellHeaderBrand = ({ className }: { className?: string }) => (
+    <Link to="/" aria-label="Fair Go home" className={cx("inline-flex shrink-0 items-center self-center", className)}>
+        <FairGoWordmark />
+    </Link>
 );
 
 export const ShellMain = ({

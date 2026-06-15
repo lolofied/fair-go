@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { ArrowLeft, LogIn01, UploadCloud02 } from "@untitledui/icons";
 import { Link, useNavigate } from "react-router";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { Button } from "@/components/base/buttons/button";
+import { readEncryptedBackup, restoreBackup } from "@/case/backup";
 import {
     mobileBtnClass,
+    SectionCard,
     Shell,
     ShellContent,
     ShellFooter,
@@ -13,16 +15,23 @@ import {
 } from "@/components/layout/shell";
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
+import { useCase } from "@/case/store";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
 export const RetrieveCaseScreen = () => {
     const navigate = useNavigate();
+    const { replaceFile } = useCase();
     const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn } = useSync();
 
     const [email, setEmail] = useState("");
     const [passphrase, setPassphrase] = useState("");
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const restoreRef = useRef<HTMLInputElement>(null);
+    const [restorePass, setRestorePass] = useState("");
+    const [restoreBusy, setRestoreBusy] = useState(false);
+    const [restoreErr, setRestoreErr] = useState<string | null>(null);
 
     const syncing = user && dekUnlocked && syncStatus === "syncing";
 
@@ -50,6 +59,27 @@ export const RetrieveCaseScreen = () => {
         }
     };
 
+    const onRestoreFile = async (f: File) => {
+        setRestoreErr(null);
+        if (!restorePass) {
+            setRestoreErr("Enter the passphrase you used for this backup.");
+            return;
+        }
+        setRestoreBusy(true);
+        try {
+            const text = await f.text();
+            const payload = await readEncryptedBackup(text, restorePass);
+            const restored = await restoreBackup(payload);
+            replaceFile(restored);
+            navigate("/case", { replace: true });
+        } catch (e) {
+            setRestoreErr(e instanceof Error ? e.message : "Could not restore that backup.");
+        } finally {
+            setRestoreBusy(false);
+            if (restoreRef.current) restoreRef.current.value = "";
+        }
+    };
+
     if (!configured) {
         return (
             <Shell>
@@ -57,6 +87,15 @@ export const RetrieveCaseScreen = () => {
                 <ShellMain>
                     <ShellContent className="text-center">
                         <p className="text-md text-tertiary">Encrypted sync is not available on this deployment yet.</p>
+                        <RestoreFromBackupSection
+                            restorePass={restorePass}
+                            setRestorePass={setRestorePass}
+                            restoreRef={restoreRef}
+                            restoreBusy={restoreBusy}
+                            restoreErr={restoreErr}
+                            onRestoreFile={onRestoreFile}
+                            className="mt-8 text-left"
+                        />
                         <Button href="/" color="secondary" size="md" className={`mt-6 ${mobileBtnClass}`} iconLeading={ArrowLeft}>
                             Back to home
                         </Button>
@@ -74,8 +113,8 @@ export const RetrieveCaseScreen = () => {
                 <ShellContent>
                     <h1 className="text-xl font-semibold tracking-tight text-primary sm:text-display-xs">Retrieve your case</h1>
                     <p className="mt-2 text-sm text-tertiary sm:text-md">
-                        Sign in with the email and passphrase you used for encrypted sync. Your case will download to this
-                        device — we cannot read it in plaintext.
+                        Sign in with the email and passphrase you used for encrypted sync, or upload an encrypted backup file
+                        from this device.
                     </p>
 
                     {syncing ? (
@@ -117,6 +156,16 @@ export const RetrieveCaseScreen = () => {
                                     Use your recovery key
                                 </Link>
                             </p>
+
+                            <RestoreFromBackupSection
+                                restorePass={restorePass}
+                                setRestorePass={setRestorePass}
+                                restoreRef={restoreRef}
+                                restoreBusy={restoreBusy}
+                                restoreErr={restoreErr}
+                                onRestoreFile={onRestoreFile}
+                                className="mt-8 border-t border-secondary pt-8 sm:mt-10 sm:pt-10"
+                            />
                         </>
                     )}
                 </ShellContent>
@@ -136,9 +185,62 @@ export const RetrieveCaseScreen = () => {
 function RetrieveHeader() {
     return (
         <ShellHeader>
-            <Link to="/" aria-label="Fair Go home">
-                <FairGoWordmark />
-            </Link>
+            <FairGoWordmark />
+            <Button href="/" size="sm" color="secondary" iconLeading={ArrowLeft}>
+                <span className="sm:hidden">Back</span>
+                <span className="hidden sm:inline">Back to home</span>
+            </Button>
         </ShellHeader>
+    );
+}
+
+function RestoreFromBackupSection({
+    restorePass,
+    setRestorePass,
+    restoreRef,
+    restoreBusy,
+    restoreErr,
+    onRestoreFile,
+    className,
+}: {
+    restorePass: string;
+    setRestorePass: (value: string) => void;
+    restoreRef: RefObject<HTMLInputElement | null>;
+    restoreBusy: boolean;
+    restoreErr: string | null;
+    onRestoreFile: (file: File) => void;
+    className?: string;
+}) {
+    return (
+        <SectionCard title="Restore from a backup file" className={className}>
+            <p className="text-sm text-tertiary">
+                Choose the encrypted backup you downloaded from Settings. Enter its passphrase, then upload the file. This
+                replaces any case already on this device.
+            </p>
+            <div className="mt-4 max-w-sm">
+                <PasswordField label="Backup passphrase" value={restorePass} onChange={setRestorePass} />
+            </div>
+            <input
+                ref={restoreRef}
+                type="file"
+                accept=".fgbackup,.json,application/json"
+                className="hidden"
+                onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onRestoreFile(f);
+                }}
+            />
+            <Button
+                color="secondary"
+                size="md"
+                iconLeading={UploadCloud02}
+                className={`mt-4 ${mobileBtnClass}`}
+                isLoading={restoreBusy}
+                onClick={() => restoreRef.current?.click()}
+            >
+                Choose backup file
+            </Button>
+            {restoreErr && <p className="mt-3 text-sm text-error-primary">{restoreErr}</p>}
+        </SectionCard>
     );
 }
