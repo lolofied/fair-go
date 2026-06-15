@@ -85,7 +85,7 @@ export const SyncSettingsCard = () => {
 
     if (recoveryKey && !savedRecovery) {
         return (
-            <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
+            <section className="fg-section-card">
                 <h2 className="text-md font-semibold text-primary">Save your recovery key</h2>
                 <GuardrailBanner tone="warning" title="This is the only way to recover your account" className="my-4">
                     If you forget your passphrase, this recovery key is the only way back in. We cannot reset it for you.
@@ -111,7 +111,7 @@ export const SyncSettingsCard = () => {
     }
 
     return (
-        <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
+        <section className="fg-section-card">
             <h2 className="text-md font-semibold text-primary">Encrypted sync</h2>
 
             {user ? (

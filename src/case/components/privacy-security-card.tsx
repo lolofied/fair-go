@@ -1,14 +1,7 @@
-import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { Shield01 } from "@untitledui/icons";
+import { SectionCard } from "@/components/layout/shell";
 import { GuardrailBanner } from "@/case/components/guardrail";
-
-const Card = ({ title, children }: { title: string; children: ReactNode }) => (
-    <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
-        <h2 className="text-md font-semibold text-primary">{title}</h2>
-        <div className="mt-4">{children}</div>
-    </section>
-);
 
 const CopyList = ({ items }: { items: string[] }) => (
     <ul className="flex list-disc flex-col gap-2 pl-5 text-sm text-tertiary marker:text-quaternary">
@@ -19,7 +12,7 @@ const CopyList = ({ items }: { items: string[] }) => (
 );
 
 export const PrivacySecurityCard = () => (
-    <Card title="Privacy and security">
+    <SectionCard title="Privacy and security">
         <GuardrailBanner tone="info" icon={Shield01} title="Private by design" className="mb-4">
             Your case documentation stays on this device unless you opt in to encrypted sync or download a backup file.
             Fair Go cannot read your case contents in plaintext.
@@ -54,5 +47,5 @@ export const PrivacySecurityCard = () => (
             </Link>
             .
         </p>
-    </Card>
+    </SectionCard>
 );

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./theme.css";
+@import "./mobile-layout.css";
 @import "./typography.css";
 
 @plugin "@tailwindcss/typography";

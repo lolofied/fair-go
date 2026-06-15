@@ -16,7 +16,7 @@ export const OptionCard = ({ letter, label, description, selected, onSelect }: O
             onClick={onSelect}
             aria-pressed={selected}
             className={cx(
-                "group flex w-full items-center gap-4 rounded-xl border bg-primary px-4 py-3.5 text-left transition duration-150 outline-brand",
+                "group flex w-full items-center gap-3 rounded-xl border bg-primary px-3.5 py-3 text-left transition duration-150 outline-brand sm:gap-4 sm:px-4 sm:py-3.5",
                 "hover:border-brand hover:bg-brand-primary focus-visible:outline-2 focus-visible:outline-offset-2",
                 selected ? "border-brand bg-brand-primary ring-1 ring-brand" : "border-secondary",
             )}

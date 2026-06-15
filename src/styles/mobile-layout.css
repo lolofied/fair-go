@@ -1,0 +1,150 @@
+/**
+ * Fair Go mobile layout tokens and utilities.
+ * Use fg-* classes for page shells, spacing, and responsive type on small screens.
+ */
+
+@layer base {
+    :root {
+        --fg-shell-x: 1rem;
+        --fg-shell-header-y: 0.75rem;
+        --fg-shell-main-y: 1.25rem;
+        --fg-shell-footer-y: 1.25rem;
+        --fg-content-max: 36rem;
+        --fg-marketing-max: 60.5rem;
+        --fg-wizard-max: 32rem;
+        --fg-stack-sm: 0.75rem;
+        --fg-stack-md: 1rem;
+        --fg-stack-lg: 1.25rem;
+        --fg-page-gap: 1.25rem;
+        --fg-card-pad: 1rem;
+        --fg-hero-size: clamp(2rem, 5.5vw + 1.25rem, 3.5rem);
+        --fg-hero-leading: 1.12;
+        --fg-lead-size: 1.0625rem;
+    }
+
+    @media (min-width: 640px) {
+        :root {
+            --fg-shell-x: 2rem;
+            --fg-shell-header-y: 1rem;
+            --fg-shell-main-y: 2.5rem;
+            --fg-shell-footer-y: 1.5rem;
+            --fg-stack-md: 1.25rem;
+            --fg-stack-lg: 1.5rem;
+            --fg-page-gap: 1.5rem;
+            --fg-card-pad: 1.25rem;
+            --fg-lead-size: 1.25rem;
+        }
+    }
+}
+
+@layer components {
+    .fg-shell-x {
+        padding-inline: var(--fg-shell-x);
+    }
+
+    .fg-shell-header {
+        padding-inline: var(--fg-shell-x);
+        padding-block: var(--fg-shell-header-y);
+    }
+
+    .fg-shell-main {
+        padding-inline: var(--fg-shell-x);
+        padding-block: var(--fg-shell-main-y);
+    }
+
+    .fg-shell-footer {
+        padding-inline: var(--fg-shell-x);
+        padding-block: var(--fg-shell-footer-y);
+    }
+
+    .fg-content {
+        width: 100%;
+        max-width: var(--fg-content-max);
+    }
+
+    .fg-marketing {
+        width: 100%;
+        max-width: var(--fg-marketing-max);
+    }
+
+    .fg-wizard {
+        width: 100%;
+        max-width: var(--fg-wizard-max);
+    }
+
+    .fg-stack-sm {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fg-stack-sm);
+    }
+
+    .fg-stack-md {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fg-stack-md);
+    }
+
+    .fg-stack-lg {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fg-stack-lg);
+    }
+
+    .fg-page-gap {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fg-page-gap);
+    }
+
+    .fg-hero-title {
+        font-size: var(--fg-hero-size);
+        line-height: var(--fg-hero-leading);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--color-text-primary);
+    }
+
+    .fg-hero-lead {
+        font-size: var(--fg-lead-size);
+        line-height: 1.5;
+        color: var(--color-text-tertiary);
+    }
+
+    .fg-section-card {
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--color-border-secondary);
+        background: var(--color-bg-primary);
+        padding: var(--fg-card-pad);
+    }
+
+    .fg-section-card-title {
+        font-size: var(--text-md);
+        line-height: var(--text-md--line-height);
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .fg-action-row {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fg-stack-sm);
+    }
+
+    @media (min-width: 640px) {
+        .fg-action-row {
+            flex-direction: row;
+            align-items: center;
+            gap: var(--fg-stack-md);
+        }
+    }
+
+    .fg-btn-block {
+        width: 100%;
+    }
+
+    @media (min-width: 640px) {
+        .fg-btn-block {
+            width: auto;
+        }
+    }
+}

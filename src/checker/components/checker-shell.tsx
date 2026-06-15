@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 import { ArrowLeft } from "@untitledui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/base/buttons/button";
+import { Shell, ShellContent, ShellHeader, ShellMain } from "@/components/layout/shell";
 import { Countdown } from "@/checker/components/countdown";
 import { ProgressBar } from "@/checker/components/progress-bar";
 import { FairGoWordmark } from "@/checker/components/wordmark";
@@ -15,21 +16,21 @@ export const CheckerShell = ({ step, children }: PropsWithChildren<{ step: StepI
     const remaining = daysRemaining(answers.effective_date);
 
     return (
-        <div className="flex min-h-dvh flex-col bg-primary">
+        <Shell>
             <ProgressBar value={progress} />
 
-            <header className="flex items-center justify-between px-5 py-4 sm:px-8">
-                <Button color="tertiary" size="md" iconLeading={ArrowLeft} onClick={back}>
-                    Back
+            <ShellHeader>
+                <Button color="tertiary" size="sm" iconLeading={ArrowLeft} onClick={back} aria-label="Back" className="shrink-0">
+                    <span className="hidden sm:inline">Back</span>
                 </Button>
-                <div className="flex items-center gap-4">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-4">
                     {remaining !== null && <Countdown daysRemaining={remaining} />}
-                    <FairGoWordmark className="hidden sm:flex" />
+                    <FairGoWordmark className="hidden shrink-0 sm:flex" />
                 </div>
-            </header>
+            </ShellHeader>
 
-            <main className="flex flex-1 items-start justify-center px-5 py-6 sm:items-center sm:py-10">
-                <div className="w-full max-w-xl">
+            <ShellMain align="start">
+                <ShellContent width="wizard">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={step}
@@ -41,8 +42,8 @@ export const CheckerShell = ({ step, children }: PropsWithChildren<{ step: StepI
                             {children}
                         </motion.div>
                     </AnimatePresence>
-                </div>
-            </main>
-        </div>
+                </ShellContent>
+            </ShellMain>
+        </Shell>
     );
 };

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { ArrowRight, CornerDownLeft } from "@untitledui/icons";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Button } from "@/components/base/buttons/button";
+import { ActionRow, mobileBtnClass } from "@/components/layout/shell";
 import { OptionCard } from "@/checker/components/option-card";
 import { isStepAnswered, OPTION_LETTERS, STEPS } from "@/checker/questions";
 import { useChecker } from "@/checker/store";
@@ -11,7 +12,7 @@ import { cx } from "@/utils/cx";
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const EnterHint = () => (
-    <span className="inline-flex items-center gap-1.5 text-sm text-tertiary">
+    <span className="hidden items-center gap-1.5 text-sm text-tertiary sm:inline-flex">
         Press
         <kbd className="inline-flex items-center gap-1 rounded-md border border-secondary bg-secondary px-1.5 py-0.5 font-mono text-xs text-secondary">
             Enter <CornerDownLeft className="size-3" />
@@ -87,10 +88,10 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
     );
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-display-xs font-semibold text-primary sm:text-display-sm">{def.title}</h1>
-                {def.subtitle && <p className="text-lg text-tertiary">{def.subtitle}</p>}
+        <div className="fg-stack-lg">
+            <div className="fg-stack-sm">
+                <h1 className="text-xl font-semibold text-primary sm:text-display-sm">{def.title}</h1>
+                {def.subtitle && <p className="text-md text-tertiary sm:text-lg">{def.subtitle}</p>}
             </div>
 
             {def.kind === "choice" && (
@@ -186,13 +187,13 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
             )}
 
             {(def.kind === "choice" || def.kind === "boolean") && (
-                <p className="text-sm text-tertiary">
+                <p className="hidden text-sm text-tertiary sm:block">
                     Tap an option or press its letter. <EnterHint /> to use a highlighted answer.
                 </p>
             )}
 
             {def.kind === "multiselect" && (
-                <p className="text-sm text-tertiary">
+                <p className="hidden text-sm text-tertiary sm:block">
                     Select all that apply (or press each letter), then <EnterHint /> to continue.
                 </p>
             )}
@@ -201,10 +202,10 @@ export const StepRenderer = ({ step }: { step: StepId }) => {
 };
 
 const ContinueRow = ({ answered, onContinue }: { answered: boolean; onContinue: () => void }) => (
-    <div className="flex items-center gap-4">
-        <Button size="xl" color="primary" isDisabled={!answered} iconTrailing={ArrowRight} onClick={onContinue}>
+    <ActionRow>
+        <Button size="xl" color="primary" isDisabled={!answered} iconTrailing={ArrowRight} className={mobileBtnClass} onClick={onContinue}>
             Continue
         </Button>
         {answered && <EnterHint />}
-    </div>
+    </ActionRow>
 );

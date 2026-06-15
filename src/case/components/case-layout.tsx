@@ -58,14 +58,14 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
         <div className="flex min-h-dvh flex-col bg-secondary">
             <CaseOnboarding />
             <header className="sticky top-0 z-10 border-b border-secondary bg-primary print:hidden">
-                <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-8">
+                <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 fg-shell-x py-2.5 sm:gap-3 sm:py-3">
                     <Link to="/" aria-label="Fair Go home">
                         <FairGoWordmark />
                     </Link>
                     <DeadlinePill effectiveDate={file?.profile.dismissal.effective_date} />
                 </div>
-                <nav className="mx-auto w-full max-w-5xl overflow-x-auto px-3 sm:px-6">
-                    <ul className="flex min-w-max items-center gap-1 pb-2">
+                <nav className="mx-auto w-full max-w-5xl overflow-x-auto fg-shell-x pb-1.5 sm:pb-2">
+                    <ul className="flex min-w-max items-center gap-0.5 sm:gap-1">
                         {NAV.map((item) => (
                             <li key={item.to}>
                                 <NavLink
@@ -73,7 +73,7 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
                                     end={item.end}
                                     className={({ isActive }) =>
                                         cx(
-                                            "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition duration-100 ease-linear",
+                                            "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition duration-100 ease-linear sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
                                             isActive
                                                 ? "bg-brand-primary text-brand-secondary"
                                                 : "text-tertiary hover:bg-primary_hover hover:text-secondary",
@@ -89,11 +89,11 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
                 </nav>
             </header>
 
-            <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-6 sm:px-8 sm:py-8 print:max-w-none print:p-0">
+            <main className="mx-auto w-full max-w-5xl flex-1 fg-shell-main print:max-w-none print:p-0">
                 {showBackupNag && (
                     <Link
                         to="/case/settings"
-                        className="mb-6 flex items-start gap-3 rounded-xl border border-warning bg-warning-primary p-4 transition duration-100 ease-linear hover:bg-warning-secondary print:hidden"
+                        className="mb-4 flex items-start gap-3 rounded-xl border border-warning bg-warning-primary p-3.5 transition duration-100 ease-linear hover:bg-warning-secondary sm:mb-6 sm:p-4 print:hidden"
                     >
                         <AlertTriangle className="mt-0.5 size-5 shrink-0 text-fg-warning-primary" aria-hidden="true" />
                         <div>
@@ -112,10 +112,10 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
 };
 
 export const PageHeading = ({ title, description, action }: { title: string; description?: string; action?: ReactNode }) => (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-6 sm:gap-4">
         <div>
-            <h1 className="text-display-xs font-semibold tracking-tight text-primary">{title}</h1>
-            {description && <p className="mt-1.5 max-w-2xl text-md text-tertiary">{description}</p>}
+            <h1 className="text-xl font-semibold tracking-tight text-primary sm:text-display-xs">{title}</h1>
+            {description && <p className="mt-1 max-w-2xl text-sm text-tertiary sm:mt-1.5 sm:text-md">{description}</p>}
         </div>
         {action}
     </div>

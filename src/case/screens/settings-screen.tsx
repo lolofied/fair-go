@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { exportEncryptedBackup, readEncryptedBackup, restoreBackup } from "@/case/backup";
 import { PageHeading } from "@/case/components/case-layout";
+import { SectionCard } from "@/components/layout/shell";
 import { TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { PrivacySecurityCard } from "@/case/components/privacy-security-card";
@@ -24,10 +25,7 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
-        <h2 className="text-md font-semibold text-primary">{title}</h2>
-        <div className="mt-4">{children}</div>
-    </section>
+    <SectionCard title={title}>{children}</SectionCard>
 );
 
 export const SettingsScreen = () => {
@@ -106,7 +104,7 @@ export const SettingsScreen = () => {
                 description="Your case is stored on this device by default. Manage encrypted sync, download a backup, review what we can and cannot protect, or erase everything."
             />
 
-            <div className="flex flex-col gap-6">
+            <div className="fg-page-gap">
                 <SyncSettingsCard />
                 <SyncAccountSecurity />
                 <PrivacySecurityCard />

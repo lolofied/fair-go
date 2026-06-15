@@ -10,6 +10,7 @@ import {
     Scales02,
 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
+import { mobileBtnClass, Shell, ShellContent, ShellHeader, ShellMain } from "@/components/layout/shell";
 import { Countdown } from "@/checker/components/countdown";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { trackClaimOutcome } from "@/checker/analytics";
@@ -106,7 +107,7 @@ const FLAG_NOTES: Partial<Record<CheckerFlag, { title: string; body: string }>> 
 const ClaimCard = ({ claim }: { claim: ClaimAssessment }) => {
     const meta = STATUS_META[claim.status];
     return (
-        <div className={cx("rounded-2xl border bg-primary p-5", meta.cardRing)}>
+        <div className={cx("fg-section-card", meta.cardRing)}>
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-md font-semibold text-primary">{CLAIM_TITLES[claim.claimType]}</h3>
                 <span className={cx("rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>{meta.label}</span>
@@ -181,8 +182,8 @@ export const ResultScreen = () => {
     }, []);
 
     return (
-        <div className="flex min-h-dvh flex-col bg-primary">
-            <header className="flex items-center justify-between px-5 py-4 sm:px-8">
+        <Shell>
+            <ShellHeader>
                 <FairGoWordmark />
                 <div className="flex items-center gap-2">
                     {/* Icon-only on mobile, full label from sm up. */}
@@ -215,20 +216,20 @@ export const ResultScreen = () => {
                         Start over
                     </Button>
                 </div>
-            </header>
+            </ShellHeader>
 
-            <main className="flex flex-1 justify-center px-5 py-8 sm:py-12">
-                <div className="w-full max-w-2xl">
+            <ShellMain align="start">
+                <ShellContent>
                     <div className="flex items-center gap-2">
                         <Scales02 className="size-5 text-fg-brand-primary" />
                         <span className="text-sm font-semibold tracking-wide text-fg-brand-primary uppercase">
                             What your answers point to
                         </span>
                     </div>
-                    <h1 className="mt-3 text-display-sm font-semibold tracking-tight text-primary">
+                    <h1 className="mt-3 text-xl font-semibold tracking-tight text-primary sm:text-display-sm">
                         Here are the paths worth taking to a lawyer.
                     </h1>
-                    <p className="mt-4 text-lg text-tertiary">
+                    <p className="mt-3 text-md text-tertiary sm:mt-4 sm:text-lg">
                         This organises your own answers into the claims a lawyer would weigh. It isn't legal advice or a
                         prediction. It's a head start, built so you don't re-enter anything.
                     </p>
@@ -239,14 +240,14 @@ export const ResultScreen = () => {
                     )}
 
                     {/* Primary CTA into the documentation flow */}
-                    <section className="mt-8 rounded-2xl border border-brand bg-brand-primary p-6">
-                        <h2 className="text-display-xs font-semibold text-primary">Build your lawyer-ready package</h2>
-                        <p className="mt-2 text-md text-tertiary">
+                    <section className="fg-section-card mt-6 border-brand bg-brand-primary sm:mt-8">
+                        <h2 className="text-lg font-semibold text-primary sm:text-display-xs">Build your lawyer-ready package</h2>
+                        <p className="mt-2 text-sm text-tertiary sm:text-md">
                             Turn these answers into an organised timeline and document set a lawyer can act on in minutes,
                             without re-entering anything you've told us.
                         </p>
-                        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-                            <Button size="xl" color="primary" href="/case" iconTrailing={ArrowRight}>
+                        <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:flex-row sm:items-center">
+                            <Button size="xl" color="primary" href="/case" iconTrailing={ArrowRight} className={mobileBtnClass}>
                                 Start documenting
                             </Button>
                             <span className="text-sm text-tertiary">Private to your device · nothing leaves your browser</span>
@@ -255,7 +256,7 @@ export const ResultScreen = () => {
 
                     {/* s.725 election warning: alternatives, never "lodge both". */}
                     {election && (
-                        <div className="mt-8 flex items-start gap-3 rounded-2xl border border-warning bg-warning-primary p-5">
+                        <div className="fg-section-card mt-6 flex items-start gap-3 border-warning bg-warning-primary sm:mt-8">
                             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-fg-warning-primary" />
                             <div>
                                 <p className="text-md font-semibold text-primary">More than one path may be open to you</p>
@@ -271,7 +272,7 @@ export const ResultScreen = () => {
 
                     {/* Still-employed (non-dismissal) note. */}
                     {isNonDismissalPath && (
-                        <div className="mt-8 rounded-2xl border border-brand bg-brand-primary p-5">
+                        <div className="fg-section-card mt-6 border-brand bg-brand-primary sm:mt-8">
                             <h2 className="text-md font-semibold text-primary">You haven't been dismissed, so a different path applies</h2>
                             <p className="mt-2 text-sm text-tertiary">
                                 If you're being targeted while still employed, that can be a general protections matter
@@ -314,7 +315,7 @@ export const ResultScreen = () => {
                                 {lawyerNotes.map((flag) => {
                                     const note = FLAG_NOTES[flag]!;
                                     return (
-                                        <li key={flag} className="rounded-xl border border-secondary p-4">
+                                        <li key={flag} className="fg-section-card">
                                             <p className="text-md font-medium text-primary">{note.title}</p>
                                             <p className="mt-1 text-sm text-tertiary">{note.body}</p>
                                         </li>
@@ -324,13 +325,13 @@ export const ResultScreen = () => {
                         </section>
                     )}
 
-                    <p className="mt-10 border-t border-secondary pt-6 text-sm text-tertiary">
+                    <p className="mt-8 border-t border-secondary pt-5 text-sm text-tertiary sm:mt-10 sm:pt-6">
                         This is general information, not legal advice, and isn't a guarantee of any outcome. Eligibility and
                         which path to pursue are ultimately decisions for you and your lawyer (and, where relevant, the Fair
                         Work Commission or a court). For advice on your situation, speak to an employment lawyer.
                     </p>
-                </div>
-            </main>
-        </div>
+                </ShellContent>
+            </ShellMain>
+        </Shell>
     );
 };

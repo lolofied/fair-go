@@ -1,52 +1,73 @@
-import { ArrowRight, Scales02 } from "@untitledui/icons";
+import { ArrowRight, LogIn01 } from "@untitledui/icons";
 import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
+import {
+    HeroLead,
+    HeroTitle,
+    mobileBtnClass,
+    Shell,
+    ShellContent,
+    ShellFooter,
+    ShellHeader,
+    ShellMain,
+} from "@/components/layout/shell";
 import { HighlightUnderline } from "@/checker/components/highlight-underline";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { useChecker } from "@/checker/store";
+import { isSyncConfigured } from "@/config/supabase";
 
 export const IntroScreen = () => {
     const { start, resume, answers } = useChecker();
     const hasProgress = Object.keys(answers).length > 0;
+    const showRetrieve = isSyncConfigured();
 
     return (
-        <div className="flex min-h-dvh flex-col bg-primary">
-            <header className="flex items-center justify-between px-5 py-4 sm:px-8">
+        <Shell>
+            <ShellHeader>
                 <FairGoWordmark />
-                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-tertiary">
-                    <Scales02 className="size-4" /> Australian unfair dismissal
-                </span>
-            </header>
+                {showRetrieve ? (
+                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01}>
+                        <span className="sm:hidden">Retrieve</span>
+                        <span className="hidden sm:inline">Retrieve my case</span>
+                    </Button>
+                ) : null}
+            </ShellHeader>
 
-            <main className="flex flex-1 items-center justify-center px-5 py-10">
-                <div className="w-full max-w-[968px] text-center">
-                    <h1 className="text-[56px] leading-[64px] font-semibold tracking-tight text-primary">
+            <ShellMain>
+                <ShellContent width="marketing" className="text-center">
+                    <HeroTitle>
                         Were you{" "}
-                        <span className="relative inline-block whitespace-nowrap">
+                        <span className="relative inline-block sm:whitespace-nowrap">
                             unfairly dismissed
                             <HighlightUnderline />
                         </span>
                         ?
-                    </h1>
+                    </HeroTitle>
 
-                    <p className="mx-auto mt-4 max-w-[720px] text-xl text-tertiary">
+                    <HeroLead className="mx-auto mt-3 max-w-[720px] sm:mt-4">
                         Find out in about 90 seconds whether you likely have an unfair dismissal claim under the Fair Work
                         Act, and exactly how long you have left to act.
-                    </p>
+                    </HeroLead>
 
-                    <div className="mt-8 flex flex-col items-center gap-3">
-                        <Button size="xl" color="primary" iconTrailing={ArrowRight} onClick={hasProgress ? resume : start}>
+                    <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8">
+                        <Button
+                            size="xl"
+                            color="primary"
+                            iconTrailing={ArrowRight}
+                            className={mobileBtnClass}
+                            onClick={hasProgress ? resume : start}
+                        >
                             {hasProgress ? "Resume my check" : "Start my free check"}
                         </Button>
                         <span className="text-sm text-tertiary">
                             No payment. No commitment. Your answers stay private.
                         </span>
                     </div>
-                </div>
-            </main>
+                </ShellContent>
+            </ShellMain>
 
-            <footer className="border-t border-secondary px-5 py-6 sm:px-8">
-                <div className="mx-auto flex max-w-[968px] flex-col items-center gap-4">
+            <ShellFooter>
+                <div className="mx-auto flex max-w-[968px] flex-col items-center gap-3 sm:gap-4">
                     <p className="text-center text-sm text-tertiary">
                         Fair Go is not a law firm and this tool is not legal advice. It helps you document your situation
                         and understand your options. For advice about your specific circumstances, speak to an employment
@@ -65,7 +86,7 @@ export const IntroScreen = () => {
                         </Link>
                     </nav>
                 </div>
-            </footer>
-        </div>
+            </ShellFooter>
+        </Shell>
     );
 };

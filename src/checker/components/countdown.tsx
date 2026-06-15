@@ -31,13 +31,13 @@ export const Countdown = ({ daysRemaining, className, variant = "pill" }: Countd
 
     if (variant === "block") {
         return (
-            <div className={cx("flex items-center gap-4 rounded-2xl border px-5 py-4", TONE_STYLES[t], className)}>
-                <Icon className="size-6 shrink-0" />
+            <div className={cx("fg-section-card flex items-center gap-3 sm:gap-4", TONE_STYLES[t], className)}>
+                <Icon className="size-5 shrink-0 sm:size-6" />
                 <div>
-                    <p className="text-sm font-medium opacity-80">
+                    <p className="text-xs font-medium opacity-80 sm:text-sm">
                         {barred ? "Standard 21-day window" : "Time left to lodge your claim"}
                     </p>
-                    <p className="text-display-xs font-semibold">
+                    <p className="text-lg font-semibold sm:text-display-xs">
                         {barred
                             ? `Closed ${Math.abs(daysRemaining)} ${Math.abs(daysRemaining) === 1 ? "day" : "days"} ago`
                             : `${daysRemaining} of ${UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days left`}
