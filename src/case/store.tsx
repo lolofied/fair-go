@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { clearAnalytics } from "@/checker/analytics";
 import { clearCheckerStorage, loadCheckerAnswers } from "@/checker/store";
-import { emptyCaseFile, newId, seedCaseFromChecker } from "@/case/seed";
+import { emptyCaseFile, mergeCheckerIntoCase, newId, seedCaseFromChecker } from "@/case/seed";
 import { deleteFile, loadCaseFile, purgeAll, putFile, saveCaseFile } from "@/case/storage";
 import { EVENT_TEMPLATES } from "@/case/templates";
 import type { CaseEvent, CaseEventType, CaseFile, CaseProfile, Evidence, EvidenceType, Witness } from "@/case/types";
@@ -55,7 +55,15 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
         let cancelled = false;
         loadCaseFile().then((existing) => {
             if (cancelled) return;
-            setFile(existing ?? seedCaseFromChecker(loadCheckerAnswers()));
+            const answers = loadCheckerAnswers();
+            const hasCheckerAnswers = Object.keys(answers).length > 0;
+            if (existing && hasCheckerAnswers) {
+                setFile(mergeCheckerIntoCase(existing, answers));
+            } else if (existing) {
+                setFile(existing);
+            } else {
+                setFile(seedCaseFromChecker(answers));
+            }
             setLoading(false);
         });
         return () => {
@@ -235,7 +243,10 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
 
     const replaceFile = useCallback((next: CaseFile) => setFile(next), []);
 
-    const reseedFromChecker = useCallback(() => setFile(seedCaseFromChecker(loadCheckerAnswers())), []);
+    const reseedFromChecker = useCallback(() => {
+        const answers = loadCheckerAnswers();
+        setFile((prev) => (prev ? mergeCheckerIntoCase(prev, answers) : seedCaseFromChecker(answers)));
+    }, []);
 
     const eraseEverything = useCallback(async () => {
         await purgeAll();

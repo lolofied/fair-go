@@ -3,7 +3,18 @@ import { Printer } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { daysRemaining } from "@/checker/logic";
 import type { ClaimStatus, ClaimType } from "@/checker/types";
+import {
+    DISMISSAL_KIND_LABELS,
+    EMPLOYEE_STATUS_LABELS,
+    EMPLOYMENT_TYPE_LABELS,
+    REASON_LABELS,
+    SIZE_ESTIMATE_LABELS,
+    YES_NO_UNSURE_LABELS,
+    formatBoolean,
+    formatOptionalLabel,
+} from "@/case/profile-labels";
 import { PageHeading } from "@/case/components/case-layout";
+import { ExportReadinessChecklist } from "@/case/components/export-readiness-checklist";
 import { assignAnnexures, annexureLetterMap, type Annexure } from "@/case/export/annexures";
 import { buildStatement } from "@/case/export/statement";
 import { flagIssues } from "@/case/issues";
@@ -97,10 +108,11 @@ export const ExportScreen = () => {
         <div>
             <div className="print:hidden">
                 <PageHeading
-                    title="Lawyer-ready export"
-                    description="A single package a lawyer can act on in minutes: a cover sheet, a plain-English statement of facts, an indexed list of your annexures, and the issues worth their review."
+                    title="Export for your lawyer"
+                    description="Run the brief audit, then save a PDF package a lawyer can act on quickly."
                     action={<Button color="primary" size="md" iconLeading={Printer} onClick={() => window.print()}>Save as PDF</Button>}
                 />
+                <ExportReadinessChecklist />
                 <p className="mb-6 rounded-xl border border-secondary bg-primary p-4 text-sm text-tertiary">
                     Tip: choose "Save as PDF" as the destination in the print dialog. The package below is what gets
                     exported. Your uploaded image documents are embedded; other files are listed in the annexure index for
@@ -133,13 +145,28 @@ export const ExportScreen = () => {
                         <Field label="Employer legal entity" value={profile.employer.legal_name || "Not recorded"} />
                         <Field label="ABN" value={profile.employer.abn || "Not recorded"} />
                         <Field label="Role" value={profile.employee.role || "Not recorded"} />
-                        <Field label="Employment type" value={profile.employee.employment_type || "Not recorded"} />
+                        <Field label="How engaged" value={formatOptionalLabel(profile.employee.employee_status, EMPLOYEE_STATUS_LABELS)} />
+                        <Field label="Employment type" value={formatOptionalLabel(profile.employee.employment_type, EMPLOYMENT_TYPE_LABELS)} />
+                        {profile.employee.employment_type === "casual" && (
+                            <>
+                                <Field label="Casual work regular & systematic" value={formatBoolean(profile.employee.casual_regular)} />
+                                <Field label="Reasonable expectation of ongoing work" value={formatBoolean(profile.employee.casual_expectation)} />
+                            </>
+                        )}
                         <Field label="Start date" value={fmt(profile.employee.start_date)} />
                         <Field label="End date" value={fmt(profile.employee.end_date)} />
+                        <Field label="What happened with job" value={formatOptionalLabel(profile.dismissal.kind, DISMISSAL_KIND_LABELS)} />
                         <Field label="Dismissal took effect" value={fmt(profile.dismissal.effective_date)} />
+                        <Field label="Reason given" value={formatOptionalLabel(profile.dismissal.reason_category, REASON_LABELS)} />
                         <Field label="Annual salary (excl. super)" value={profile.employee.salary != null ? `$${profile.employee.salary.toLocaleString("en-AU")}` : "Not recorded"} />
                         <Field label="Award / agreement" value={profile.employee.award_or_eba} />
+                        <Field label="Covered by award" value={formatOptionalLabel(profile.employee.award_covered, YES_NO_UNSURE_LABELS)} />
+                        <Field label="Covered by EBA" value={formatOptionalLabel(profile.employee.eba_applies, YES_NO_UNSURE_LABELS)} />
                         <Field label="Employer size" value={profile.employer.size_bucket || "Not recorded"} />
+                        {profile.employer.size_bucket === "unsure" && (
+                            <Field label="Headcount estimate" value={formatOptionalLabel(profile.employer.size_estimate, SIZE_ESTIMATE_LABELS)} />
+                        )}
+                        <Field label="Associated entities" value={formatOptionalLabel(profile.employer.has_associated_entities, YES_NO_UNSURE_LABELS)} />
                     </dl>
 
                     <div className="mt-4 break-inside-avoid">

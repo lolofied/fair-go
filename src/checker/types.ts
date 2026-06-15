@@ -165,19 +165,29 @@ export interface CapturedData {
     employee: {
         name?: string;
         role?: string;
+        employee_status?: EmployeeStatus;
         employment_type?: EmploymentType;
+        /** Casual only: regular and systematic work pattern. */
+        casual_regular?: boolean;
+        /** Casual only: reasonable expectation of ongoing work. */
+        casual_expectation?: boolean;
         start_date?: string;
         end_date?: string;
         salary?: number;
         award_or_eba: "award" | "eba" | "both" | "none" | "unsure";
+        award_covered?: YesNoUnsure;
+        eba_applies?: YesNoUnsure;
     };
     employer: {
         legal_name?: string;
         abn?: string;
         size_bucket?: EmployerSize;
+        size_estimate?: SizeEstimate;
         has_associated_entities?: YesNoUnsure;
     };
     dismissal: {
+        /** What happened with the job (checker Q1). */
+        kind?: DismissalKind;
         effective_date?: string;
         reason_category?: ReasonCategory;
         redundancy_claimed: boolean;

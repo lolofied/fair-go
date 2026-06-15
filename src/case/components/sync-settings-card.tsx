@@ -111,7 +111,7 @@ export const SyncSettingsCard = () => {
     }
 
     return (
-        <section className="fg-section-card">
+        <section id="sync" className="fg-section-card">
             <h2 className="text-md font-semibold text-primary">Encrypted sync</h2>
 
             {user ? (

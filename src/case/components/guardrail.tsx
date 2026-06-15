@@ -1,4 +1,4 @@
-import { AlertTriangle, Lock01, Shield01 } from "@untitledui/icons";
+import { AlertTriangle, Lock01 } from "@untitledui/icons";
 import { cx } from "@/utils/cx";
 
 type GuardrailTone = "warning" | "info";
@@ -35,10 +35,14 @@ export const GuardrailBanner = ({
 
 /** Reused at every upload / capture point (PRD principle #2). */
 export const ExfiltrationGuardrail = ({ className }: { className?: string }) => (
-    <GuardrailBanner tone="warning" icon={Shield01} title="Document your own experience, don't take company files" className={className}>
-        Capture your own notes, what was said, and communications addressed to you. Do not upload confidential company
-        documents you weren't given access to for this purpose. Taking files you shouldn't have can put you in breach of
-        your contract and hand your employer a reason to act against you.
+    <GuardrailBanner
+        tone="warning"
+        icon={AlertTriangle}
+        title="Upload your documents, not confidential company files"
+        className={className}
+    >
+        Your contract, key letters, emails to you, and payslips are fine. So are your own notes. Do not upload
+        confidential company files you were not allowed to take. That can breach your contract.
     </GuardrailBanner>
 );
 

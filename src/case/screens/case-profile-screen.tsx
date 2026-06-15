@@ -1,8 +1,14 @@
-import { ArrowRight } from "@untitledui/icons";
-import { Button } from "@/components/base/buttons/button";
 import type { ClaimStatus, ClaimType } from "@/checker/types";
 import { PageHeading } from "@/case/components/case-layout";
 import { DateField, SelectField, TextAreaField, TextField } from "@/case/components/fields";
+import {
+    DISMISSAL_KIND_LABELS,
+    EMPLOYEE_STATUS_LABELS,
+    EMPLOYMENT_TYPE_LABELS,
+    REASON_LABELS,
+    SIZE_ESTIMATE_LABELS,
+    YES_NO_UNSURE_LABELS,
+} from "@/case/profile-labels";
 import { useCase } from "@/case/store";
 
 const CLAIM_TITLES: Record<ClaimType, string> = {
@@ -39,11 +45,6 @@ export const CaseProfileScreen = () => {
             <PageHeading
                 title="Your case profile"
                 description="Carried straight from your eligibility check, so there's nothing to re-enter. Review and fill any gaps; this is the spine of your export."
-                action={
-                    <Button color="primary" size="md" href="/case/timeline" iconTrailing={ArrowRight}>
-                        Build your timeline
-                    </Button>
-                }
             />
 
             <div className="flex flex-col gap-6">
@@ -51,16 +52,39 @@ export const CaseProfileScreen = () => {
                     <TextField label="Full name" value={employee.name ?? ""} onChange={(v) => setEmployee({ name: v })} placeholder="As it appears on your contract" />
                     <TextField label="Your role" value={employee.role ?? ""} onChange={(v) => setEmployee({ role: v })} />
                     <SelectField
+                        label="How you were engaged"
+                        value={employee.employee_status ?? ""}
+                        onChange={(v) => setEmployee({ employee_status: (v || undefined) as typeof employee.employee_status })}
+                        options={Object.entries(EMPLOYEE_STATUS_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
+                    <SelectField
                         label="Employment type"
                         value={employee.employment_type ?? ""}
                         onChange={(v) => setEmployee({ employment_type: (v || undefined) as typeof employee.employment_type })}
-                        options={[
-                            { value: "permanent", label: "Permanent" },
-                            { value: "casual", label: "Casual" },
-                            { value: "fixed_term_early", label: "Fixed term" },
-                            { value: "trainee", label: "Trainee / apprentice" },
-                        ]}
+                        options={Object.entries(EMPLOYMENT_TYPE_LABELS).map(([value, label]) => ({ value, label }))}
                     />
+                    {employee.employment_type === "casual" && (
+                        <>
+                            <SelectField
+                                label="Casual work was regular and systematic"
+                                value={employee.casual_regular === undefined ? "" : employee.casual_regular ? "yes" : "no"}
+                                onChange={(v) => setEmployee({ casual_regular: v === "" ? undefined : v === "yes" })}
+                                options={[
+                                    { value: "yes", label: "Yes" },
+                                    { value: "no", label: "No" },
+                                ]}
+                            />
+                            <SelectField
+                                label="Reasonable expectation of ongoing work"
+                                value={employee.casual_expectation === undefined ? "" : employee.casual_expectation ? "yes" : "no"}
+                                onChange={(v) => setEmployee({ casual_expectation: v === "" ? undefined : v === "yes" })}
+                                options={[
+                                    { value: "yes", label: "Yes" },
+                                    { value: "no", label: "No" },
+                                ]}
+                            />
+                        </>
+                    )}
                     <SelectField
                         label="Award or agreement coverage"
                         value={employee.award_or_eba}
@@ -73,7 +97,20 @@ export const CaseProfileScreen = () => {
                             { value: "unsure", label: "Not sure" },
                         ]}
                     />
+                    <SelectField
+                        label="Covered by an award"
+                        value={employee.award_covered ?? ""}
+                        onChange={(v) => setEmployee({ award_covered: (v || undefined) as typeof employee.award_covered })}
+                        options={Object.entries(YES_NO_UNSURE_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
+                    <SelectField
+                        label="Covered by an enterprise agreement"
+                        value={employee.eba_applies ?? ""}
+                        onChange={(v) => setEmployee({ eba_applies: (v || undefined) as typeof employee.eba_applies })}
+                        options={Object.entries(YES_NO_UNSURE_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
                     <DateField label="Start date" value={employee.start_date ?? ""} onChange={(v) => setEmployee({ start_date: v })} />
+                    <DateField label="End date" value={employee.end_date ?? ""} onChange={(v) => setEmployee({ end_date: v })} />
                     <TextField
                         label="Annual salary (excluding super)"
                         value={employee.salary != null ? String(employee.salary) : ""}
@@ -95,20 +132,35 @@ export const CaseProfileScreen = () => {
                             { value: "unsure", label: "Not sure" },
                         ]}
                     />
+                    {employer.size_bucket === "unsure" && (
+                        <SelectField
+                            label="Best estimate of headcount"
+                            value={employer.size_estimate ?? ""}
+                            onChange={(v) => setEmployer({ size_estimate: (v || undefined) as typeof employer.size_estimate })}
+                            options={Object.entries(SIZE_ESTIMATE_LABELS).map(([value, label]) => ({ value, label }))}
+                        />
+                    )}
+                    <SelectField
+                        label="Associated entities (same headcount)"
+                        value={employer.has_associated_entities ?? ""}
+                        onChange={(v) => setEmployer({ has_associated_entities: (v || undefined) as typeof employer.has_associated_entities })}
+                        options={Object.entries(YES_NO_UNSURE_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
                 </Section>
 
                 <Section title="The dismissal">
+                    <SelectField
+                        label="What happened with your job"
+                        value={dismissal.kind ?? ""}
+                        onChange={(v) => setDismissal({ kind: (v || undefined) as typeof dismissal.kind })}
+                        options={Object.entries(DISMISSAL_KIND_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
                     <DateField label="Date it took effect" value={dismissal.effective_date ?? ""} onChange={(v) => setDismissal({ effective_date: v })} />
                     <SelectField
                         label="Reason given"
                         value={dismissal.reason_category ?? ""}
                         onChange={(v) => setDismissal({ reason_category: (v || undefined) as typeof dismissal.reason_category })}
-                        options={[
-                            { value: "performance", label: "Performance" },
-                            { value: "conduct", label: "Conduct" },
-                            { value: "redundancy", label: "Redundancy" },
-                            { value: "none_given", label: "No reason given" },
-                        ]}
+                        options={Object.entries(REASON_LABELS).map(([value, label]) => ({ value, label }))}
                     />
                 </Section>
 

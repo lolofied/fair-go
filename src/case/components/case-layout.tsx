@@ -1,13 +1,12 @@
 import { type ReactNode } from "react";
 import {
-    AlertTriangle,
+    Archive,
     Clock,
     Download01,
-    File02,
-    FileCheck02,
     Home02,
-    SearchLg,
+    List,
     Settings01,
+    User01,
     Users01,
 } from "@untitledui/icons";
 import { Link, NavLink } from "react-router";
@@ -19,19 +18,14 @@ import { cx } from "@/utils/cx";
 
 const NAV = [
     { to: "/case", label: "Overview", icon: Home02, end: true },
+    { to: "/case/profile", label: "Profile", icon: User01, end: false },
     { to: "/case/timeline", label: "Timeline", icon: Clock, end: false },
-    { to: "/case/events", label: "Events", icon: FileCheck02, end: false },
-    { to: "/case/evidence", label: "Evidence", icon: File02, end: false },
+    { to: "/case/events", label: "Events", icon: List, end: false },
+    { to: "/case/evidence", label: "Evidence", icon: Archive, end: false },
     { to: "/case/witnesses", label: "Witnesses", icon: Users01, end: false },
-    { to: "/case/gaps", label: "What's missing", icon: SearchLg, end: false },
     { to: "/case/export", label: "Export", icon: Download01, end: false },
     { to: "/case/settings", label: "Settings", icon: Settings01, end: false },
 ];
-
-function needsBackup(lastBackupAt: string | undefined, updatedAt: string): boolean {
-    if (!lastBackupAt) return true;
-    return new Date(updatedAt).getTime() > new Date(lastBackupAt).getTime();
-}
 
 const DeadlinePill = ({ effectiveDate }: { effectiveDate?: string }) => {
     const remaining = daysRemaining(effectiveDate);
@@ -52,7 +46,6 @@ const DeadlinePill = ({ effectiveDate }: { effectiveDate?: string }) => {
 
 export const CaseLayout = ({ children }: { children: ReactNode }) => {
     const { file } = useCase();
-    const showBackupNag = file ? needsBackup(file.meta.lastBackupAt, file.meta.updatedAt) : false;
 
     return (
         <div className="flex min-h-dvh flex-col bg-secondary">
@@ -64,8 +57,8 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
                     </Link>
                     <DeadlinePill effectiveDate={file?.profile.dismissal.effective_date} />
                 </div>
-                <nav className="mx-auto w-full max-w-5xl overflow-x-auto fg-shell-x pb-1.5 sm:pb-2">
-                    <ul className="flex min-w-max items-center gap-0.5 sm:gap-1">
+                <nav className="mx-auto w-full max-w-5xl overflow-x-auto fg-shell-x">
+                    <ul className="flex min-w-max items-end gap-1 sm:gap-2">
                         {NAV.map((item) => (
                             <li key={item.to}>
                                 <NavLink
@@ -73,10 +66,10 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
                                     end={item.end}
                                     className={({ isActive }) =>
                                         cx(
-                                            "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition duration-100 ease-linear sm:gap-2 sm:px-3 sm:py-2 sm:text-sm",
+                                            "inline-flex items-center gap-1.5 border-b-2 px-2 py-2.5 text-xs font-medium transition duration-100 ease-linear sm:gap-2 sm:px-3 sm:py-3 sm:text-sm",
                                             isActive
-                                                ? "bg-brand-primary text-brand-secondary"
-                                                : "text-tertiary hover:bg-primary_hover hover:text-secondary",
+                                                ? "border-fg-primary text-primary opacity-100"
+                                                : "border-transparent text-primary opacity-70 hover:opacity-100",
                                         )
                                     }
                                 >
@@ -90,21 +83,6 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
             </header>
 
             <main className="mx-auto w-full max-w-5xl flex-1 fg-shell-main print:max-w-none print:p-0">
-                {showBackupNag && (
-                    <Link
-                        to="/case/settings"
-                        className="mb-4 flex items-start gap-3 rounded-xl border border-warning bg-warning-primary p-3.5 transition duration-100 ease-linear hover:bg-warning-secondary sm:mb-6 sm:p-4 print:hidden"
-                    >
-                        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-fg-warning-primary" aria-hidden="true" />
-                        <div>
-                            <p className="text-sm font-semibold text-primary">Back up your case</p>
-                            <p className="mt-1 text-sm text-tertiary">
-                                Your case lives only on this device. Download an encrypted backup so you don't lose it if
-                                your browser is cleared. Tap to back up now.
-                            </p>
-                        </div>
-                    </Link>
-                )}
                 {children}
             </main>
         </div>

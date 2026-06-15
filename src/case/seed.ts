@@ -20,6 +20,38 @@ function now(): string {
     return new Date().toISOString();
 }
 
+function isBlank(value: unknown): boolean {
+    return value === undefined || value === null || value === "";
+}
+
+/** Fill empty profile fields from checker data without overwriting user edits. */
+function mergeProfileSection<T extends Record<string, unknown>>(existing: T, fresh: T): T {
+    const out = { ...existing };
+    for (const key of Object.keys(fresh) as (keyof T)[]) {
+        const next = fresh[key];
+        if (next === undefined) continue;
+        if (isBlank(existing[key])) {
+            out[key] = next;
+        }
+    }
+    return out;
+}
+
+function eventKey(event: CaseEvent): string {
+    return `${event.type}:${JSON.stringify(event.fields)}`;
+}
+
+function mergeSeedEvents(existing: CaseEvent[], seeded: CaseEvent[]): CaseEvent[] {
+    const seen = new Set(existing.map(eventKey));
+    const added = seeded.filter((event) => {
+        const key = eventKey(event);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+    return added.length > 0 ? [...existing, ...added] : existing;
+}
+
 export function emptyCaseFile(): CaseFile {
     const ts = now();
     return {
@@ -97,5 +129,30 @@ export function seedCaseFromChecker(answers: CheckerAnswers): CaseFile {
         documents: [],
         witnesses: [],
         meta: { createdAt: ts, updatedAt: ts, schemaVersion: CASE_SCHEMA_VERSION, seededFromChecker: true },
+    };
+}
+
+/**
+ * Sync checker answers into an existing case file: fill gaps in the profile,
+ * refresh derived claims/flags, and append any missing seeded GP events.
+ */
+export function mergeCheckerIntoCase(existing: CaseFile, answers: CheckerAnswers): CaseFile {
+    const fresh = seedCaseFromChecker(answers);
+    return {
+        ...existing,
+        profile: {
+            desiredOutcome: existing.profile.desiredOutcome,
+            employee: mergeProfileSection(existing.profile.employee, fresh.profile.employee),
+            employer: mergeProfileSection(existing.profile.employer, fresh.profile.employer),
+            dismissal: {
+                ...mergeProfileSection(existing.profile.dismissal, fresh.profile.dismissal),
+                days_remaining: fresh.profile.dismissal.days_remaining,
+                redundancy_claimed: fresh.profile.dismissal.redundancy_claimed,
+            },
+            candidateClaims: fresh.profile.candidateClaims,
+            flags: fresh.profile.flags,
+        },
+        events: mergeSeedEvents(existing.events, fresh.events),
+        meta: { ...existing.meta, seededFromChecker: true },
     };
 }

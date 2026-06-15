@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router";
 import { CaseLayout } from "@/case/components/case-layout";
+import { CaseOverviewScreen } from "@/case/screens/case-overview-screen";
 import { CaseProfileScreen } from "@/case/screens/case-profile-screen";
 import { EventLogScreen } from "@/case/screens/event-log-screen";
 import { EvidenceScreen } from "@/case/screens/evidence-screen";
 import { ExportScreen } from "@/case/screens/export-screen";
-import { GapAnalysisScreen } from "@/case/screens/gap-analysis-screen";
 import { SettingsScreen } from "@/case/screens/settings-screen";
 import { RetrieveCaseScreen } from "@/case/screens/retrieve-case-screen";
 import { TimelineScreen } from "@/case/screens/timeline-screen";
@@ -32,12 +32,12 @@ const CaseRoutes = () => {
                 element={
                     <CaseLayout>
                         <Routes>
-                            <Route index element={<CaseProfileScreen />} />
+                            <Route index element={<CaseOverviewScreen />} />
+                            <Route path="profile" element={<CaseProfileScreen />} />
                             <Route path="timeline" element={<TimelineScreen />} />
                             <Route path="events" element={<EventLogScreen />} />
                             <Route path="evidence" element={<EvidenceScreen />} />
                             <Route path="witnesses" element={<WitnessScreen />} />
-                            <Route path="gaps" element={<GapAnalysisScreen />} />
                             <Route path="export" element={<ExportScreen />} />
                             <Route path="settings" element={<SettingsScreen />} />
                         </Routes>
