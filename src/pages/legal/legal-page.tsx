@@ -48,8 +48,8 @@ export const LegalPage = ({ title, lastUpdated, intro, children }: PropsWithChil
     </div>
 );
 
-export const LegalSection = ({ heading, children }: PropsWithChildren<{ heading: string }>) => (
-    <section className="flex flex-col gap-3">
+export const LegalSection = ({ heading, id, children }: PropsWithChildren<{ heading: string; id?: string }>) => (
+    <section id={id} className="flex flex-col gap-3 scroll-mt-24">
         <h2 className="text-xl font-semibold text-primary">{heading}</h2>
         {children}
     </section>

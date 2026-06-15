@@ -6,6 +6,9 @@ import { exportEncryptedBackup, readEncryptedBackup, restoreBackup } from "@/cas
 import { PageHeading } from "@/case/components/case-layout";
 import { TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
+import { PrivacySecurityCard } from "@/case/components/privacy-security-card";
+import { SyncAccountSecurity } from "@/case/components/sync-account-security";
+import { SyncSettingsCard } from "@/case/components/sync-settings-card";
 import { RecordingConsentWarning } from "@/case/components/recording-consent-warning";
 import { useCase } from "@/case/store";
 
@@ -98,9 +101,16 @@ export const SettingsScreen = () => {
 
     return (
         <div>
-            <PageHeading title="Settings, backup and privacy" description="Your case is stored only on this device. Manage your encrypted backup, restore from one, check recording rules, or erase everything." />
+            <PageHeading
+                title="Settings, backup and privacy"
+                description="Your case is stored on this device by default. Manage encrypted sync, download a backup, review what we can and cannot protect, or erase everything."
+            />
 
             <div className="flex flex-col gap-6">
+                <SyncSettingsCard />
+                <SyncAccountSecurity />
+                <PrivacySecurityCard />
+
                 <Card title="Back up your case">
                     <GuardrailBanner tone="info" title="Your backup is encrypted with your passphrase" className="mb-4">
                         The backup is encrypted on this device before it's saved. We never see it or your passphrase. If

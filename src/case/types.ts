@@ -8,6 +8,7 @@
  */
 
 import type { CapturedData, CheckerFlag, ClaimAssessment, ClaimType } from "@/checker/types";
+import type { KdfParams } from "@/case/crypto/types";
 
 export const CASE_SCHEMA_VERSION = 1;
 
@@ -152,15 +153,28 @@ export interface CaseFile {
 
 /* --------------------------------- backups ---------------------------------- */
 
-/** Envelope for an encrypted backup file (see `backup.ts`). */
-export interface EncryptedBackup {
+/** v1 backup envelope (PBKDF2 + AES-GCM). Import-only; new exports use v2. */
+export interface EncryptedBackupV1 {
     format: "fairgo-case-backup";
-    version: number;
-    /** AES-GCM + PBKDF2 parameters, base64-encoded. */
+    version: 1;
     kdf: "PBKDF2";
     iterations: number;
     saltB64: string;
     ivB64: string;
-    /** Base64 ciphertext of the gzip-free JSON payload (case file + files). */
     cipherB64: string;
 }
+
+/** v2 backup envelope (Argon2id + DEK + XChaCha20-Poly1305). Same crypto as sync. */
+export interface EncryptedBackupV2 {
+    format: "fairgo-case-backup";
+    version: 2;
+    kdf: "argon2id";
+    kdfParams: KdfParams;
+    saltB64: string;
+    wrappedDekPassphraseB64: string;
+    wrappedDekPassphraseNonceB64: string;
+    cipherB64: string;
+    nonceB64: string;
+}
+
+export type EncryptedBackup = EncryptedBackupV1 | EncryptedBackupV2;

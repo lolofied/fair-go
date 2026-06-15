@@ -37,6 +37,20 @@ export const TextField = ({ id, label, help, value, onChange, placeholder }: Bas
     </FieldShell>
 );
 
+export const PasswordField = ({ id, label, help, value, onChange, placeholder }: BaseProps) => (
+    <FieldShell label={label} help={help} htmlFor={id}>
+        <input
+            id={id}
+            type="password"
+            autoComplete={label.toLowerCase().includes("confirm") ? "new-password" : "current-password"}
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => onChange(e.target.value)}
+            className={controlClass}
+        />
+    </FieldShell>
+);
+
 export const TextAreaField = ({ id, label, help, value, onChange, placeholder }: BaseProps) => (
     <FieldShell label={label} help={help} htmlFor={id}>
         <textarea

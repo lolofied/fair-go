@@ -10,6 +10,9 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    optimizeDeps: {
+        include: ["libsodium-wrappers-sumo", "libsodium-sumo"],
+    },
     server: {
         watch: {
             // Native file events can miss saves in some macOS/Cursor setups.

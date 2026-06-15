@@ -9,6 +9,8 @@ import { SettingsScreen } from "@/case/screens/settings-screen";
 import { TimelineScreen } from "@/case/screens/timeline-screen";
 import { WitnessScreen } from "@/case/screens/witness-screen";
 import { CaseProvider, useCase } from "@/case/store";
+import { SyncEngineBridge } from "@/case/sync/sync-engine-bridge";
+import { SyncProvider } from "@/case/sync/sync-provider";
 
 const CaseRoutes = () => {
     const { loading } = useCase();
@@ -38,7 +40,10 @@ const CaseRoutes = () => {
 };
 
 export const CaseModule = () => (
-    <CaseProvider>
-        <CaseRoutes />
-    </CaseProvider>
+    <SyncProvider>
+        <CaseProvider>
+            <SyncEngineBridge />
+            <CaseRoutes />
+        </CaseProvider>
+    </SyncProvider>
 );
