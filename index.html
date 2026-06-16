@@ -13,18 +13,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,700&family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&display=swap" rel="stylesheet" />
 
         <title>Fair Go | Free unfair dismissal eligibility check</title>
+        <script>document.documentElement.classList.remove("dark-mode");</script>
     </head>
 
     <body class="size-full bg-primary antialiased">
         <div id="root"></div>
         <script type="module" src="/src/main.tsx"></script>
-        <script>
-            // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-            if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-                document.documentElement.classList.add("dark-mode");
-            } else {
-                document.documentElement.classList.remove("dark-mode");
-            }
-        </script>
     </body>
 </html>
