@@ -94,6 +94,11 @@ export function loadCheckerAnswers(): CheckerAnswers {
     return loadPersisted().answers;
 }
 
+/** The persisted checker screen (intro, result, or an in-progress step). */
+export function loadCheckerScreen(): Screen {
+    return loadPersisted().screen;
+}
+
 /** Remove the persisted checker state (used by the case module's right-to-erasure). */
 export function clearCheckerStorage(): void {
     if (typeof window === "undefined") return;

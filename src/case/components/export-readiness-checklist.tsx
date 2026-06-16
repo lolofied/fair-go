@@ -2,9 +2,11 @@ import { useState } from "react";
 import { ArrowRight, CheckCircle, ChevronRight, FileSearch02, HelpCircle } from "@untitledui/icons";
 import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
+import { CloseButton } from "@/components/base/buttons/close-button";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { analyseGaps } from "@/case/gap-analysis";
 import { useCase } from "@/case/store";
+import { cx } from "@/utils/cx";
 
 export function exportReadinessSummary(file: Parameters<typeof analyseGaps>[0]) {
     const report = analyseGaps(file);
@@ -25,7 +27,7 @@ function findingCountLabel(count: number): string {
 
 /** One-line summary for the export audit banner. */
 function auditBannerCopy(findingCount: number): string {
-    return `Brief audit · ${findingCountLabel(findingCount)} to review`;
+    return `${findingCountLabel(findingCount)} to review`;
 }
 
 function findingSeverityLabel(severity: "missing" | "needs_detail"): string {
@@ -39,7 +41,6 @@ function ExportAuditModal({
     openGaps,
     totalElements,
     covered,
-    findingCount,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -47,30 +48,25 @@ function ExportAuditModal({
     openGaps: number;
     totalElements: number;
     covered: number;
-    findingCount: number;
 }) {
     return (
         <ModalOverlay isOpen={open} onOpenChange={onOpenChange}>
             <Modal className="max-w-lg">
                 <Dialog className="w-full items-center justify-center outline-hidden">
-                    <div className="flex max-h-[min(85vh,720px)] w-full flex-col rounded-2xl border border-secondary bg-primary shadow-xl">
-                        <div className="border-b border-secondary px-5 py-4 sm:px-6">
-                            <p className="text-xs font-semibold tracking-wide text-brand-secondary uppercase">Automated review</p>
-                            <h2 className="mt-1 text-display-xs font-semibold text-primary">Brief audit</h2>
+                    <div className="relative flex max-h-[min(85vh,720px)] w-full flex-col rounded-2xl border border-secondary bg-primary shadow-xl">
+                        <CloseButton size="xs" className="absolute top-3 right-3 z-10" onPress={() => onOpenChange(false)} />
+                        <div className="border-b border-secondary px-5 py-4 pr-12 sm:px-6 sm:pr-14">
+                            <h2 className="text-display-xs font-semibold text-primary">Review findings</h2>
                             <p className="mt-2 text-sm text-tertiary">
-                                We checked your events, evidence, and claim elements against what lawyers typically look for
-                                on these claims. {findingCountLabel(findingCount)} came back for review. These are prompts,
-                                not legal advice — you can still export anytime.
+                                We checked your events, evidence, and claim elements against what lawyers typically look for on
+                                these claims. You can still export anytime.
                             </p>
                             {covered > 0 && (
                                 <p className="mt-2 text-xs font-medium text-secondary">
                                     {covered} of {totalElements} claim elements already supported in your record
                                 </p>
                             )}
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
-                            <div className="flex flex-col gap-2 sm:flex-row">
+                            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                                 {openGaps > 0 && (
                                     <Button color="primary" size="md" href="/case/events" iconTrailing={ArrowRight} className="w-full sm:w-auto">
                                         Add events
@@ -80,9 +76,11 @@ function ExportAuditModal({
                                     Add evidence
                                 </Button>
                             </div>
+                        </div>
 
+                        <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
                             {report.contextual.length > 0 && (
-                                <div className="mt-5 border-t border-secondary pt-4">
+                                <div>
                                     <h3 className="text-sm font-semibold text-primary">Priority findings</h3>
                                     <ul className="mt-2 flex flex-col gap-2">
                                         {report.contextual.map((p) => (
@@ -94,7 +92,7 @@ function ExportAuditModal({
                                 </div>
                             )}
 
-                            <div className="mt-5 flex flex-col gap-4 border-t border-secondary pt-4">
+                            <div className={cx("flex flex-col gap-4", report.contextual.length > 0 && "mt-5 border-t border-secondary pt-4")}>
                                 {report.byClaim.map((claim) =>
                                     claim.gaps.length === 0 ? null : (
                                         <div key={claim.claimType}>
@@ -114,15 +112,6 @@ function ExportAuditModal({
                                                                 </span>
                                                             </p>
                                                             <p className="mt-1 text-sm text-tertiary">{gap.prompt}</p>
-                                                            <p className="mt-2 text-xs">
-                                                                <Link
-                                                                    to={gap.severity === "missing" ? "/case/events" : "/case/evidence"}
-                                                                    className="font-medium text-brand-secondary underline-offset-2 hover:underline"
-                                                                    onClick={() => onOpenChange(false)}
-                                                                >
-                                                                    {gap.severity === "missing" ? "Record an event" : "Upload or link evidence"}
-                                                                </Link>
-                                                            </p>
                                                         </div>
                                                     </li>
                                                 ))}
@@ -132,12 +121,6 @@ function ExportAuditModal({
                                 )}
                             </div>
                         </div>
-
-                        <div className="border-t border-secondary px-5 py-4 sm:px-6">
-                            <Button color="secondary" size="md" className="w-full" onClick={() => onOpenChange(false)}>
-                                Close audit
-                            </Button>
-                        </div>
                     </div>
                 </Dialog>
             </Modal>
@@ -145,7 +128,7 @@ function ExportAuditModal({
     );
 }
 
-/** Automated brief audit before export — surfaces findings, not conclusions. */
+/** Export readiness: surfaces findings, not conclusions. */
 export const ExportReadinessChecklist = () => {
     const { file } = useCase();
     const [modalOpen, setModalOpen] = useState(false);
@@ -158,7 +141,7 @@ export const ExportReadinessChecklist = () => {
         return (
             <section className="mb-6 rounded-2xl border border-secondary bg-primary p-4 sm:p-5 print:hidden">
                 <p className="text-sm text-tertiary">
-                    A brief audit will run here once you have active candidate claims in your{" "}
+                    A findings review will run here once you have active candidate claims in your{" "}
                     <Link to="/case/profile" className="font-medium text-brand-secondary underline-offset-2 hover:underline">
                         case profile
                     </Link>
@@ -173,7 +156,7 @@ export const ExportReadinessChecklist = () => {
             <section className="mb-6 flex items-center gap-3 rounded-2xl border border-success bg-success-primary p-4 sm:p-5 print:hidden">
                 <CheckCircle className="size-5 shrink-0 text-fg-success-primary" aria-hidden="true" />
                 <p className="text-sm text-primary">
-                    Brief audit passed — nothing obvious missing from your record. Save the PDF below when you are ready.
+                    No findings. Your record looks complete. Save the PDF below when you are ready.
                 </p>
             </section>
         );
@@ -187,7 +170,7 @@ export const ExportReadinessChecklist = () => {
                 type="button"
                 onClick={() => setModalOpen(true)}
                 aria-haspopup="dialog"
-                aria-label={`${bannerCopy}. Open brief audit.`}
+                aria-label={`${bannerCopy}. Open review findings.`}
                 className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-secondary bg-primary p-4 text-left transition duration-100 ease-linear hover:bg-primary_hover sm:p-5 print:hidden"
             >
                 <FileSearch02 className="size-5 shrink-0 text-fg-brand-primary" aria-hidden="true" />
@@ -202,7 +185,6 @@ export const ExportReadinessChecklist = () => {
                 openGaps={openGaps}
                 totalElements={totalElements}
                 covered={covered}
-                findingCount={findingCount}
             />
         </>
     );

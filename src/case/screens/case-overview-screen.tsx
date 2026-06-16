@@ -5,32 +5,60 @@ import { PageHeading } from "@/case/components/case-layout";
 import { DeadlinePill } from "@/case/components/deadline-pill";
 import { computeDocumentationProgress, type DocProgressStatus, type DocSectionProgress } from "@/case/documentation-progress";
 import { useCase } from "@/case/store";
-import { useSync } from "@/case/sync/sync-provider";
 import { cx } from "@/utils/cx";
 
 const STATUS_META: Record<
     DocProgressStatus,
-    { label: string; icon: typeof CheckCircle; badgeClass: string; dotClass: string }
+    { label: string; icon: typeof CheckCircle; badgeClass: string; iconClass: string }
 > = {
     complete: {
         label: "Complete",
         icon: CheckCircle,
         badgeClass: "bg-success-secondary text-fg-success-primary",
-        dotClass: "bg-fg-success-primary",
+        iconClass: "text-fg-success-primary",
     },
     in_progress: {
         label: "In progress",
         icon: Clock,
         badgeClass: "bg-brand-secondary text-fg-brand-primary",
-        dotClass: "bg-fg-brand-primary",
+        iconClass: "text-fg-brand-primary",
     },
     not_started: {
         label: "Not started",
         icon: Circle,
         badgeClass: "bg-secondary text-quaternary",
-        dotClass: "bg-fg-quaternary",
+        iconClass: "text-fg-quaternary",
     },
 };
+
+function ProgressRing({ value }: { value: number }) {
+    return (
+        <div
+            role="progressbar"
+            aria-valuenow={value}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Documentation progress"
+            className="relative flex size-10 shrink-0 items-center justify-center"
+        >
+            <svg className="size-10 -rotate-90" viewBox="0 0 60 60">
+                <circle className="stroke-bg-quaternary" cx="30" cy="30" r="24" fill="none" strokeWidth="5" />
+                <circle
+                    className="stroke-fg-brand-primary"
+                    style={{ strokeDashoffset: `calc(100 - ${value})` }}
+                    cx="30"
+                    cy="30"
+                    r="24"
+                    fill="none"
+                    strokeWidth="5"
+                    strokeDasharray="100"
+                    pathLength="100"
+                    strokeLinecap="round"
+                />
+            </svg>
+        </div>
+    );
+}
 
 function ProgressRow({ section }: { section: DocSectionProgress }) {
     const meta = STATUS_META[section.status];
@@ -41,7 +69,7 @@ function ProgressRow({ section }: { section: DocSectionProgress }) {
             to={section.href}
             className="group flex items-start gap-4 rounded-xl border border-secondary bg-primary p-4 transition duration-100 ease-linear hover:border-brand hover:bg-primary_hover sm:p-5"
         >
-            <span className={cx("mt-1 size-2.5 shrink-0 rounded-full", meta.dotClass)} aria-hidden="true" />
+            <StatusIcon className={cx("mt-0.5 size-5 shrink-0", meta.iconClass)} aria-hidden="true" />
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-semibold text-primary sm:text-md">{section.label}</h3>
@@ -63,12 +91,10 @@ function ProgressRow({ section }: { section: DocSectionProgress }) {
 
 export const CaseOverviewScreen = () => {
     const { file } = useCase();
-    const { configured, user, dekUnlocked } = useSync();
 
     if (!file) return null;
 
-    const savedRemotely = configured && Boolean(user && dekUnlocked);
-    const progress = computeDocumentationProgress(file, { savedRemotely });
+    const progress = computeDocumentationProgress(file);
 
     return (
         <div>
@@ -80,25 +106,14 @@ export const CaseOverviewScreen = () => {
 
             <div className="flex flex-col gap-6">
                 <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
-                    <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3">
                         <div>
                             <h2 className="text-md font-semibold text-primary">Your progress</h2>
                             <p className="mt-1 text-sm text-tertiary">
                                 {progress.completedCount} of {progress.totalCount} sections complete
                             </p>
                         </div>
-                        <p className="text-2xl font-semibold tabular-nums text-brand-secondary">{progress.percentComplete}%</p>
-                    </div>
-                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-quaternary">
-                        <div
-                            className="h-full rounded-full bg-brand-solid transition-all duration-300 ease-linear"
-                            style={{ width: `${progress.percentComplete}%` }}
-                            role="progressbar"
-                            aria-valuenow={progress.percentComplete}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-label="Documentation progress"
-                        />
+                        <ProgressRing value={progress.percentComplete} />
                     </div>
 
                     {progress.nextSection && (

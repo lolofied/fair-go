@@ -1,24 +1,16 @@
 import { useState, type ReactNode } from "react";
-import { AlertTriangle, CheckCircle, ChevronDown, Download01, LogIn01, UploadCloud02 } from "@untitledui/icons";
+import { CheckCircle, ChevronDown, Download01, LogIn01, UploadCloud02 } from "@untitledui/icons";
 import { Link, useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
+import { needsBackup } from "@/case/case-save-status";
 import { useCase } from "@/case/store";
-import type { CaseFile } from "@/case/types";
+import { formatUnsavedChangesLabel } from "@/case/unsaved-changes";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 import { cx } from "@/utils/cx";
-
-function needsBackup(lastBackupAt: string | undefined, updatedAt: string): boolean {
-    if (!lastBackupAt) return true;
-    return new Date(updatedAt).getTime() > new Date(lastBackupAt).getTime();
-}
-
-function hasCaseChanges(file: CaseFile): boolean {
-    return new Date(file.meta.updatedAt).getTime() > new Date(file.meta.createdAt).getTime();
-}
 
 function formatHeaderTimestamp(iso: string): string {
     return new Date(iso).toLocaleString("en-AU", {
@@ -49,7 +41,7 @@ export const HeaderSaveStatus = () => {
     const hasBackup = Boolean(file.meta.lastBackupAt);
     const backupStale = needsBackup(file.meta.lastBackupAt, file.meta.updatedAt);
     const isSaved = configured && Boolean(user && dekUnlocked);
-    const unsavedChanges = hasCaseChanges(file);
+    const unsavedLabel = formatUnsavedChangesLabel(file);
 
     const onSaveMenuAction = (key: React.Key) => {
         if (key === "create-account") setCreateOpen(true);
@@ -115,7 +107,7 @@ export const HeaderSaveStatus = () => {
             );
         }
         return (
-            <Link to="/case/settings#sync" className={cx(shared, "hover:opacity-90")}>
+            <Link to="/case/settings" className={cx(shared, "hover:opacity-90")}>
                 {children}
             </Link>
         );
@@ -126,7 +118,7 @@ export const HeaderSaveStatus = () => {
             <div className="flex flex-wrap items-center justify-end gap-3 sm:gap-4">
                 {isSaved ? (
                     syncStatus === "error" ? (
-                        statusPill("bg-error-secondary text-fg-error-primary", <>Sync failed — tap to retry</>, onRetrySync)
+                        statusPill("bg-error-secondary text-fg-error-primary", <>Sync failed. Tap to retry</>, onRetrySync)
                     ) : (
                         statusPill(
                             "bg-success-secondary text-fg-success-primary",
@@ -152,10 +144,7 @@ export const HeaderSaveStatus = () => {
                     </Link>
                 ) : (
                     <>
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-fg-warning-primary">
-                            <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
-                            <span className="truncate">{unsavedChanges ? "Unsaved changes" : "Not saved"}</span>
-                        </span>
+                        <span className="truncate text-xs font-medium text-fg-warning-primary">{unsavedLabel}</span>
                         <Dropdown.Root>
                             <Button
                                 size="xs"
@@ -174,7 +163,7 @@ export const HeaderSaveStatus = () => {
                                     )}
                                     {user && !dekUnlocked && (
                                         <Dropdown.Item id="sign-in" icon={LogIn01}>
-                                            Sign in
+                                            Unlock sync
                                         </Dropdown.Item>
                                     )}
                                     {(configured && !user) || (user && !dekUnlocked) ? <Dropdown.Separator /> : null}
@@ -219,7 +208,7 @@ export const HeaderSaveStatus = () => {
                                 <>
                                     <h2 className="text-display-xs font-semibold text-primary">Create a sync account</h2>
                                     <p className="mt-2 text-sm text-tertiary">
-                                        Use a personal email only. Your case is encrypted before it leaves this device — we only store
+                                        Use a personal email only. Your case is encrypted before it leaves this device. We only store
                                         ciphertext we cannot read.
                                     </p>
                                     <div className="mt-5 grid gap-4">

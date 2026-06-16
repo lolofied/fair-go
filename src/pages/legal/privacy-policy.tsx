@@ -17,7 +17,7 @@ export const PrivacyPolicy = () => (
                 <li>The checker and case documentation work without an account. Your answers and case file stay on your device by default.</li>
                 <li>We do not ask for your name to use the checker. Optional encrypted sync uses an email and passphrase you choose.</li>
                 <li>If you turn on encrypted sync, we store only ciphertext we cannot read. Your passphrase and recovery key never leave your device in plaintext.</li>
-                <li>We store your deadline date in plaintext if you use sync, so we can send reminder emails — the one deliberate exception to pure zero-knowledge.</li>
+                <li>We store your deadline date in plaintext if you use sync, so we can send reminder emails. This is the one deliberate exception to pure zero-knowledge.</li>
                 <li>We keep anonymous, non-identifying signals about which kinds of results people reach, so we know which tools to build next.</li>
                 <li>You can erase local data at any time, export an encrypted backup, or stop using sync.</li>
             </LegalList>
@@ -49,7 +49,7 @@ export const PrivacyPolicy = () => (
                 <li>
                     <span className="font-medium text-secondary">Optional encrypted sync account.</span> If you create a sync
                     account, we store your email, cryptographic parameters (such as a key-derivation salt), wrapped encryption
-                    keys, encrypted copies of your case and files, and — for reminder emails — your deadline date in
+                    keys, encrypted copies of your case and files, and (for reminder emails) your deadline date in
                     plaintext. We never receive your passphrase, recovery key, or decrypted case contents. See{" "}
                     <a href="#encrypted-sync" className="font-medium text-brand-secondary">
                         Encrypted sync
@@ -96,7 +96,7 @@ export const PrivacyPolicy = () => (
                 <span className="font-medium text-secondary">How it works.</span> When you create a sync account, your
                 browser generates encryption keys from your passphrase. Your case and uploaded files are encrypted on your
                 device before anything is sent. Only ciphertext is uploaded to our sync backend in Sydney, Australia
-                (ap-southeast-2). We cannot decrypt your case — we do not hold your passphrase or the data encryption key
+                (ap-southeast-2). We cannot decrypt your case. We do not hold your passphrase or the data encryption key
                 in usable form.
             </LegalParagraph>
             <LegalParagraph>
@@ -110,21 +110,21 @@ export const PrivacyPolicy = () => (
                 <li>
                     <span className="font-medium text-secondary">Your deadline date (plaintext).</span> This is the one
                     intentional exception to zero-knowledge storage. A bare date reveals little about your case facts, but
-                    it lets us send "your window is closing" reminder emails — the product's most safety-critical nudge. We
+                    it lets us send "your window is closing" reminder emails, the product's most safety-critical nudge. We
                     do not store employer names, dismissal facts, event text, witness details, or document contents in
                     plaintext.
                 </li>
             </LegalList>
             <LegalParagraph>
                 <span className="font-medium text-secondary">Passphrase and recovery key.</span> Your passphrase unlocks
-                encryption and signs you in (via a derived authentication secret — we never store the passphrase itself).
+                encryption and signs you in (via a derived authentication secret; we never store the passphrase itself).
                 At signup you receive a one-time recovery key. If you forget your passphrase, the recovery key is the only
-                way to set a new one. We cannot reset your encryption through email password reset — that would not recover
+                way to set a new one. We cannot reset your encryption through email password reset. That would not recover
                 your keys. If you lose both your passphrase and recovery key, your encrypted sync data cannot be recovered.
             </LegalParagraph>
             <LegalParagraph>
                 <span className="font-medium text-secondary">Changing your passphrase.</span> If you change your sync
-                passphrase, only the wrapped encryption keys are updated. Your case and files are not re-encrypted — this is
+                passphrase, only the wrapped encryption keys are updated. Your case and files are not re-encrypted. This is
                 by design and does not weaken the encryption of your data.
             </LegalParagraph>
         </LegalSection>
@@ -138,7 +138,7 @@ export const PrivacyPolicy = () => (
                 </li>
                 <li>
                     <span className="font-medium text-secondary">Insider or casual access.</span> Our staff and infrastructure
-                    providers cannot read your case contents — there is no server-side decryption path.
+                    providers cannot read your case contents. There is no server-side decryption path.
                 </li>
                 <li>
                     <span className="font-medium text-secondary">Subpoena or discovery for case contents.</span> We can only
@@ -181,7 +181,7 @@ export const PrivacyPolicy = () => (
                     your browser, the encryption code is delivered from our website when you load the app. In principle, a
                     compromised deployment could serve tampered code that captures keys. Native apps with code you install
                     once avoid this class of risk. We mitigate browser risk with strict content security policy, subresource
-                    integrity where applicable, minimal dependencies, and published build verification — but we cannot
+                    integrity where applicable, minimal dependencies, and published build verification, but we cannot
                     eliminate it entirely in a web app.
                 </li>
                 <li>
@@ -230,7 +230,7 @@ export const PrivacyPolicy = () => (
 
         <LegalSection heading="How long information is kept">
             <LegalParagraph>
-                Your checker answers and case file remain in your browser until you remove them — for example by erasing your
+                Your checker answers and case file remain in your browser until you remove them, for example by erasing your
                 case, selecting "Start over", or clearing browser storage. Encrypted sync data remains on our servers while
                 your account exists until you delete it or ask us to delete it. Anonymous usage signals are limited in
                 volume and carry no identifying information.
@@ -252,7 +252,7 @@ export const PrivacyPolicy = () => (
         <LegalSection heading="Your privacy rights">
             <LegalParagraph>
                 We handle personal information in line with the Australian Privacy Principles under the Privacy Act 1988
-                (Cth). If you use encrypted sync, we hold your email address and related account metadata — you can contact us
+                (Cth). If you use encrypted sync, we hold your email address and related account metadata. You can contact us
                 to ask about access, correction, or deletion. Because case contents are encrypted in a way we cannot decrypt,
                 we cannot read or correct the substance of your case on your behalf; you retain control through your device
                 and passphrase.

@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
-import { Download01, Trash01, UploadCloud02 } from "@untitledui/icons";
+import { useState } from "react";
+import { Download01, Trash01 } from "@untitledui/icons";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
-import { exportEncryptedBackup, readEncryptedBackup, restoreBackup } from "@/case/backup";
+import { exportEncryptedBackup } from "@/case/backup";
 import { PageHeading } from "@/case/components/case-layout";
 import { SectionCard } from "@/components/layout/shell";
 import { TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { PrivacySecurityCard } from "@/case/components/privacy-security-card";
-import { SyncAccountSecurity } from "@/case/components/sync-account-security";
-import { SyncSettingsCard } from "@/case/components/sync-settings-card";
 import { RecordingConsentWarning } from "@/case/components/recording-consent-warning";
+import { RetrieveDifferentCaseCard } from "@/case/components/retrieve-different-case-card";
+import { SyncSettingsCard } from "@/case/components/sync-settings-card";
 import { useCase } from "@/case/store";
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -29,18 +29,13 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
 );
 
 export const SettingsScreen = () => {
-    const { file, markBackedUp, replaceFile, eraseEverything } = useCase();
+    const { file, markBackedUp, eraseEverything } = useCase();
     const navigate = useNavigate();
-    const restoreRef = useRef<HTMLInputElement>(null);
 
     const [pass, setPass] = useState("");
     const [confirm, setConfirm] = useState("");
     const [backupBusy, setBackupBusy] = useState(false);
     const [backupMsg, setBackupMsg] = useState<string | null>(null);
-
-    const [restorePass, setRestorePass] = useState("");
-    const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
-    const [restoreErr, setRestoreErr] = useState<string | null>(null);
 
     const [confirmErase, setConfirmErase] = useState(false);
 
@@ -69,27 +64,6 @@ export const SettingsScreen = () => {
         }
     };
 
-    const onRestoreFile = async (f: File) => {
-        setRestoreMsg(null);
-        setRestoreErr(null);
-        if (!restorePass) {
-            setRestoreErr("Enter the passphrase you used for this backup.");
-            return;
-        }
-        try {
-            const text = await f.text();
-            const payload = await readEncryptedBackup(text, restorePass);
-            const restored = await restoreBackup(payload);
-            replaceFile(restored);
-            setRestoreMsg("Backup restored. Your case has been loaded onto this device.");
-            setRestorePass("");
-        } catch (e) {
-            setRestoreErr(e instanceof Error ? e.message : "Could not restore that backup.");
-        } finally {
-            if (restoreRef.current) restoreRef.current.value = "";
-        }
-    };
-
     const doErase = async () => {
         await eraseEverything();
         navigate("/");
@@ -101,19 +75,17 @@ export const SettingsScreen = () => {
         <div>
             <PageHeading
                 title="Settings, backup and privacy"
-                description="Your case is stored on this device by default. Manage encrypted sync, download a backup, review what we can and cannot protect, or erase everything."
+                description="Save your case with a backup or encrypted sync account. Review privacy details, or erase everything on this device."
             />
 
             <div className="fg-page-gap">
                 <SyncSettingsCard />
-                <SyncAccountSecurity />
-                <PrivacySecurityCard />
 
                 <Card title="Back up your case">
-                    <GuardrailBanner tone="info" title="Your backup is encrypted with your passphrase" className="mb-4">
+                    <p className="mb-4 text-sm text-tertiary">
                         The backup is encrypted on this device before it's saved. We never see it or your passphrase. If
                         you lose the passphrase, the backup cannot be recovered, so store it somewhere safe.
-                    </GuardrailBanner>
+                    </p>
                     <p className="mb-4 text-sm text-tertiary">Last backup: {lastBackup}</p>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <TextField label="Passphrase" value={pass} onChange={setPass} placeholder="At least 8 characters" />
@@ -125,30 +97,7 @@ export const SettingsScreen = () => {
                     </Button>
                 </Card>
 
-                <Card title="Restore from a backup">
-                    <p className="mb-4 text-sm text-tertiary">
-                        Loading a backup replaces the case on this device. Enter the passphrase first, then choose your
-                        backup file.
-                    </p>
-                    <div className="max-w-sm">
-                        <TextField label="Passphrase" value={restorePass} onChange={setRestorePass} />
-                    </div>
-                    <input
-                        ref={restoreRef}
-                        type="file"
-                        accept=".fgbackup,.json,application/json"
-                        className="hidden"
-                        onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) onRestoreFile(f);
-                        }}
-                    />
-                    <Button color="secondary" size="md" iconLeading={UploadCloud02} className="mt-4" onClick={() => restoreRef.current?.click()}>
-                        Choose backup file
-                    </Button>
-                    {restoreMsg && <p className="mt-3 text-sm text-success-primary">{restoreMsg}</p>}
-                    {restoreErr && <p className="mt-3 text-sm text-error-primary">{restoreErr}</p>}
-                </Card>
+                <PrivacySecurityCard />
 
                 <RecordingConsentWarning />
 
@@ -165,6 +114,8 @@ export const SettingsScreen = () => {
                         Erase all case data
                     </Button>
                 </Card>
+
+                <RetrieveDifferentCaseCard />
             </div>
         </div>
     );

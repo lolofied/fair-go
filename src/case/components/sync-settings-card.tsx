@@ -3,6 +3,7 @@ import { LogOut01, UploadCloud02 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
+import { SyncAccountSecurity } from "@/case/components/sync-account-security";
 import { useCase } from "@/case/store";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
@@ -10,7 +11,6 @@ export const SyncSettingsCard = () => {
     const { file } = useCase();
     const { configured, loading, user, dekUnlocked, syncStatus, syncError, lastSyncedAt, signUp, signIn, signOut, syncNow } = useSync();
 
-    const [mode, setMode] = useState<"signin" | "signup">("signin");
     const [email, setEmail] = useState("");
     const [passphrase, setPassphrase] = useState("");
     const [confirm, setConfirm] = useState("");
@@ -50,32 +50,40 @@ export const SyncSettingsCard = () => {
         setError(null);
     };
 
-    const onSubmit = async () => {
+    const onCreateAccount = async () => {
         setError(null);
         if (passphrase.length < 8) {
             setError("Use a passphrase of at least 8 characters.");
             return;
         }
-        if (mode === "signup" && passphrase !== confirm) {
+        if (passphrase !== confirm) {
             setError("The passphrases don't match.");
             return;
         }
 
         setBusy(true);
         try {
-            if (user && !dekUnlocked) {
-                await signIn(user.email ?? email, passphrase);
-                resetForm();
-                return;
-            }
-            if (mode === "signup") {
-                const { recoveryKey: key } = await signUp(email, passphrase, file);
-                setRecoveryKey(key);
-                resetForm();
-            } else {
-                await signIn(email, passphrase);
-                resetForm();
-            }
+            const { recoveryKey: key } = await signUp(email, passphrase, file);
+            setRecoveryKey(key);
+            resetForm();
+        } catch (e) {
+            setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Something went wrong.");
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const onUnlock = async () => {
+        setError(null);
+        if (passphrase.length < 8) {
+            setError("Use a passphrase of at least 8 characters.");
+            return;
+        }
+
+        setBusy(true);
+        try {
+            await signIn(user!.email ?? email, passphrase);
+            resetForm();
         } catch (e) {
             setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Something went wrong.");
         } finally {
@@ -85,7 +93,7 @@ export const SyncSettingsCard = () => {
 
     if (recoveryKey && !savedRecovery) {
         return (
-            <section className="fg-section-card">
+            <section id="sync" className="fg-section-card">
                 <h2 className="text-md font-semibold text-primary">Save your recovery key</h2>
                 <GuardrailBanner tone="warning" title="This is the only way to recover your account" className="my-4">
                     If you forget your passphrase, this recovery key is the only way back in. We cannot reset it for you.
@@ -131,7 +139,7 @@ export const SyncSettingsCard = () => {
                         </div>
                     )}
                     {!dekUnlocked && (
-                        <Button color="primary" size="md" iconLeading={UploadCloud02} className="mt-4" isLoading={busy} onClick={onSubmit}>
+                        <Button color="primary" size="md" iconLeading={UploadCloud02} className="mt-4" isLoading={busy} onClick={onUnlock}>
                             Unlock encryption
                         </Button>
                     )}
@@ -151,32 +159,22 @@ export const SyncSettingsCard = () => {
                             Sign out
                         </Button>
                     </div>
+                    <SyncAccountSecurity />
                 </div>
             ) : (
                 <div className="mt-4">
-                    <GuardrailBanner tone="info" title="Optional encrypted sync" className="mb-4">
-                        Your case stays on this device until you sync. Sign in to store an encrypted copy you can retrieve
-                        from anywhere. We only store ciphertext we cannot read. Your deadline date may be stored in plaintext
-                        for reminder emails — see{" "}
+                    <p className="mb-4 text-sm text-tertiary">
+                        Create an account to store an encrypted copy of this case you can retrieve from another device. We only
+                        store ciphertext we cannot read. See{" "}
                         <a href="/privacy#encrypted-sync" className="font-medium text-brand-secondary underline-offset-2 hover:underline">
                             Privacy Policy
                         </a>
                         .
-                    </GuardrailBanner>
-                    <div className="mb-4 flex gap-2">
-                        <Button size="sm" color={mode === "signin" ? "primary" : "secondary"} onClick={() => setMode("signin")}>
-                            Sign in
-                        </Button>
-                        <Button size="sm" color={mode === "signup" ? "primary" : "secondary"} onClick={() => setMode("signup")}>
-                            Create account
-                        </Button>
-                    </div>
+                    </p>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <TextField label="Email" value={email} onChange={setEmail} placeholder="you@example.com" />
                         <PasswordField label="Passphrase" value={passphrase} onChange={setPassphrase} placeholder="At least 8 characters" />
-                        {mode === "signup" && (
-                            <PasswordField label="Confirm passphrase" value={confirm} onChange={setConfirm} />
-                        )}
+                        <PasswordField label="Confirm passphrase" value={confirm} onChange={setConfirm} />
                     </div>
                     {error && <p className="mt-3 text-sm text-error-primary">{error}</p>}
                     <Button
@@ -185,9 +183,9 @@ export const SyncSettingsCard = () => {
                         iconLeading={UploadCloud02}
                         className="mt-4"
                         isLoading={busy}
-                        onClick={onSubmit}
+                        onClick={onCreateAccount}
                     >
-                        {mode === "signup" ? "Create sync account" : "Sign in"}
+                        Create sync account
                     </Button>
                 </div>
             )}

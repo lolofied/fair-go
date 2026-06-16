@@ -16,6 +16,7 @@ import {
 import { PageHeading } from "@/case/components/case-layout";
 import { ExportReadinessChecklist } from "@/case/components/export-readiness-checklist";
 import { assignAnnexures, annexureLetterMap, type Annexure } from "@/case/export/annexures";
+import { printCaseExport } from "@/case/export/print";
 import { buildStatement } from "@/case/export/statement";
 import { flagIssues } from "@/case/issues";
 import { getFile } from "@/case/storage";
@@ -109,15 +110,10 @@ export const ExportScreen = () => {
             <div className="print:hidden">
                 <PageHeading
                     title="Export for your lawyer"
-                    description="Run the brief audit, then save a PDF package a lawyer can act on quickly."
-                    action={<Button color="primary" size="md" iconLeading={Printer} onClick={() => window.print()}>Save as PDF</Button>}
+                    description="Review findings, then save a PDF package a lawyer can act on quickly."
+                    action={<Button color="primary" size="md" iconLeading={Printer} onClick={() => printCaseExport(file)}>Save as PDF</Button>}
                 />
                 <ExportReadinessChecklist />
-                <p className="mb-6 rounded-xl border border-secondary bg-primary p-4 text-sm text-tertiary">
-                    Tip: choose "Save as PDF" as the destination in the print dialog. The package below is what gets
-                    exported. Your uploaded image documents are embedded; other files are listed in the annexure index for
-                    you to attach.
-                </p>
             </div>
 
             {/* Printable package */}

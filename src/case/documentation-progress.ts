@@ -1,6 +1,6 @@
 /**
  * Deterministic progress for each documentation area. Used on the overview
- * dashboard — prompts and counts only, never a merits assessment.
+ * dashboard: prompts and counts only, never a merits assessment.
  */
 
 import { analyseGaps } from "@/case/gap-analysis";
@@ -77,7 +77,7 @@ function evidenceProgress(file: CaseFile): Pick<DocSectionProgress, "status" | "
 
 function witnessesProgress(file: CaseFile): Pick<DocSectionProgress, "status" | "detail"> {
     const count = file.witnesses.length;
-    if (count === 0) return { status: "not_started", detail: "Optional — add if others saw key moments" };
+    if (count === 0) return { status: "not_started", detail: "No witnesses added yet" };
     const detailed = file.witnesses.filter((w) => w.name.trim() && (w.whatTheyWitnessed?.trim() || w.personalContact?.trim())).length;
     if (detailed >= 1) {
         return { status: "complete", detail: `${count} witness${count === 1 ? "" : "es"} with details` };
@@ -100,42 +100,19 @@ function exportProgress(file: CaseFile): Pick<DocSectionProgress, "status" | "de
     }
 
     if (report.byClaim.length > 0 && itemsToCheck === 0) {
-        return { status: "complete", detail: "Brief audit passed — ready to save as PDF" };
+        return { status: "complete", detail: "No findings. Ready to save as PDF" };
     }
 
     if (itemsToCheck > 0) {
         const label = itemsToCheck === 1 ? "1 finding" : `${itemsToCheck} findings`;
-        return { status: "in_progress", detail: `Brief audit · ${label} to review` };
+        return { status: "in_progress", detail: `${label} to review` };
     }
 
     return { status: "in_progress", detail: "Review your export and save a PDF" };
 }
 
-function saveProgress(savedRemotely: boolean, hasBackup: boolean): Pick<DocSectionProgress, "status" | "detail"> {
-    if (savedRemotely && hasBackup) {
-        return { status: "complete", detail: "Sync account and local backup both in place" };
-    }
-    if (savedRemotely) {
-        return { status: "complete", detail: "Encrypted copy saved to your account" };
-    }
-    if (hasBackup) {
-        return { status: "in_progress", detail: "Local backup downloaded — create an account to retrieve from anywhere" };
-    }
-    return { status: "not_started", detail: "Your case only lives in this browser until you save it" };
-}
-
-export function computeDocumentationProgress(file: CaseFile, options?: { savedRemotely?: boolean }): DocumentationProgress {
-    const savedRemotely = options?.savedRemotely ?? false;
-    const hasBackup = Boolean(file.meta.lastBackupAt);
-
+export function computeDocumentationProgress(file: CaseFile): DocumentationProgress {
     const sections: DocSectionProgress[] = [
-        {
-            id: "save",
-            label: "Save your case",
-            description: "Create an account or download a backup so you can retrieve your work",
-            href: "/case/settings",
-            ...saveProgress(savedRemotely, hasBackup),
-        },
         {
             id: "profile",
             label: "Case profile",
@@ -167,7 +144,7 @@ export function computeDocumentationProgress(file: CaseFile, options?: { savedRe
         {
             id: "export",
             label: "Export for a lawyer",
-            description: "Brief audit, then save your PDF package",
+            description: "Review findings, then save your PDF package",
             href: "/case/export",
             ...exportProgress(file),
         },
@@ -178,8 +155,8 @@ export function computeDocumentationProgress(file: CaseFile, options?: { savedRe
     const percentComplete = Math.round((completedCount / totalCount) * 100);
 
     const nextSection =
-        sections.find((s) => s.status === "not_started") ??
         sections.find((s) => s.status === "in_progress") ??
+        sections.find((s) => s.status === "not_started") ??
         null;
 
     return { sections, completedCount, totalCount, percentComplete, nextSection };

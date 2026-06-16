@@ -48,6 +48,22 @@ export const CaseProfileScreen = () => {
             />
 
             <div className="flex flex-col gap-6">
+                <Section title="The dismissal">
+                    <SelectField
+                        label="What happened with your job"
+                        value={dismissal.kind ?? ""}
+                        onChange={(v) => setDismissal({ kind: (v || undefined) as typeof dismissal.kind })}
+                        options={Object.entries(DISMISSAL_KIND_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
+                    <DateField label="Date it took effect" value={dismissal.effective_date ?? ""} onChange={(v) => setDismissal({ effective_date: v })} />
+                    <SelectField
+                        label="Reason given"
+                        value={dismissal.reason_category ?? ""}
+                        onChange={(v) => setDismissal({ reason_category: (v || undefined) as typeof dismissal.reason_category })}
+                        options={Object.entries(REASON_LABELS).map(([value, label]) => ({ value, label }))}
+                    />
+                </Section>
+
                 <Section title="You">
                     <TextField label="Full name" value={employee.name ?? ""} onChange={(v) => setEmployee({ name: v })} placeholder="As it appears on your contract" />
                     <TextField label="Your role" value={employee.role ?? ""} onChange={(v) => setEmployee({ role: v })} />
@@ -145,22 +161,6 @@ export const CaseProfileScreen = () => {
                         value={employer.has_associated_entities ?? ""}
                         onChange={(v) => setEmployer({ has_associated_entities: (v || undefined) as typeof employer.has_associated_entities })}
                         options={Object.entries(YES_NO_UNSURE_LABELS).map(([value, label]) => ({ value, label }))}
-                    />
-                </Section>
-
-                <Section title="The dismissal">
-                    <SelectField
-                        label="What happened with your job"
-                        value={dismissal.kind ?? ""}
-                        onChange={(v) => setDismissal({ kind: (v || undefined) as typeof dismissal.kind })}
-                        options={Object.entries(DISMISSAL_KIND_LABELS).map(([value, label]) => ({ value, label }))}
-                    />
-                    <DateField label="Date it took effect" value={dismissal.effective_date ?? ""} onChange={(v) => setDismissal({ effective_date: v })} />
-                    <SelectField
-                        label="Reason given"
-                        value={dismissal.reason_category ?? ""}
-                        onChange={(v) => setDismissal({ reason_category: (v || undefined) as typeof dismissal.reason_category })}
-                        options={Object.entries(REASON_LABELS).map(([value, label]) => ({ value, label }))}
                     />
                 </Section>
 

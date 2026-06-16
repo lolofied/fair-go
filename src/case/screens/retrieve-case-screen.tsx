@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { ArrowLeft, LogIn01, UploadCloud02 } from "@untitledui/icons";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { Button } from "@/components/base/buttons/button";
 import { readEncryptedBackup, restoreBackup } from "@/case/backup";
@@ -15,6 +15,7 @@ import {
 } from "@/components/layout/shell";
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
+import { RecoverPassphrasePanel } from "@/case/components/recover-passphrase-panel";
 import { useCase } from "@/case/store";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
@@ -152,9 +153,9 @@ export const RetrieveCaseScreen = () => {
 
                             <p className="mt-4 text-center text-sm text-tertiary">
                                 Forgot your passphrase?{" "}
-                                <Link to="/case/settings" className="font-medium text-brand-secondary hover:text-brand-secondary_hover">
+                                <a href="#recover" className="font-medium text-brand-secondary hover:text-brand-secondary_hover">
                                     Use your recovery key
-                                </Link>
+                                </a>
                             </p>
 
                             <RestoreFromBackupSection
@@ -166,6 +167,8 @@ export const RetrieveCaseScreen = () => {
                                 onRestoreFile={onRestoreFile}
                                 className="mt-8 border-t border-secondary pt-8 sm:mt-10 sm:pt-10"
                             />
+
+                            <RecoverPassphrasePanel className="mt-8 border-t border-secondary pt-8 sm:mt-10 sm:pt-10" />
                         </>
                     )}
                 </ShellContent>

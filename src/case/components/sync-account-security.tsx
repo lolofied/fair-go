@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Key01, RefreshCw01 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
-import { PasswordField, TextField } from "@/case/components/fields";
-import { GuardrailBanner } from "@/case/components/guardrail";
+import { PasswordField } from "@/case/components/fields";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
-type Panel = "change" | "recover" | null;
+type Panel = "change" | null;
 
 export const SyncAccountSecurity = () => {
-    const { user, dekUnlocked, changePassphrase, recoverPassphrase } = useSync();
+    const { user, dekUnlocked, changePassphrase } = useSync();
 
     const [panel, setPanel] = useState<Panel>(null);
     const [busy, setBusy] = useState(false);
@@ -19,70 +18,7 @@ export const SyncAccountSecurity = () => {
     const [newPassphrase, setNewPassphrase] = useState("");
     const [confirmPassphrase, setConfirmPassphrase] = useState("");
 
-    const [recoverEmail, setRecoverEmail] = useState("");
-    const [recoveryKey, setRecoveryKey] = useState("");
-
-    if (!user) {
-        return (
-            <div className="mt-6 border-t border-secondary pt-6">
-                <h3 className="text-sm font-semibold text-primary">Forgot your passphrase?</h3>
-                <p className="mt-2 text-sm text-tertiary">
-                    Use the recovery key you saved at signup. We cannot reset your passphrase or read your encrypted case.
-                </p>
-                {panel !== "recover" ? (
-                    <Button color="link-gray" size="sm" className="mt-3" onClick={() => setPanel("recover")}>
-                        Recover with recovery key
-                    </Button>
-                ) : (
-                    <RecoverForm
-                        email={recoverEmail}
-                        recoveryKey={recoveryKey}
-                        newPassphrase={newPassphrase}
-                        confirmPassphrase={confirmPassphrase}
-                        busy={busy}
-                        error={error}
-                        success={success}
-                        onEmailChange={setRecoverEmail}
-                        onRecoveryKeyChange={setRecoveryKey}
-                        onNewPassphraseChange={setNewPassphrase}
-                        onConfirmPassphraseChange={setConfirmPassphrase}
-                        onCancel={() => {
-                            setPanel(null);
-                            setError(null);
-                            setSuccess(null);
-                        }}
-                        onSubmit={async () => {
-                            setError(null);
-                            setSuccess(null);
-                            if (newPassphrase.length < 8) {
-                                setError("Use a passphrase of at least 8 characters.");
-                                return;
-                            }
-                            if (newPassphrase !== confirmPassphrase) {
-                                setError("The new passphrases don't match.");
-                                return;
-                            }
-                            setBusy(true);
-                            try {
-                                await recoverPassphrase(recoverEmail, recoveryKey, newPassphrase);
-                                setSuccess("Passphrase updated. You are signed in with your new passphrase.");
-                                setPanel(null);
-                                setRecoveryKey("");
-                                setNewPassphrase("");
-                                setConfirmPassphrase("");
-                            } catch (e) {
-                                setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Recovery failed.");
-                            } finally {
-                                setBusy(false);
-                            }
-                        }}
-                    />
-                )}
-            </div>
-        );
-    }
-
-    if (!dekUnlocked) return null;
+    if (!user || !dekUnlocked) return null;
 
     return (
         <div className="mt-6 border-t border-secondary pt-6">
@@ -157,58 +93,3 @@ export const SyncAccountSecurity = () => {
         </div>
     );
 };
-
-function RecoverForm({
-    email,
-    recoveryKey,
-    newPassphrase,
-    confirmPassphrase,
-    busy,
-    error,
-    success,
-    onEmailChange,
-    onRecoveryKeyChange,
-    onNewPassphraseChange,
-    onConfirmPassphraseChange,
-    onCancel,
-    onSubmit,
-}: {
-    email: string;
-    recoveryKey: string;
-    newPassphrase: string;
-    confirmPassphrase: string;
-    busy: boolean;
-    error: string | null;
-    success: string | null;
-    onEmailChange: (v: string) => void;
-    onRecoveryKeyChange: (v: string) => void;
-    onNewPassphraseChange: (v: string) => void;
-    onConfirmPassphraseChange: (v: string) => void;
-    onCancel: () => void;
-    onSubmit: () => void;
-}) {
-    return (
-        <div className="mt-4">
-            <GuardrailBanner tone="warning" title="Recovery key required" className="mb-4">
-                Supabase email password reset cannot recover your encryption key. Without your recovery key, your encrypted
-                sync data cannot be unlocked.
-            </GuardrailBanner>
-            <div className="grid gap-4 sm:grid-cols-2">
-                <TextField label="Account email" value={email} onChange={onEmailChange} placeholder="you@example.com" />
-                <TextField label="Recovery key" value={recoveryKey} onChange={onRecoveryKeyChange} placeholder="From signup" />
-                <PasswordField label="New passphrase" value={newPassphrase} onChange={onNewPassphraseChange} />
-                <PasswordField label="Confirm new passphrase" value={confirmPassphrase} onChange={onConfirmPassphraseChange} />
-            </div>
-            {error && <p className="mt-3 text-sm text-error-primary">{error}</p>}
-            {success && <p className="mt-3 text-sm text-success-primary">{success}</p>}
-            <div className="mt-4 flex flex-wrap gap-2">
-                <Button size="md" color="primary" iconLeading={Key01} isLoading={busy} onClick={onSubmit}>
-                    Set new passphrase
-                </Button>
-                <Button size="md" color="secondary" onClick={onCancel}>
-                    Cancel
-                </Button>
-            </div>
-        </div>
-    );
-}

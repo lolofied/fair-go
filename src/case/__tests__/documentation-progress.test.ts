@@ -29,21 +29,15 @@ const answers: CheckerAnswers = {
 };
 
 describe("computeDocumentationProgress", () => {
-    it("marks save as not started on a fresh seeded case", () => {
+    it("tracks documentation sections without a save row", () => {
         const file = seedCaseFromChecker(answers);
         const progress = computeDocumentationProgress(file);
 
-        expect(progress.sections.find((s) => s.id === "save")?.status).toBe("not_started");
+        expect(progress.totalCount).toBe(5);
+        expect(progress.sections.some((s) => s.id === "save")).toBe(false);
         expect(progress.sections.find((s) => s.id === "profile")?.status).toBe("complete");
         expect(progress.sections.find((s) => s.id === "events")?.status).toBe("in_progress");
-        expect(progress.nextSection?.id).toBe("save");
-    });
-
-    it("marks save complete when synced remotely", () => {
-        const file = seedCaseFromChecker(answers);
-        const progress = computeDocumentationProgress(file, { savedRemotely: true });
-
-        expect(progress.sections.find((s) => s.id === "save")?.status).toBe("complete");
+        expect(progress.nextSection?.id).toBe("events");
     });
 
     it("reflects open checklist items on the export section", () => {
@@ -53,7 +47,7 @@ describe("computeDocumentationProgress", () => {
 
         expect(exportSection).toBeDefined();
         expect(exportSection!.status).toBe("in_progress");
-        expect(exportSection!.detail).toMatch(/brief audit/i);
+        expect(exportSection!.detail).toMatch(/findings to review/i);
         expect(progress.sections.some((s) => s.id === "gaps")).toBe(false);
     });
 });
