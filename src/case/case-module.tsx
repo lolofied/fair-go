@@ -26,6 +26,7 @@ const CaseRoutes = () => {
     return (
         <Routes>
             <Route path="retrieve" element={<RetrieveCaseScreen />} />
+            <Route path="settings" element={<SettingsScreen />} />
             <Route
                 path="*"
                 element={
@@ -38,7 +39,6 @@ const CaseRoutes = () => {
                             <Route path="evidence" element={<EvidenceScreen />} />
                             <Route path="witnesses" element={<WitnessScreen />} />
                             <Route path="export" element={<ExportScreen />} />
-                            <Route path="settings" element={<SettingsScreen />} />
                         </Routes>
                     </CaseLayout>
                 }

@@ -32,12 +32,17 @@ export const IntroScreen = () => {
         <Shell>
             <ShellHeader>
                 <FairGoWordmark />
-                {showRetrieve ? (
-                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01}>
-                        <span className="sm:hidden">Retrieve</span>
-                        <span className="hidden sm:inline">Retrieve my case</span>
+                <div className="flex items-center gap-4">
+                    <Button href="/support" size="sm" color="link-gray">
+                        Support
                     </Button>
-                ) : null}
+                    {showRetrieve ? (
+                        <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01}>
+                            <span className="sm:hidden">Retrieve</span>
+                            <span className="hidden sm:inline">Retrieve my case</span>
+                        </Button>
+                    ) : null}
+                </div>
             </ShellHeader>
 
             <ShellMain>
@@ -90,6 +95,9 @@ export const IntroScreen = () => {
                         </Link>
                         <Link to="/terms" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                             Terms of Use
+                        </Link>
+                        <Link to="/support" className="font-medium transition duration-100 ease-linear hover:text-secondary">
+                            Support
                         </Link>
                     </nav>
                 </div>

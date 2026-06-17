@@ -123,7 +123,7 @@ export const TermsOfService = () => (
         </LegalSection>
 
         <LegalSection heading="Contact us">
-            <LegalParagraph>If you have any questions about these terms, contact us at hello@fairgo.au.</LegalParagraph>
+            <LegalParagraph>If you have any questions about these terms, contact us at support@fair-go.ai.</LegalParagraph>
         </LegalSection>
     </LegalPage>
 );

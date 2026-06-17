@@ -283,7 +283,7 @@ export const PrivacyPolicy = () => (
         <LegalSection heading="Contact us">
             <LegalParagraph>
                 If you have any questions about this policy, encrypted sync, or how your information is handled, contact us at
-                privacy@fairgo.au.
+                support@fair-go.ai.
             </LegalParagraph>
         </LegalSection>
     </LegalPage>

@@ -4,11 +4,11 @@ import {
     Download01,
     Home02,
     List,
-    Settings01,
     User01,
     Users01,
 } from "@untitledui/icons";
 import { NavLink } from "react-router";
+import { CaseHeaderMenu } from "@/case/components/case-header-menu";
 import { CaseOnboarding } from "@/case/components/case-onboarding";
 import { HeaderSaveStatus } from "@/case/components/header-save-status";
 import { ShellHeaderBrand } from "@/components/layout/shell";
@@ -21,7 +21,6 @@ const NAV = [
     { to: "/case/evidence", label: "Evidence", icon: Archive, end: false },
     { to: "/case/witnesses", label: "Witnesses", icon: Users01, end: false },
     { to: "/case/export", label: "Export", icon: Download01, end: false },
-    { to: "/case/settings", label: "Settings", icon: Settings01, end: false },
 ];
 
 export const CaseLayout = ({ children }: { children: ReactNode }) => {
@@ -31,7 +30,10 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
             <header className="sticky top-0 z-10 border-b border-secondary bg-primary print:hidden">
                 <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 fg-shell-x py-2.5 sm:gap-3 sm:py-3">
                     <ShellHeaderBrand />
-                    <HeaderSaveStatus />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <HeaderSaveStatus />
+                        <CaseHeaderMenu />
+                    </div>
                 </div>
                 <nav className="mx-auto w-full max-w-5xl overflow-x-auto fg-shell-x">
                     <ul className="flex min-w-max items-end gap-1 sm:gap-2">
