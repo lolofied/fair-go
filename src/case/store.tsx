@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { clearAnalytics } from "@/checker/analytics";
 import { clearCheckerStorage, loadCheckerAnswers } from "@/checker/store";
-import { emptyCaseFile, mergeCheckerIntoCase, newId, seedCaseFromChecker } from "@/case/seed";
+import { mergeCheckerIntoCase, newId, seedCaseFromChecker } from "@/case/seed";
+import { evidenceFileSizeError } from "@/case/evidence-upload";
+import { trackCaseDocumentAdded } from "@/analytics/product-analytics";
 import { deleteFile, loadCaseFile, purgeAll, putFile, saveCaseFile } from "@/case/storage";
 import { EVENT_TEMPLATES } from "@/case/templates";
 import type { CaseEvent, CaseEventType, CaseFile, CaseProfile, Evidence, EvidenceType, Witness } from "@/case/types";
@@ -164,6 +166,9 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
 
     const addDocument = useCallback(
         async (input: NewEvidenceInput, uploaded: File) => {
+            const sizeError = evidenceFileSizeError(uploaded.size);
+            if (sizeError) throw new Error(sizeError);
+
             const id = newId();
             const fileRef = newId();
             await putFile(fileRef, uploaded);
@@ -181,6 +186,7 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
                 createdAt: nowISO(),
             };
             mutate((f) => ({ ...f, documents: [...f.documents, evidence] }));
+            trackCaseDocumentAdded(input.docType);
             return id;
         },
         [mutate],
@@ -259,7 +265,8 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
         await purgeAll();
         clearCheckerStorage();
         clearAnalytics();
-        setFile(emptyCaseFile());
+        // Null avoids re-persisting an empty case before we leave the case module.
+        setFile(null);
     }, []);
 
     const value: CaseContextValue = {

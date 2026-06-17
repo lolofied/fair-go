@@ -24,6 +24,7 @@ import { getSupabaseClient } from "@/case/sync/client";
 import { pushLocalCase, SyncEngineError } from "@/case/sync/engine";
 import { clearSyncSession } from "@/case/sync/session";
 import type { CaseFile } from "@/case/types";
+import { trackSyncAccountCreated } from "@/analytics/product-analytics";
 import { isSyncConfigured } from "@/config/supabase";
 
 export type SyncStatus = "idle" | "syncing" | "synced" | "error";
@@ -153,6 +154,7 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
         const result = await signUpWithPassphrase(email, passphrase, caseFile);
         setUser(result.user);
         setDekUnlocked(true);
+        trackSyncAccountCreated();
         return { recoveryKey: result.recoveryKey };
     }, []);
 

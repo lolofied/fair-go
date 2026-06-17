@@ -18,9 +18,11 @@ import { ExportReadinessChecklist } from "@/case/components/export-readiness-che
 import { assignAnnexures, annexureLetterMap, type Annexure } from "@/case/export/annexures";
 import { printCaseExport } from "@/case/export/print";
 import { buildStatement } from "@/case/export/statement";
+import { analyseGaps } from "@/case/gap-analysis";
 import { flagIssues } from "@/case/issues";
 import { getFile } from "@/case/storage";
 import { useCase } from "@/case/store";
+import { trackCaseExportViewed } from "@/analytics/product-analytics";
 
 const CLAIM_TITLES: Record<ClaimType, string> = {
     unfair_dismissal: "Unfair dismissal (Fair Work Act Pt 3-2)",
@@ -96,6 +98,14 @@ const ImageAnnexures = ({ annexures }: { annexures: Annexure[] }) => {
 
 export const ExportScreen = () => {
     const { file } = useCase();
+
+    useEffect(() => {
+        if (!file) return;
+        const report = analyseGaps(file);
+        const findingsCount = report.byClaim.reduce((sum, claim) => sum + claim.gaps.length, 0) + report.contextual.length;
+        trackCaseExportViewed(findingsCount);
+    }, [file]);
+
     if (!file) return null;
 
     const { profile } = file;

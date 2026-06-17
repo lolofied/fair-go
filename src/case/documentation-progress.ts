@@ -23,6 +23,13 @@ export interface DocumentationProgress {
     totalCount: number;
     percentComplete: number;
     nextSection: DocSectionProgress | null;
+    nextStep: SuggestedNextStep | null;
+}
+
+export interface SuggestedNextStep {
+    title: string;
+    subtitle: string;
+    href: string;
 }
 
 function isFilled(value: unknown): boolean {
@@ -111,6 +118,75 @@ function exportProgress(file: CaseFile): Pick<DocSectionProgress, "status" | "de
     return { status: "in_progress", detail: "Review your export and save a PDF" };
 }
 
+function buildSuggestedNextStep(section: DocSectionProgress): SuggestedNextStep {
+    const { id, status, detail, href } = section;
+
+    switch (id) {
+        case "profile":
+            if (status === "not_started") {
+                return {
+                    title: "Review your case profile",
+                    subtitle: "Confirm your employment details and what you want to achieve",
+                    href,
+                };
+            }
+            return { title: "Finish your case profile", subtitle: detail, href };
+
+        case "events":
+            if (status === "not_started") {
+                return {
+                    title: "Record what happened",
+                    subtitle: "Add your first event to build a structured timeline",
+                    href,
+                };
+            }
+            return { title: "Keep building your event log", subtitle: detail, href };
+
+        case "evidence":
+            if (status === "not_started") {
+                return {
+                    title: "Upload supporting documents",
+                    subtitle: "Add evidence and link it to the events it supports",
+                    href,
+                };
+            }
+            return { title: "Strengthen your evidence", subtitle: detail, href };
+
+        case "witnesses":
+            if (status === "not_started") {
+                return {
+                    title: "Add witnesses",
+                    subtitle: "Record who saw key moments and what they can speak to",
+                    href,
+                };
+            }
+            return { title: "Complete witness details", subtitle: detail, href };
+
+        case "export":
+            if (status === "not_started") {
+                return {
+                    title: "Build your record first",
+                    subtitle: "Complete your profile, events, and evidence before exporting",
+                    href,
+                };
+            }
+            if (detail.includes("findings")) {
+                return { title: "Review export findings", subtitle: detail, href };
+            }
+            if (detail.includes("Ready to save")) {
+                return {
+                    title: "Save your PDF export",
+                    subtitle: "Your package is ready. Review it, then download for your lawyer.",
+                    href,
+                };
+            }
+            return { title: "Review and save your export", subtitle: detail, href };
+
+        default:
+            return { title: section.label, subtitle: detail, href };
+    }
+}
+
 export function computeDocumentationProgress(file: CaseFile): DocumentationProgress {
     const sections: DocSectionProgress[] = [
         {
@@ -154,10 +230,8 @@ export function computeDocumentationProgress(file: CaseFile): DocumentationProgr
     const totalCount = sections.length;
     const percentComplete = Math.round((completedCount / totalCount) * 100);
 
-    const nextSection =
-        sections.find((s) => s.status === "in_progress") ??
-        sections.find((s) => s.status === "not_started") ??
-        null;
+    const nextSection = sections.find((s) => s.status !== "complete") ?? null;
+    const nextStep = nextSection ? buildSuggestedNextStep(nextSection) : null;
 
-    return { sections, completedCount, totalCount, percentComplete, nextSection };
+    return { sections, completedCount, totalCount, percentComplete, nextSection, nextStep };
 }

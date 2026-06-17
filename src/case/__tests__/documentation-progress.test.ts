@@ -38,6 +38,7 @@ describe("computeDocumentationProgress", () => {
         expect(progress.sections.find((s) => s.id === "profile")?.status).toBe("complete");
         expect(progress.sections.find((s) => s.id === "events")?.status).toBe("in_progress");
         expect(progress.nextSection?.id).toBe("events");
+        expect(progress.nextStep?.title).toBe("Keep building your event log");
     });
 
     it("reflects open checklist items on the export section", () => {
@@ -49,5 +50,20 @@ describe("computeDocumentationProgress", () => {
         expect(exportSection!.status).toBe("in_progress");
         expect(exportSection!.detail).toMatch(/findings to review/i);
         expect(progress.sections.some((s) => s.id === "gaps")).toBe(false);
+    });
+
+    it("suggests the first incomplete section in list order", () => {
+        const file = { ...seedCaseFromChecker(answers), events: [] };
+        const progress = computeDocumentationProgress(file);
+
+        expect(progress.sections.find((s) => s.id === "profile")?.status).toBe("complete");
+        expect(progress.sections.find((s) => s.id === "events")?.status).toBe("not_started");
+        expect(progress.sections.find((s) => s.id === "export")?.status).toBe("in_progress");
+        expect(progress.nextSection?.id).toBe("events");
+        expect(progress.nextStep).toEqual({
+            title: "Record what happened",
+            subtitle: "Add your first event to build a structured timeline",
+            href: "/case/events",
+        });
     });
 });

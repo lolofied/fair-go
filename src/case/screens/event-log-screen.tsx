@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Plus, Trash01 } from "@untitledui/icons";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, File02, FileCheck02, Plus, Trash01 } from "@untitledui/icons";
+import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { buildTimeline } from "@/case/chronology";
 import { PageHeading } from "@/case/components/case-layout";
@@ -7,8 +8,16 @@ import { DateField, TemplateFieldInput, TextField } from "@/case/components/fiel
 import { ExfiltrationGuardrail } from "@/case/components/guardrail";
 import { useCase } from "@/case/store";
 import { EVENT_TEMPLATES, EVENT_TEMPLATE_ORDER } from "@/case/templates";
-import type { CaseEvent } from "@/case/types";
+import type { CaseEvent, Evidence } from "@/case/types";
 import { cx } from "@/utils/cx";
+
+const dateFmt = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", year: "numeric" });
+
+function formatDate(iso?: string): string {
+    if (!iso) return "No date";
+    const d = new Date(iso + "T00:00:00");
+    return Number.isNaN(d.getTime()) ? iso : dateFmt.format(d);
+}
 
 const LinkChips = ({
     title,
@@ -50,6 +59,20 @@ const LinkChips = ({
     </div>
 );
 
+const DocumentTimelineRow = ({ document }: { document: Evidence }) => (
+    <Link
+        to="/case/evidence"
+        className="group flex items-center gap-2 rounded-xl border border-secondary bg-secondary_subtle p-4 transition duration-100 ease-linear hover:border-brand hover:bg-primary_hover"
+    >
+        <div className="flex-1">
+            <p className="text-xs font-medium text-tertiary">{formatDate(document.date)}</p>
+            <p className="text-sm font-semibold text-primary">{document.title}</p>
+            <p className="text-xs text-tertiary">Document · view in Evidence</p>
+        </div>
+        <File02 className="size-4 shrink-0 text-fg-quaternary transition duration-100 ease-linear group-hover:text-fg-brand-primary" aria-hidden="true" />
+    </Link>
+);
+
 const EventCard = ({ event, expanded, onToggle }: { event: CaseEvent; expanded: boolean; onToggle: () => void }) => {
     const { file, updateEvent, deleteEvent, moveEvent } = useCase();
     const template = EVENT_TEMPLATES[event.type];
@@ -70,7 +93,7 @@ const EventCard = ({ event, expanded, onToggle }: { event: CaseEvent; expanded: 
                     {expanded ? <ChevronDown className="size-5 text-fg-quaternary" /> : <ChevronRight className="size-5 text-fg-quaternary" />}
                     <span>
                         <span className="block text-sm font-semibold text-primary">{event.title?.trim() || template.label}</span>
-                        <span className="block text-xs text-tertiary">{event.date || "No date yet"}</span>
+                        <span className="block text-xs text-tertiary">{event.date ? formatDate(event.date) : "No date yet"}</span>
                     </span>
                 </button>
                 <Button color="tertiary" size="sm" iconLeading={ArrowUp} aria-label="Move earlier" onClick={() => moveEvent(event.id, "up")} />
@@ -119,9 +142,8 @@ export const EventLogScreen = () => {
     const [picking, setPicking] = useState(false);
 
     if (!file) return null;
-    const ordered = buildTimeline({ events: file.events, documents: [] })
-        .filter((i): i is Extract<ReturnType<typeof buildTimeline>[number], { kind: "event" }> => i.kind === "event")
-        .map((i) => i.event);
+
+    const items = buildTimeline(file);
 
     const add = (type: Parameters<typeof addEvent>[0]) => {
         const id = addEvent(type);
@@ -141,7 +163,7 @@ export const EventLogScreen = () => {
         <div>
             <PageHeading
                 title="Event log"
-                description="Record what happened, one event at a time. Each template asks the questions that matter for your claim, so your notes do double duty as a lawyer brief."
+                description="Record events and dated documents in chronological order. Reorder events to fix the sequence; undated items sit at the end."
                 action={<Button color="primary" size="md" iconLeading={Plus} onClick={() => setPicking((p) => !p)}>Add event</Button>}
             />
 
@@ -169,23 +191,38 @@ export const EventLogScreen = () => {
 
             <ExfiltrationGuardrail className="mb-6" />
 
-            {ordered.length === 0 ? (
+            {items.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-secondary p-10 text-center">
-                    <p className="text-md font-medium text-primary">No events yet</p>
+                    <p className="text-md font-medium text-primary">Nothing in your chronology yet</p>
                     <p className="mx-auto mt-1 max-w-md text-sm text-tertiary">
-                        Start with whatever is freshest in your memory, like a recent meeting or the dismissal itself. You
-                        can reorder events later.
+                        Start with whatever is freshest in your memory, like a recent meeting or the dismissal itself. Uploaded
+                        documents with dates will appear here too.
                     </p>
                     <Button color="primary" size="md" iconLeading={Plus} className="mt-4" onClick={() => setPicking(true)}>
                         Add your first event
                     </Button>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3">
-                    {ordered.map((event) => (
-                        <EventCard key={event.id} event={event} expanded={expanded.has(event.id)} onToggle={() => toggle(event.id)} />
-                    ))}
-                </div>
+                <ol className="relative flex flex-col gap-3 border-l border-secondary pl-6">
+                    {items.map((item) => {
+                        const isEvent = item.kind === "event";
+                        const Icon = isEvent ? FileCheck02 : File02;
+                        const key = isEvent ? item.event.id : item.document.id;
+
+                        return (
+                            <li key={key} className="relative">
+                                <span className="absolute -left-[31px] flex size-5 items-center justify-center rounded-full bg-brand-solid">
+                                    <Icon className="size-3 text-white" aria-hidden="true" />
+                                </span>
+                                {isEvent ? (
+                                    <EventCard event={item.event} expanded={expanded.has(item.event.id)} onToggle={() => toggle(item.event.id)} />
+                                ) : (
+                                    <DocumentTimelineRow document={item.document} />
+                                )}
+                            </li>
+                        );
+                    })}
+                </ol>
             )}
         </div>
     );

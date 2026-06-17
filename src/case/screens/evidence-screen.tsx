@@ -4,6 +4,7 @@ import { Button } from "@/components/base/buttons/button";
 import { PageHeading } from "@/case/components/case-layout";
 import { DateField, SelectField, TextField } from "@/case/components/fields";
 import { ExfiltrationGuardrail } from "@/case/components/guardrail";
+import { evidenceFileSizeError, MAX_EVIDENCE_FILE_LABEL } from "@/case/evidence-upload";
 import { getFile } from "@/case/storage";
 import { useCase } from "@/case/store";
 import { EVENT_TEMPLATES } from "@/case/templates";
@@ -101,6 +102,7 @@ export const EvidenceScreen = () => {
     const [date, setDate] = useState("");
     const [source, setSource] = useState("");
     const [busy, setBusy] = useState(false);
+    const [fileError, setFileError] = useState<string | null>(null);
 
     if (!file) return null;
 
@@ -110,7 +112,28 @@ export const EvidenceScreen = () => {
         setDocType("other");
         setDate("");
         setSource("");
+        setFileError(null);
         if (inputRef.current) inputRef.current.value = "";
+    };
+
+    const onFileSelected = (f: File | null) => {
+        if (!f) {
+            setPending(null);
+            setFileError(null);
+            return;
+        }
+
+        const sizeError = evidenceFileSizeError(f.size);
+        if (sizeError) {
+            setPending(null);
+            setFileError(sizeError);
+            if (inputRef.current) inputRef.current.value = "";
+            return;
+        }
+
+        setFileError(null);
+        setPending(f);
+        if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""));
     };
 
     const onSave = async () => {
@@ -141,11 +164,7 @@ export const EvidenceScreen = () => {
                         ref={inputRef}
                         type="file"
                         accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx,.txt,.heic"
-                        onChange={(e) => {
-                            const f = e.target.files?.[0] ?? null;
-                            setPending(f);
-                            if (f && !title) setTitle(f.name.replace(/\.[^.]+$/, ""));
-                        }}
+                        onChange={(e) => onFileSelected(e.target.files?.[0] ?? null)}
                         className="hidden"
                     />
                     <button
@@ -155,8 +174,9 @@ export const EvidenceScreen = () => {
                     >
                         <UploadCloud02 className="size-6 text-fg-quaternary" aria-hidden="true" />
                         <span className="text-sm font-medium text-primary">{pending ? pending.name : "Choose a file"}</span>
-                        <span className="text-xs text-tertiary">PDF, images, or documents. Stored only on this device.</span>
+                        <span className="text-xs text-tertiary">PDF, images, or documents up to {MAX_EVIDENCE_FILE_LABEL}.</span>
                     </button>
+                    {fileError && <p className="mt-2 text-sm text-error-primary">{fileError}</p>}
                 </div>
 
                 {pending && (

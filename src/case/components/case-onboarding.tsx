@@ -36,7 +36,7 @@ const STEPS: OnboardingStep[] = [
         icon: HardDrive,
         color: "brand",
         title: "Your case stays on this device",
-        body: "Nothing you record here is sent to our servers. That keeps it private, but it also means your browser can lose it. Download an encrypted backup from Settings when you're done for the day, especially before clearing your browser or switching devices.",
+        body: "Nothing you record here is sent to our servers by default. That keeps it private, but your browser can lose it. From Settings, download an encrypted backup or create a sync account to retrieve your case on another device, especially before clearing your browser or switching devices.",
     },
 ];
 

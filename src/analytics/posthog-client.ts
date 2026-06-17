@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
+import { ALLOWED_PRODUCT_EVENTS } from "@/analytics/product-events";
 
-const ALLOWED_EVENTS = new Set(["claim_outcome"]);
+const ALLOWED_EVENTS = ALLOWED_PRODUCT_EVENTS;
 
 const key = import.meta.env.VITE_POSTHOG_KEY;
 const host = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
@@ -39,7 +40,7 @@ export function initPostHog(): void {
 
 export function capturePostHog(event: string, properties: Record<string, unknown>): void {
     if (!ready || !ALLOWED_EVENTS.has(event)) return;
-    posthog.capture(event, properties);
+    posthog.capture(event, properties, { send_instantly: true });
 }
 
 export function shutdownPostHog(): void {

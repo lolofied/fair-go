@@ -1,6 +1,6 @@
 /**
  * Merged chronology of events and documents. This is the backbone of the
- * timeline view, the export's statement of facts, and the GP temporal-connection
+ * event log, the export's statement of facts, and the GP temporal-connection
  * analysis, so it lives on its own and is unit-tested.
  *
  * Sort order: dated items ascending by date; ties broken by manual `order` then

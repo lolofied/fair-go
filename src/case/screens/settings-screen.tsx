@@ -12,6 +12,7 @@ import { RecordingConsentWarning } from "@/case/components/recording-consent-war
 import { ReplaceCaseOptionsCard } from "@/case/components/replace-case-options-card";
 import { SyncSettingsCard } from "@/case/components/sync-settings-card";
 import { useCase } from "@/case/store";
+import { trackCaseBackupDownloaded, trackCaseErased } from "@/analytics/product-analytics";
 
 function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob);
@@ -56,6 +57,7 @@ export const SettingsScreen = () => {
             const { blob, filename } = await exportEncryptedBackup(file, pass);
             downloadBlob(blob, filename);
             markBackedUp();
+            trackCaseBackupDownloaded();
             setPass("");
             setConfirm("");
             setBackupMsg("Backup downloaded. Keep it somewhere safe, along with your passphrase.");
@@ -65,8 +67,9 @@ export const SettingsScreen = () => {
     };
 
     const doErase = async () => {
+        trackCaseErased();
         await eraseEverything();
-        navigate("/");
+        navigate("/", { replace: true, state: { forceChecker: true } });
     };
 
     const lastBackup = file.meta.lastBackupAt ? new Date(file.meta.lastBackupAt).toLocaleString("en-AU") : "Never";

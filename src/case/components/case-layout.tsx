@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import {
     Archive,
-    Clock,
     Download01,
     Home02,
     List,
@@ -18,7 +17,6 @@ import { cx } from "@/utils/cx";
 const NAV = [
     { to: "/case", label: "Overview", icon: Home02, end: true },
     { to: "/case/profile", label: "Profile", icon: User01, end: false },
-    { to: "/case/timeline", label: "Timeline", icon: Clock, end: false },
     { to: "/case/events", label: "Events", icon: List, end: false },
     { to: "/case/evidence", label: "Evidence", icon: Archive, end: false },
     { to: "/case/witnesses", label: "Witnesses", icon: Users01, end: false },

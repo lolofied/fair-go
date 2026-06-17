@@ -14,6 +14,7 @@ import { mobileBtnClass, Shell, ShellContent, ShellHeader, ShellMain } from "@/c
 import { Countdown } from "@/checker/components/countdown";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { trackClaimOutcome } from "@/checker/analytics";
+import { trackDocumentationStarted } from "@/analytics/product-analytics";
 import { toCapturedData } from "@/checker/claims";
 import { useChecker } from "@/checker/store";
 import type { ClaimAssessment, ClaimStatus, ClaimType, CheckerFlag } from "@/checker/types";
@@ -247,7 +248,14 @@ export const ResultScreen = () => {
                             without re-entering anything you've told us.
                         </p>
                         <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:flex-row sm:items-center">
-                            <Button size="xl" color="primary" href="/case" iconTrailing={ArrowRight} className={mobileBtnClass}>
+                            <Button
+                                size="xl"
+                                color="primary"
+                                href="/case"
+                                iconTrailing={ArrowRight}
+                                className={mobileBtnClass}
+                                onClick={() => trackDocumentationStarted()}
+                            >
                                 Start documenting
                             </Button>
                             <span className="text-sm text-tertiary">Private to your device · nothing leaves your browser</span>

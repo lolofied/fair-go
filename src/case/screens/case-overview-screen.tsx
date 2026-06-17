@@ -116,14 +116,14 @@ export const CaseOverviewScreen = () => {
                         <ProgressRing value={progress.percentComplete} />
                     </div>
 
-                    {progress.nextSection && (
+                    {progress.nextStep && (
                         <div className="mt-5 flex flex-col gap-3 rounded-xl border border-secondary bg-secondary_subtle p-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-xs font-semibold tracking-wide text-tertiary uppercase">Suggested next step</p>
-                                <p className="mt-1 text-sm font-medium text-primary">{progress.nextSection.label}</p>
-                                <p className="mt-0.5 text-sm text-tertiary">{progress.nextSection.detail}</p>
+                                <p className="mt-1 text-sm font-medium text-primary">{progress.nextStep.title}</p>
+                                <p className="mt-0.5 text-sm text-tertiary">{progress.nextStep.subtitle}</p>
                             </div>
-                            <Button color="primary" size="md" href={progress.nextSection.href} iconTrailing={ArrowRight} className="w-full sm:w-auto">
+                            <Button color="primary" size="md" href={progress.nextStep.href} iconTrailing={ArrowRight} className="w-full sm:w-auto">
                                 Continue
                             </Button>
                         </div>

@@ -11,7 +11,8 @@
  * to PostHog when configured.
  */
 
-import { capturePostHog, shutdownPostHog } from "@/analytics/posthog-client";
+import { trackClaimOutcomePostHog } from "@/analytics/product-analytics";
+import { shutdownPostHog } from "@/analytics/posthog-client";
 import type { CheckerFlag, ClaimAssessment, ClaimStatus, ClaimType } from "@/checker/types";
 
 export interface ClaimOutcomeEvent {
@@ -37,10 +38,10 @@ function persist(event: ClaimOutcomeEvent): void {
         const trimmed = buffer.slice(-MAX_BUFFERED);
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
         window.dispatchEvent(new CustomEvent("fairgo:analytics", { detail: event }));
-        capturePostHog("claim_outcome", {
+        trackClaimOutcomePostHog({
             claims: event.claims,
             flags: event.flags,
-            election_required: event.electionRequired,
+            electionRequired: event.electionRequired,
         });
     } catch {
         /* analytics must never break the app, so fail silently */

@@ -14,12 +14,19 @@ import {
 import { HighlightUnderline } from "@/checker/components/highlight-underline";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { useChecker } from "@/checker/store";
+import { trackCheckerStarted } from "@/analytics/product-analytics";
 import { isSyncConfigured } from "@/config/supabase";
 
 export const IntroScreen = () => {
     const { start, resume, answers } = useChecker();
     const hasProgress = Object.keys(answers).length > 0;
     const showRetrieve = isSyncConfigured();
+
+    const onStart = () => {
+        trackCheckerStarted(hasProgress ? "resume" : "new");
+        if (hasProgress) resume();
+        else start();
+    };
 
     return (
         <Shell>
@@ -55,7 +62,7 @@ export const IntroScreen = () => {
                             color="primary"
                             iconTrailing={ArrowRight}
                             className={mobileBtnClass}
-                            onClick={hasProgress ? resume : start}
+                            onClick={onStart}
                         >
                             {hasProgress ? "Resume my check" : "Start my free check"}
                         </Button>

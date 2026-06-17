@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import { CaseLayout } from "@/case/components/case-layout";
 import { CaseOverviewScreen } from "@/case/screens/case-overview-screen";
 import { CaseProfileScreen } from "@/case/screens/case-profile-screen";
@@ -7,7 +7,6 @@ import { EvidenceScreen } from "@/case/screens/evidence-screen";
 import { ExportScreen } from "@/case/screens/export-screen";
 import { SettingsScreen } from "@/case/screens/settings-screen";
 import { RetrieveCaseScreen } from "@/case/screens/retrieve-case-screen";
-import { TimelineScreen } from "@/case/screens/timeline-screen";
 import { WitnessScreen } from "@/case/screens/witness-screen";
 import { CaseProvider, useCase } from "@/case/store";
 import { SyncEngineBridge } from "@/case/sync/sync-engine-bridge";
@@ -34,7 +33,7 @@ const CaseRoutes = () => {
                         <Routes>
                             <Route index element={<CaseOverviewScreen />} />
                             <Route path="profile" element={<CaseProfileScreen />} />
-                            <Route path="timeline" element={<TimelineScreen />} />
+                            <Route path="timeline" element={<Navigate to="/case/events" replace />} />
                             <Route path="events" element={<EventLogScreen />} />
                             <Route path="evidence" element={<EvidenceScreen />} />
                             <Route path="witnesses" element={<WitnessScreen />} />
