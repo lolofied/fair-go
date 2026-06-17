@@ -9,7 +9,7 @@ import { TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { PrivacySecurityCard } from "@/case/components/privacy-security-card";
 import { RecordingConsentWarning } from "@/case/components/recording-consent-warning";
-import { RetrieveDifferentCaseCard } from "@/case/components/retrieve-different-case-card";
+import { ReplaceCaseOptionsCard } from "@/case/components/replace-case-options-card";
 import { SyncSettingsCard } from "@/case/components/sync-settings-card";
 import { useCase } from "@/case/store";
 
@@ -115,7 +115,7 @@ export const SettingsScreen = () => {
                     </Button>
                 </Card>
 
-                <RetrieveDifferentCaseCard />
+                <ReplaceCaseOptionsCard />
             </div>
         </div>
     );

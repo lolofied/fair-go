@@ -7,10 +7,11 @@
  * the user's answers, dates, salary, names, or free text.
  *
  * The transport is intentionally a thin, swappable sink: today it buffers to
- * localStorage and emits a `fairgo:analytics` event; a real endpoint can be
- * dropped in here without touching call sites.
+ * localStorage, emits a `fairgo:analytics` event, and forwards allowlisted events
+ * to PostHog when configured.
  */
 
+import { capturePostHog, shutdownPostHog } from "@/analytics/posthog-client";
 import type { CheckerFlag, ClaimAssessment, ClaimStatus, ClaimType } from "@/checker/types";
 
 export interface ClaimOutcomeEvent {
@@ -36,6 +37,11 @@ function persist(event: ClaimOutcomeEvent): void {
         const trimmed = buffer.slice(-MAX_BUFFERED);
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
         window.dispatchEvent(new CustomEvent("fairgo:analytics", { detail: event }));
+        capturePostHog("claim_outcome", {
+            claims: event.claims,
+            flags: event.flags,
+            election_required: event.electionRequired,
+        });
     } catch {
         /* analytics must never break the app, so fail silently */
     }
@@ -46,6 +52,7 @@ export function clearAnalytics(): void {
     if (typeof window === "undefined") return;
     try {
         window.localStorage.removeItem(STORAGE_KEY);
+        shutdownPostHog();
     } catch {
         /* storage may be unavailable; nothing to clear */
     }

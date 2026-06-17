@@ -36,6 +36,7 @@ interface CaseContextValue {
     markBackedUp: () => void;
     replaceFile: (file: CaseFile) => void;
     reseedFromChecker: () => void;
+    startNewCase: () => Promise<void>;
     eraseEverything: () => Promise<void>;
 }
 
@@ -248,6 +249,12 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
         setFile((prev) => (prev ? mergeCheckerIntoCase(prev, answers) : seedCaseFromChecker(answers)));
     }, []);
 
+    const startNewCase = useCallback(async () => {
+        await purgeAll();
+        clearCheckerStorage();
+        clearAnalytics();
+    }, []);
+
     const eraseEverything = useCallback(async () => {
         await purgeAll();
         clearCheckerStorage();
@@ -272,6 +279,7 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
         markBackedUp,
         replaceFile,
         reseedFromChecker,
+        startNewCase,
         eraseEverything,
     };
 

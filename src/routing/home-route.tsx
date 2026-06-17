@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { CheckerFlow } from "@/checker/checker-flow";
 import { shouldEnterCaseOverview } from "@/routing/should-enter-case";
 
 export const HomeRoute = () => {
-    const [target, setTarget] = useState<"loading" | "checker" | "case">("loading");
+    const location = useLocation();
+    const forceChecker = Boolean((location.state as { forceChecker?: boolean } | null)?.forceChecker);
+    const [target, setTarget] = useState<"loading" | "checker" | "case">(forceChecker ? "checker" : "loading");
 
     useEffect(() => {
+        if (forceChecker) return;
+
         let cancelled = false;
 
         shouldEnterCaseOverview().then((enterCase) => {
@@ -17,7 +21,7 @@ export const HomeRoute = () => {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [forceChecker]);
 
     if (target === "loading") {
         return (
