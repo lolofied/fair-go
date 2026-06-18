@@ -123,6 +123,6 @@ export function purgeAll(): Promise<void> {
         const request = indexedDB.deleteDatabase(DB_NAME);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
-        request.onblocked = () => resolve();
+        request.onblocked = () => reject(new Error("Close other Fair Go tabs before erasing local case data."));
     });
 }

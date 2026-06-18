@@ -5,6 +5,7 @@ import { mergeCheckerIntoCase, newId, seedCaseFromChecker } from "@/case/seed";
 import { evidenceFileSizeError } from "@/case/evidence-upload";
 import { trackCaseDocumentAdded } from "@/analytics/product-analytics";
 import { deleteFile, loadCaseFile, purgeAll, putFile, saveCaseFile } from "@/case/storage";
+import { signOutSync } from "@/case/sync/auth";
 import { EVENT_TEMPLATES } from "@/case/templates";
 import type { CaseEvent, CaseEventType, CaseFile, CaseProfile, Evidence, EvidenceType, Witness } from "@/case/types";
 
@@ -256,12 +257,14 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
     }, []);
 
     const startNewCase = useCallback(async () => {
+        await signOutSync();
         await purgeAll();
         clearCheckerStorage();
         clearAnalytics();
     }, []);
 
     const eraseEverything = useCallback(async () => {
+        await signOutSync();
         await purgeAll();
         clearCheckerStorage();
         clearAnalytics();
