@@ -44,7 +44,7 @@ interface SyncContextValue {
     lastSyncedAt: string | null;
     lastPushedUpdatedAtRef: MutableRefObject<string | null>;
     signUp: (email: string, passphrase: string, caseFile: CaseFile) => Promise<{ recoveryKey: string }>;
-    signIn: (email: string, passphrase: string) => Promise<void>;
+    signIn: (email: string, passphrase: string) => Promise<User>;
     signOut: () => Promise<void>;
     syncNow: (caseFile: CaseFile) => Promise<void>;
     changePassphrase: (email: string, currentPassphrase: string, newPassphrase: string) => Promise<void>;
@@ -162,6 +162,7 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
         const next = await signInWithPassphrase(email, passphrase);
         setUser(next);
         setDekUnlocked(true);
+        return next;
     }, []);
 
     const signOut = useCallback(async () => {

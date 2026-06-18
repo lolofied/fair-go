@@ -17,12 +17,14 @@ import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { RecoverPassphrasePanel } from "@/case/components/recover-passphrase-panel";
 import { useCase } from "@/case/store";
+import { retrieveRemoteCase, SyncEngineError } from "@/case/sync/engine";
+import { getSyncDek } from "@/case/sync/session";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
 export const RetrieveCaseScreen = () => {
     const navigate = useNavigate();
     const { replaceFile } = useCase();
-    const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn } = useSync();
+    const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn, signOut, setSyncState, markSynced } = useSync();
 
     const [email, setEmail] = useState("");
     const [passphrase, setPassphrase] = useState("");
@@ -51,9 +53,27 @@ export const RetrieveCaseScreen = () => {
             return;
         }
         setBusy(true);
+        let signedInForRetrieve = false;
         try {
-            await signIn(email, passphrase);
+            setSyncState({ status: "syncing", error: null });
+            const signedInUser = await signIn(email, passphrase);
+            signedInForRetrieve = true;
+            const dek = getSyncDek();
+            if (!dek) {
+                throw new SyncEngineError("Unlock encryption with your passphrase first.");
+            }
+
+            const restored = await retrieveRemoteCase(dek, signedInUser.id);
+            replaceFile(restored);
+            markSynced(restored.meta.updatedAt);
+            setSyncState({ status: "synced", error: null });
+            navigate("/case", { replace: true });
         } catch (e) {
+            if (signedInForRetrieve) {
+                await signOut();
+            } else {
+                setSyncState({ status: "idle", error: null });
+            }
             setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Sign-in failed.");
         } finally {
             setBusy(false);
@@ -70,6 +90,7 @@ export const RetrieveCaseScreen = () => {
         try {
             const text = await f.text();
             const payload = await readEncryptedBackup(text, restorePass);
+            await signOut();
             const restored = await restoreBackup(payload);
             replaceFile(restored);
             navigate("/case", { replace: true });

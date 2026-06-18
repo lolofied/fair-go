@@ -13,7 +13,7 @@ import {
     encryptJson,
     unlockWithPassphrase,
 } from "@/case/crypto";
-import { getAllFiles, putFile, saveCaseFile } from "@/case/storage";
+import { getAllFiles, purgeAll, putFile, saveCaseFile } from "@/case/storage";
 import type { CaseFile, EncryptedBackup, EncryptedBackupV1, EncryptedBackupV2 } from "@/case/types";
 
 const PBKDF2_ITERATIONS = 250_000;
@@ -165,6 +165,7 @@ export async function readEncryptedBackup(fileText: string, passphrase: string):
 
 /** Restore a decrypted payload into local storage (case file + files). */
 export async function restoreBackup(payload: BackupPayload): Promise<CaseFile> {
+    await purgeAll();
     for (const [ref, file] of Object.entries(payload.files)) {
         await putFile(ref, backupFileToBlob(file));
     }
