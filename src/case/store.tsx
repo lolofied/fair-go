@@ -3,7 +3,7 @@ import { clearAnalytics } from "@/checker/analytics";
 import { clearCheckerStorage, loadCheckerAnswers } from "@/checker/store";
 import { mergeCheckerIntoCase, newId, seedCaseFromChecker } from "@/case/seed";
 import { evidenceFileSizeError } from "@/case/evidence-upload";
-import { trackCaseDocumentAdded } from "@/analytics/product-analytics";
+import { trackCaseDocumentAdded, trackCaseEventAdded, trackCaseWitnessAdded } from "@/analytics/product-analytics";
 import { deleteFile, loadCaseFile, purgeAll, putFile, saveCaseFile } from "@/case/storage";
 import { EVENT_TEMPLATES } from "@/case/templates";
 import type { CaseEvent, CaseEventType, CaseFile, CaseProfile, Evidence, EvidenceType, Witness } from "@/case/types";
@@ -113,6 +113,7 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
                 updatedAt: ts,
             };
             mutate((f) => ({ ...f, events: [...f.events, event] }));
+            trackCaseEventAdded(type);
             return id;
         },
         [mutate],
@@ -227,6 +228,7 @@ export const CaseProvider = ({ children }: PropsWithChildren) => {
                 createdAt: nowISO(),
             };
             mutate((f) => ({ ...f, witnesses: [...f.witnesses, record] }));
+            trackCaseWitnessAdded();
             return id;
         },
         [mutate],

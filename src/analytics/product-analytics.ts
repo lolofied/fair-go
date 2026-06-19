@@ -6,7 +6,9 @@
 import { capturePostHog } from "@/analytics/posthog-client";
 import type { ProductEventName } from "@/analytics/product-events";
 import type { CheckerFlag, ClaimStatus, ClaimType } from "@/checker/types";
-import type { EvidenceType } from "@/case/types";
+import type { CaseEventType, EvidenceType } from "@/case/types";
+
+export type CaseSyncSavedTrigger = "manual" | "auto" | "login";
 
 function track(event: ProductEventName, properties: Record<string, unknown> = {}): void {
     try {
@@ -36,6 +38,18 @@ export function trackDocumentationStarted(): void {
     track("documentation_started");
 }
 
+export function trackCaseOnboardingCompleted(): void {
+    track("case_onboarding_completed");
+}
+
+export function trackCaseEventAdded(eventType: CaseEventType): void {
+    track("case_event_added", { event_type: eventType });
+}
+
+export function trackCaseWitnessAdded(): void {
+    track("case_witness_added");
+}
+
 export function trackCaseDocumentAdded(docType: EvidenceType): void {
     track("case_document_added", { doc_type: docType });
 }
@@ -58,6 +72,14 @@ export function trackCaseBackupDownloaded(): void {
 
 export function trackSyncAccountCreated(): void {
     track("sync_account_created");
+}
+
+export function trackSyncAccountSignedIn(): void {
+    track("sync_account_signed_in");
+}
+
+export function trackCaseSyncSaved(trigger: CaseSyncSavedTrigger): void {
+    track("case_sync_saved", { trigger });
 }
 
 export function trackCaseErased(): void {

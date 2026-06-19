@@ -24,7 +24,7 @@ import { getSupabaseClient } from "@/case/sync/client";
 import { pushLocalCase, SyncEngineError } from "@/case/sync/engine";
 import { clearSyncSession } from "@/case/sync/session";
 import type { CaseFile } from "@/case/types";
-import { trackSyncAccountCreated } from "@/analytics/product-analytics";
+import { trackCaseSyncSaved, trackSyncAccountCreated, trackSyncAccountSignedIn } from "@/analytics/product-analytics";
 import { isSyncConfigured } from "@/config/supabase";
 
 export type SyncStatus = "idle" | "syncing" | "synced" | "error";
@@ -128,6 +128,7 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
             try {
                 await pushLocalCase(caseFile, dek, user.id);
                 markSynced(caseFile.meta.updatedAt);
+                trackCaseSyncSaved("manual");
                 setSyncState({ status: "synced", error: null });
             } catch (error) {
                 const message = error instanceof SyncEngineError ? error.message : "Sync failed.";
@@ -162,6 +163,7 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
         const next = await signInWithPassphrase(email, passphrase);
         setUser(next);
         setDekUnlocked(true);
+        trackSyncAccountSignedIn();
     }, []);
 
     const signOut = useCallback(async () => {

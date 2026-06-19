@@ -5,6 +5,7 @@ import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { FeaturedIcon } from "@/components/foundations/featured-icon/featured-icon";
+import { trackCaseOnboardingCompleted } from "@/analytics/product-analytics";
 
 const ONBOARDING_KEY = "fairgo.case.onboarding.v1";
 
@@ -72,6 +73,7 @@ export const CaseOnboarding = () => {
 
     const finish = () => {
         markOnboardingSeen();
+        trackCaseOnboardingCompleted();
         setOpen(false);
     };
 

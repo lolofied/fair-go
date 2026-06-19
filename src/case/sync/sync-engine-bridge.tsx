@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useCase } from "@/case/store";
+import { trackCaseSyncSaved } from "@/analytics/product-analytics";
 import { resolveOnLogin, pushLocalCase, SyncEngineError } from "@/case/sync/engine";
 import { getSyncDek } from "@/case/sync/session";
 import { useSync } from "@/case/sync/sync-provider";
@@ -38,6 +39,8 @@ export const SyncEngineBridge = () => {
 
                 if (result.applied === "remote") {
                     replaceFile(result.caseFile);
+                } else if (result.applied === "local") {
+                    trackCaseSyncSaved("login");
                 }
 
                 markSynced(result.caseFile.meta.updatedAt);
@@ -73,6 +76,7 @@ export const SyncEngineBridge = () => {
             try {
                 await pushLocalCase(current, dek, user.id);
                 markSynced(current.meta.updatedAt);
+                trackCaseSyncSaved("auto");
                 setSyncState({ status: "synced", error: null });
             } catch (error) {
                 setSyncState({
