@@ -1,14 +1,17 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { initPostHog } from "@/analytics/posthog-client";
-import { CaseModule } from "@/case/case-module";
+import { RouteLoadingFallback } from "@/components/layout/route-loading-fallback";
 import { HomeRoute } from "@/routing/home-route";
-import { PrivacyPolicy } from "@/pages/legal/privacy-policy";
-import { TermsOfService } from "@/pages/legal/terms-of-service";
-import { SupportPage } from "@/pages/support";
-import { AboutPage } from "@/pages/about";
-import { NotFound } from "@/pages/not-found";
+import {
+    LazyAboutPage,
+    LazyCaseModule,
+    LazyNotFound,
+    LazyPrivacyPolicy,
+    LazySupportPage,
+    LazyTermsOfService,
+} from "@/routing/lazy-routes";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
@@ -20,15 +23,17 @@ createRoot(document.getElementById("root")!).render(
         <ThemeProvider>
             <BrowserRouter>
                 <RouteProvider>
-                    <Routes>
-                        <Route path="/" element={<HomeRoute />} />
-                        <Route path="/case/*" element={<CaseModule />} />
-                        <Route path="/privacy" element={<PrivacyPolicy />} />
-                        <Route path="/terms" element={<TermsOfService />} />
-                        <Route path="/support" element={<SupportPage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                        <Routes>
+                            <Route path="/" element={<HomeRoute />} />
+                            <Route path="/case/*" element={<LazyCaseModule />} />
+                            <Route path="/privacy" element={<LazyPrivacyPolicy />} />
+                            <Route path="/terms" element={<LazyTermsOfService />} />
+                            <Route path="/support" element={<LazySupportPage />} />
+                            <Route path="/about" element={<LazyAboutPage />} />
+                            <Route path="*" element={<LazyNotFound />} />
+                        </Routes>
+                    </Suspense>
                 </RouteProvider>
             </BrowserRouter>
         </ThemeProvider>
