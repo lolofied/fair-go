@@ -1,13 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     AlertTriangle,
     ArrowRight,
     CheckCircle,
+    ChevronDown,
     Edit01,
     HelpCircle,
     InfoCircle,
     RefreshCcw01,
-    Scales02,
 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { mobileBtnClass, Shell, ShellContent, ShellHeader, ShellMain } from "@/components/layout/shell";
@@ -105,15 +105,45 @@ const FLAG_NOTES: Partial<Record<CheckerFlag, { title: string; body: string }>> 
     },
 };
 
-const ClaimCard = ({ claim }: { claim: ClaimAssessment }) => {
-    const meta = STATUS_META[claim.status];
-    return (
-        <div className={cx("fg-section-card", meta.cardRing)}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-md font-semibold text-primary">{CLAIM_TITLES[claim.claimType]}</h3>
-                <span className={cx("rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>{meta.label}</span>
+/** Decorative mock of the exported case package: a PDF document with a chronological timeline inside. */
+const PackagePreview = () => (
+    <div aria-hidden="true" className="pointer-events-none hidden shrink-0 sm:block">
+        <div className="w-52 rotate-2 rounded-xl border border-secondary bg-primary p-4 shadow-lg transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:rotate-0 group-hover:shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+                <div className="h-2 w-20 rounded-full bg-quaternary" />
+                <span className="rounded bg-error-primary px-1.5 py-px text-[10px] font-bold tracking-wide text-error-primary">
+                    PDF
+                </span>
             </div>
 
+            <div className="relative flex flex-col gap-3.5">
+                {/* Connecting line behind the timeline dots. */}
+                <span className="absolute top-1.5 bottom-1.5 left-[3px] w-px bg-border-secondary" />
+                {[0, 1, 2].map((row) => (
+                    <div key={row} className="relative flex items-center gap-2.5">
+                        <span className="z-10 size-1.5 shrink-0 rounded-full bg-brand-solid ring-2 ring-white" />
+                        <div className="flex-1">
+                            <div className="h-1.5 w-full rounded-full bg-quaternary" />
+                            <div className="mt-1 h-1.5 w-2/3 rounded-full bg-tertiary" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
+
+const ClaimCard = ({ claim }: { claim: ClaimAssessment }) => {
+    const meta = STATUS_META[claim.status];
+    // "May not apply" claims start collapsed so stronger paths stay front and centre.
+    const isCollapsible = claim.status === "unlikely";
+    const [isOpen, setIsOpen] = useState(!isCollapsible);
+
+    const titleText = CLAIM_TITLES[claim.claimType];
+    const badge = <span className={cx("rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>{meta.label}</span>;
+
+    const details = (
+        <>
             {claim.deadline && (
                 <p className="mt-2 text-sm text-tertiary">
                     {claim.deadline.daysRemaining < 0
@@ -161,6 +191,44 @@ const ClaimCard = ({ claim }: { claim: ClaimAssessment }) => {
                     )}
                 </div>
             )}
+        </>
+    );
+
+    if (isCollapsible) {
+        return (
+            <div className={cx("fg-section-card", meta.cardRing)}>
+                <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => setIsOpen((open) => !open)}
+                    className="flex w-full flex-wrap items-center justify-between gap-3 text-left"
+                >
+                    <h3 className="text-md font-semibold text-primary">{titleText}</h3>
+                    <div className="flex items-center gap-2">
+                        {badge}
+                        <ChevronDown
+                            className={cx(
+                                "size-5 text-fg-quaternary transition-transform duration-100 ease-linear",
+                                isOpen && "rotate-180",
+                            )}
+                            aria-hidden="true"
+                        />
+                    </div>
+                </button>
+
+                {isOpen && details}
+            </div>
+        );
+    }
+
+    return (
+        <div className={cx("fg-section-card", meta.cardRing)}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-md font-semibold text-primary">{titleText}</h3>
+                {badge}
+            </div>
+
+            {details}
         </div>
     );
 };
@@ -221,13 +289,7 @@ export const ResultScreen = () => {
 
             <ShellMain align="start">
                 <ShellContent>
-                    <div className="flex items-center gap-2">
-                        <Scales02 className="size-5 text-fg-brand-primary" />
-                        <span className="text-sm font-semibold tracking-wide text-fg-brand-primary uppercase">
-                            What your answers point to
-                        </span>
-                    </div>
-                    <h1 className="mt-3 text-xl font-semibold tracking-tight text-primary sm:text-display-sm">
+                    <h1 className="text-xl font-semibold tracking-tight text-primary sm:text-display-sm">
                         Here are the paths worth taking to a lawyer.
                     </h1>
                     <p className="mt-3 text-md text-tertiary sm:mt-4 sm:text-lg">
@@ -239,28 +301,6 @@ export const ResultScreen = () => {
                     {!isNonDismissalPath && remaining !== null && (
                         <Countdown variant="block" daysRemaining={remaining} className="mt-8" />
                     )}
-
-                    {/* Primary CTA into the documentation flow */}
-                    <section className="fg-section-card mt-6 border-brand bg-brand-primary sm:mt-8">
-                        <h2 className="text-lg font-semibold text-primary sm:text-display-xs">Build your lawyer-ready package</h2>
-                        <p className="mt-2 text-sm text-tertiary sm:text-md">
-                            Turn these answers into an organised timeline and document set a lawyer can act on in minutes,
-                            without re-entering anything you've told us.
-                        </p>
-                        <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:flex-row sm:items-center">
-                            <Button
-                                size="xl"
-                                color="primary"
-                                href="/case"
-                                iconTrailing={ArrowRight}
-                                className={mobileBtnClass}
-                                onClick={() => trackDocumentationStarted()}
-                            >
-                                Start documenting
-                            </Button>
-                            <span className="text-sm text-tertiary">Private to your device · nothing leaves your browser</span>
-                        </div>
-                    </section>
 
                     {/* s.725 election warning: alternatives, never "lodge both". */}
                     {election && (
@@ -311,6 +351,36 @@ export const ResultScreen = () => {
                             </ul>
                         </section>
                     )}
+
+                    {/* Primary CTA into the documentation flow */}
+                    <section className="fg-section-card group relative mt-8 overflow-hidden border-brand bg-brand-primary shadow-lg sm:mt-10">
+                        <div className="flex items-center justify-between gap-6">
+                            <div className="max-w-md">
+                                <h2 className="text-lg font-semibold text-primary sm:text-display-xs">
+                                    Build your lawyer-ready package
+                                </h2>
+                                <p className="mt-2 text-sm text-tertiary sm:text-md">
+                                    Turn these answers into an organised timeline and document set a lawyer can act on in
+                                    minutes
+                                </p>
+                                <div className="mt-4 flex flex-col gap-3 sm:mt-5">
+                                    <Button
+                                        size="xl"
+                                        color="primary"
+                                        href="/case"
+                                        iconTrailing={ArrowRight}
+                                        className={mobileBtnClass}
+                                        onClick={() => trackDocumentationStarted()}
+                                    >
+                                        Start documenting
+                                    </Button>
+                                    <span className="text-sm text-tertiary">Private to your device · nothing leaves your browser</span>
+                                </div>
+                            </div>
+
+                            <PackagePreview />
+                        </div>
+                    </section>
 
                     {/* Things to ask a lawyer about */}
                     {lawyerNotes.length > 0 && (

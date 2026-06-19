@@ -1,26 +1,15 @@
-import { ArrowRight, LogIn01 } from "@untitledui/icons";
-import { Link } from "react-router";
+import { ArrowRight } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
-import {
-    HeroLead,
-    HeroTitle,
-    mobileBtnClass,
-    Shell,
-    ShellContent,
-    ShellFooter,
-    ShellHeader,
-    ShellMain,
-} from "@/components/layout/shell";
+import { HeroLead, HeroTitle, mobileBtnClass, Shell, ShellContent, ShellMain } from "@/components/layout/shell";
 import { HighlightUnderline } from "@/checker/components/highlight-underline";
-import { FairGoWordmark } from "@/checker/components/wordmark";
+import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
+import { PageMeta } from "@/components/seo/page-meta";
 import { useChecker } from "@/checker/store";
 import { trackCheckerStarted } from "@/analytics/product-analytics";
-import { isSyncConfigured } from "@/config/supabase";
 
 export const IntroScreen = () => {
     const { start, resume, answers } = useChecker();
     const hasProgress = Object.keys(answers).length > 0;
-    const showRetrieve = isSyncConfigured();
 
     const onStart = () => {
         trackCheckerStarted(hasProgress ? "resume" : "new");
@@ -30,20 +19,11 @@ export const IntroScreen = () => {
 
     return (
         <Shell>
-            <ShellHeader>
-                <FairGoWordmark />
-                <div className="flex items-center gap-4">
-                    <Button href="/support" size="sm" color="link-gray">
-                        Support
-                    </Button>
-                    {showRetrieve ? (
-                        <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01}>
-                            <span className="sm:hidden">Retrieve</span>
-                            <span className="hidden sm:inline">Retrieve my case</span>
-                        </Button>
-                    ) : null}
-                </div>
-            </ShellHeader>
+            <PageMeta
+                title="Fair Go | Free unfair dismissal eligibility check"
+                description="Free, 90-second check for whether you may have an Australian unfair dismissal claim under the Fair Work Act, and how long you have left to act. Not legal advice."
+            />
+            <LandingHeader />
 
             <ShellMain>
                 <ShellContent width="marketing" className="text-center">
@@ -78,30 +58,7 @@ export const IntroScreen = () => {
                 </ShellContent>
             </ShellMain>
 
-            <ShellFooter>
-                <div className="mx-auto flex max-w-[968px] flex-col items-center gap-3 sm:gap-4">
-                    <p className="text-center text-sm text-tertiary">
-                        Fair Go is not a law firm and this tool is not legal advice. It helps you document your situation
-                        and understand your options. For advice about your specific circumstances, speak to an employment
-                        lawyer or contact the{" "}
-                        <a className="font-medium text-brand-secondary underline" href="https://www.fwc.gov.au" target="_blank" rel="noreferrer">
-                            Fair Work Commission
-                        </a>
-                        .
-                    </p>
-                    <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-tertiary">
-                        <Link to="/privacy" className="font-medium transition duration-100 ease-linear hover:text-secondary">
-                            Privacy Policy
-                        </Link>
-                        <Link to="/terms" className="font-medium transition duration-100 ease-linear hover:text-secondary">
-                            Terms of Use
-                        </Link>
-                        <Link to="/support" className="font-medium transition duration-100 ease-linear hover:text-secondary">
-                            Support
-                        </Link>
-                    </nav>
-                </div>
-            </ShellFooter>
+            <LandingFooter />
         </Shell>
     );
 };

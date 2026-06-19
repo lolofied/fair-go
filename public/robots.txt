@@ -1,0 +1,9 @@
+# https://fair-go.ai
+User-agent: *
+Allow: /
+
+# The case documentation app is private and stored per-device; keep it out of the index.
+Disallow: /case
+Disallow: /case/
+
+Sitemap: https://fair-go.ai/sitemap.xml

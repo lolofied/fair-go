@@ -1,9 +1,9 @@
 import { cx } from "@/utils/cx";
 
-const LOGO_SRC = "/app-icon.png";
+const LOGO_SRC = "/fair-go-logo.png";
 
 export const FairGoLogo = ({ className }: { className?: string }) => (
-    <img src={LOGO_SRC} alt="" aria-hidden="true" className={cx("size-6 shrink-0 rounded-md object-cover", className)} />
+    <img src={LOGO_SRC} alt="" aria-hidden="true" className={cx("size-6 shrink-0 rounded-md object-contain", className)} />
 );
 
 export const FairGoWordmark = ({ className }: { className?: string }) => (

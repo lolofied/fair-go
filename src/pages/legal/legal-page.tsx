@@ -37,6 +37,9 @@ export const LegalPage = ({ title, lastUpdated, intro, children }: PropsWithChil
                 <Link to="/" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     Home
                 </Link>
+                <Link to="/about" className="font-medium transition duration-100 ease-linear hover:text-secondary">
+                    About
+                </Link>
                 <Link to="/privacy" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     Privacy Policy
                 </Link>

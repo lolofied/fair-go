@@ -1,4 +1,5 @@
 import { LegalList, LegalPage, LegalParagraph, LegalSection } from "@/pages/legal/legal-page";
+import { PageMeta } from "@/components/seo/page-meta";
 
 export const TermsOfService = () => (
     <LegalPage
@@ -11,6 +12,11 @@ export const TermsOfService = () => (
             </>
         }
     >
+        <PageMeta
+            title="Terms of Use | Fair Go"
+            description="The terms of use for Fair Go, a free unfair dismissal eligibility checker and private case documentation tool. Not legal advice."
+            path="/terms"
+        />
         <LegalSection heading="What Fair Go is">
             <LegalParagraph>
                 Fair Go is a free, self-help tool that asks you questions and gives you general information about whether

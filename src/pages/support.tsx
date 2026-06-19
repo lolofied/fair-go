@@ -3,6 +3,9 @@ import { useLocation } from "react-router";
 import { HelpCircle, MessageChatCircle, Send01 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { SelectField, TextAreaField, TextField } from "@/case/components/fields";
+import { Shell, ShellContent, ShellMain } from "@/components/layout/shell";
+import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
+import { PageMeta } from "@/components/seo/page-meta";
 import { StandalonePageContent, StandalonePageShell } from "@/components/layout/standalone-page-shell";
 
 type SupportLocationState = {
@@ -52,62 +55,87 @@ export const SupportPage = () => {
         window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
     };
 
-    return (
-        <StandalonePageShell
-            brandHref="/"
-            brandLabel="Back to Fair Go home"
-            backHref={returnToCase ? "/case" : "/"}
-            backLabel={returnToCase ? "Back to case" : "Back to home"}
-        >
-            <StandalonePageContent>
-                <h1 className="text-display-sm font-semibold tracking-tight text-primary">Contact support</h1>
+    const content = (
+        <>
+            <PageMeta
+                title="Support | Fair Go"
+                description="Get help with Fair Go. Ask a product question, report a problem, or share feedback. Your case stays private on your device."
+                path="/support"
+            />
+            <h1 className="text-display-sm font-semibold tracking-tight text-primary">Contact support</h1>
 
-                <ul className="mt-6 flex flex-col gap-3">
-                    {INTENT_ITEMS.map(({ icon: Icon, text }) => (
-                        <li key={text} className="flex items-center gap-3 text-md text-secondary">
-                            <Icon className="size-5 shrink-0 text-fg-quaternary" aria-hidden="true" />
-                            {text}
-                        </li>
-                    ))}
-                </ul>
+            <ul className="mt-6 flex flex-col gap-3">
+                {INTENT_ITEMS.map(({ icon: Icon, text }) => (
+                    <li key={text} className="flex items-center gap-3 text-md text-secondary">
+                        <Icon className="size-5 shrink-0 text-fg-quaternary" aria-hidden="true" />
+                        {text}
+                    </li>
+                ))}
+            </ul>
 
-                <section className="mt-10 rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
-                    <h2 className="text-md font-semibold text-primary">Tell us how we can help</h2>
-                    <p className="mt-2 text-sm text-tertiary">
-                        Share anything we need to understand your question. Do not include your case details, employer name,
-                        or other identifying information unless you are comfortable emailing it to us.
-                    </p>
-
-                    <form className="mt-6 flex flex-col gap-4" onSubmit={onSubmit}>
-                        <SelectField label="Topic" value={topic} onChange={setTopic} options={TOPICS} />
-                        <TextField
-                            label="Your email (optional)"
-                            value={email}
-                            onChange={setEmail}
-                            placeholder="you@example.com"
-                            help="Include this if you would like a reply."
-                        />
-                        <TextAreaField
-                            label="Message"
-                            value={message}
-                            onChange={setMessage}
-                            placeholder="Describe your question or feedback"
-                            help="Screenshots can be attached after your email app opens."
-                        />
-                        <Button type="submit" color="primary" size="md" iconLeading={Send01} isDisabled={!message.trim()}>
-                            Send message
-                        </Button>
-                    </form>
-                </section>
-
-                <p className="mt-6 text-sm text-tertiary">
-                    Or email us directly at{" "}
-                    <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium text-brand-secondary underline">
-                        {SUPPORT_EMAIL}
-                    </a>
-                    .
+            <section className="mt-10 rounded-2xl border border-secondary bg-primary p-5 sm:p-6">
+                <h2 className="text-md font-semibold text-primary">Tell us how we can help</h2>
+                <p className="mt-2 text-sm text-tertiary">
+                    Share anything we need to understand your question. Do not include your case details, employer name,
+                    or other identifying information unless you are comfortable emailing it to us.
                 </p>
-            </StandalonePageContent>
-        </StandalonePageShell>
+
+                <form className="mt-6 flex flex-col gap-4" onSubmit={onSubmit}>
+                    <SelectField label="Topic" value={topic} onChange={setTopic} options={TOPICS} />
+                    <TextField
+                        label="Your email (optional)"
+                        value={email}
+                        onChange={setEmail}
+                        placeholder="you@example.com"
+                        help="Include this if you would like a reply."
+                    />
+                    <TextAreaField
+                        label="Message"
+                        value={message}
+                        onChange={setMessage}
+                        placeholder="Describe your question or feedback"
+                        help="Screenshots can be attached after your email app opens."
+                    />
+                    <Button type="submit" color="primary" size="md" iconLeading={Send01} isDisabled={!message.trim()}>
+                        Send message
+                    </Button>
+                </form>
+            </section>
+
+            <p className="mt-6 text-sm text-tertiary">
+                Or email us directly at{" "}
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium text-brand-secondary underline">
+                    {SUPPORT_EMAIL}
+                </a>
+                .
+            </p>
+        </>
+    );
+
+    // From the case, keep the focused "Back to case" chrome. From the public landing,
+    // reuse the shared landing nav so the navigation never changes between pages.
+    if (returnToCase) {
+        return (
+            <StandalonePageShell
+                brandHref="/case"
+                brandLabel="Back to case overview"
+                backHref="/case"
+                backLabel="Back to case"
+            >
+                <StandalonePageContent>{content}</StandalonePageContent>
+            </StandalonePageShell>
+        );
+    }
+
+    return (
+        <Shell>
+            <LandingHeader brandAsLink />
+
+            <ShellMain align="start">
+                <ShellContent>{content}</ShellContent>
+            </ShellMain>
+
+            <LandingFooter />
+        </Shell>
     );
 };

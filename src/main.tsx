@@ -7,6 +7,7 @@ import { HomeRoute } from "@/routing/home-route";
 import { PrivacyPolicy } from "@/pages/legal/privacy-policy";
 import { TermsOfService } from "@/pages/legal/terms-of-service";
 import { SupportPage } from "@/pages/support";
+import { AboutPage } from "@/pages/about";
 import { NotFound } from "@/pages/not-found";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")!).render(
                         <Route path="/privacy" element={<PrivacyPolicy />} />
                         <Route path="/terms" element={<TermsOfService />} />
                         <Route path="/support" element={<SupportPage />} />
+                        <Route path="/about" element={<AboutPage />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </RouteProvider>

@@ -1,4 +1,5 @@
 import { LegalList, LegalPage, LegalParagraph, LegalSection } from "@/pages/legal/legal-page";
+import { PageMeta } from "@/components/seo/page-meta";
 
 export const PrivacyPolicy = () => (
     <LegalPage
@@ -12,6 +13,11 @@ export const PrivacyPolicy = () => (
             </>
         }
     >
+        <PageMeta
+            title="Privacy Policy | Fair Go"
+            description="How Fair Go handles your information: local-first and encrypted on your device, built so we can't read or sell your data. Read the full privacy policy."
+            path="/privacy"
+        />
         <LegalSection heading="The short version">
             <LegalList>
                 <li>The checker and case documentation work without an account. Your answers and case file stay on your device by default.</li>

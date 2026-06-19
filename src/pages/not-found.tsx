@@ -1,12 +1,14 @@
 import { ArrowLeft } from "@untitledui/icons";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
+import { PageMeta } from "@/components/seo/page-meta";
 
 export function NotFound() {
     const router = useNavigate();
 
     return (
         <section className="flex min-h-screen items-start bg-primary py-16 md:items-center md:py-24">
+            <PageMeta title="Page not found | Fair Go" description="Sorry, the page you are looking for doesn't exist or has been moved." noindex />
             <div className="mx-auto max-w-container grow px-4 md:px-8">
                 <div className="flex w-full max-w-3xl flex-col gap-8 md:gap-12">
                     <div className="flex flex-col gap-4 md:gap-6">

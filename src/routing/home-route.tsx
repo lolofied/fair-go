@@ -6,10 +6,13 @@ import { shouldEnterCaseOverview } from "@/routing/should-enter-case";
 export const HomeRoute = () => {
     const location = useLocation();
     const forceChecker = Boolean((location.state as { forceChecker?: boolean } | null)?.forceChecker);
-    const [target, setTarget] = useState<"loading" | "checker" | "case">(forceChecker ? "checker" : "loading");
+    const isPrerender = new URLSearchParams(location.search).has("prerender");
+    const [target, setTarget] = useState<"loading" | "checker" | "case">(
+        forceChecker || isPrerender ? "checker" : "loading",
+    );
 
     useEffect(() => {
-        if (forceChecker) return;
+        if (forceChecker || isPrerender) return;
 
         let cancelled = false;
 

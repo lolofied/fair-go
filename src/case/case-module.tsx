@@ -11,6 +11,7 @@ import { WitnessScreen } from "@/case/screens/witness-screen";
 import { CaseProvider, useCase } from "@/case/store";
 import { SyncEngineBridge } from "@/case/sync/sync-engine-bridge";
 import { SyncProvider } from "@/case/sync/sync-provider";
+import { PageMeta } from "@/components/seo/page-meta";
 
 const CaseRoutes = () => {
     const { loading } = useCase();
@@ -50,6 +51,11 @@ const CaseRoutes = () => {
 export const CaseModule = () => (
     <SyncProvider>
         <CaseProvider>
+            <PageMeta
+                title="Your case | Fair Go"
+                description="Your private Fair Go case workspace."
+                noindex
+            />
             <SyncEngineBridge />
             <CaseRoutes />
         </CaseProvider>
