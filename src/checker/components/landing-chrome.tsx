@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { ShellFooter, ShellHeader, ShellHeaderBrand } from "@/components/layout/shell";
 import { FairGoWordmark } from "@/checker/components/wordmark";
+import { LandingHeaderMenu } from "@/checker/components/landing-header-menu";
 import { isSyncConfigured } from "@/config/supabase";
 import { DONATION_URL } from "@/config/donation";
 import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
@@ -36,7 +37,7 @@ export const LandingHeader = ({ brandAsLink = false }: { brandAsLink?: boolean }
         >
             {brandAsLink ? <ShellHeaderBrand /> : <FairGoWordmark />}
             <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3">
+                <div className="hidden items-center gap-3 sm:flex">
                     <Button href="/about" size="sm" color="link-gray">
                         About
                     </Button>
@@ -45,11 +46,13 @@ export const LandingHeader = ({ brandAsLink = false }: { brandAsLink?: boolean }
                     </Button>
                 </div>
                 {showRetrieve ? (
-                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01}>
-                        <span className="sm:hidden">Retrieve</span>
-                        <span className="hidden sm:inline">Retrieve my case</span>
+                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01} className="hidden sm:flex">
+                        Retrieve my case
                     </Button>
                 ) : null}
+                <div className="sm:hidden">
+                    <LandingHeaderMenu />
+                </div>
             </div>
         </ShellHeader>
     );
