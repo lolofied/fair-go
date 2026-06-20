@@ -53,6 +53,10 @@ const ROUTES = [
     },
 ];
 
+function shouldSkipPrerender() {
+    return process.env.SKIP_PRERENDER === "1" || process.env.CI === "true" || process.env.CI === "1";
+}
+
 function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -108,36 +112,13 @@ function dumpDom(url) {
     });
 }
 
-async function launchBrowser() {
-    try {
-        const puppeteer = await import("puppeteer");
-        return puppeteer.default.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-        });
-    } catch {
-        return null;
-    }
-}
-
-async function dumpDomWithPuppeteer(browser, url) {
-    const page = await browser.newPage();
-
-    try {
-        await page.goto(url, { waitUntil: "networkidle0", timeout: 30_000 });
-        return await page.content();
-    } finally {
-        await page.close();
-    }
-}
-
 function isMissingBrowserError(error) {
     return error instanceof Error && (error.message.includes("ENOENT") || ("code" in error && error.code === "ENOENT"));
 }
 
-async function prerenderRoute(route, browser) {
+async function prerenderRoute(route) {
     const url = `${PREVIEW_ORIGIN}${route.url}`;
-    const html = browser ? await dumpDomWithPuppeteer(browser, url) : await dumpDom(url);
+    const html = await dumpDom(url);
 
     if (!html.includes(route.titleIncludes)) {
         throw new Error(`Prerender for ${route.url} did not include expected title: ${route.titleIncludes}`);
@@ -155,6 +136,11 @@ async function prerenderRoute(route, browser) {
 }
 
 async function main() {
+    if (shouldSkipPrerender()) {
+        console.warn("Skipping prerender in CI (headless Chrome is unavailable in this environment).");
+        return;
+    }
+
     console.log("Starting preview server…");
     const preview = spawn("npx", ["vite", "preview", "--port", String(PREVIEW_PORT), "--strictPort"], {
         cwd: ROOT,
@@ -175,16 +161,12 @@ async function main() {
         process.exit(1);
     });
 
-    let browser;
-
     try {
         await waitForPreview();
         console.log("Prerendering public routes…");
 
-        browser = await launchBrowser();
-
         for (const route of ROUTES) {
-            await prerenderRoute(route, browser);
+            await prerenderRoute(route);
         }
 
         console.log("Prerender complete.");
@@ -196,7 +178,6 @@ async function main() {
 
         throw error;
     } finally {
-        if (browser) await browser.close();
         cleanup();
     }
 }
