@@ -9,6 +9,7 @@ import type { CheckerFlag, ClaimStatus, ClaimType } from "@/checker/types";
 import type { CaseEventType, EvidenceType } from "@/case/types";
 
 export type CaseSyncSavedTrigger = "manual" | "auto" | "login";
+export type DocumentationStartedEntry = "prep" | "result";
 
 function track(event: ProductEventName, properties: Record<string, unknown> = {}): void {
     try {
@@ -41,8 +42,8 @@ export function trackClaimOutcomePostHog(payload: {
     });
 }
 
-export function trackDocumentationStarted(): void {
-    track("documentation_started");
+export function trackDocumentationStarted(entry: DocumentationStartedEntry): void {
+    track("documentation_started", { entry });
 }
 
 export function trackCaseOnboardingCompleted(): void {

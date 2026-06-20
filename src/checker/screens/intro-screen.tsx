@@ -1,13 +1,16 @@
 import { ArrowRight } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { HeroLead, HeroTitle, mobileBtnClass, Shell, ShellContent, ShellMain } from "@/components/layout/shell";
 import { HighlightUnderline } from "@/checker/components/highlight-underline";
 import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
 import { PageMeta } from "@/components/seo/page-meta";
 import { useChecker } from "@/checker/store";
-import { trackCheckerStarted } from "@/analytics/product-analytics";
+import { trackCheckerStarted, trackDocumentationStarted } from "@/analytics/product-analytics";
+import { setDocumentationEntry } from "@/case/documentation-entry";
 
 export const IntroScreen = () => {
+    const navigate = useNavigate();
     const { start, resume, answers } = useChecker();
     const hasProgress = Object.keys(answers).length > 0;
 
@@ -15,6 +18,12 @@ export const IntroScreen = () => {
         trackCheckerStarted(hasProgress ? "resume" : "new");
         if (hasProgress) resume();
         else start();
+    };
+
+    const onStartPrepRecord = () => {
+        setDocumentationEntry("prep");
+        trackDocumentationStarted("prep");
+        navigate("/case");
     };
 
     return (
@@ -54,6 +63,12 @@ export const IntroScreen = () => {
                         <span className="text-sm text-tertiary">
                             No payment. No commitment. Your answers stay private.
                         </span>
+                        <div className="mt-6 w-full max-w-md rounded-2xl bg-brand-primary px-4 pt-6 pb-4 sm:px-5 sm:pt-7">
+                            <p className="text-sm text-tertiary">Still employed but worried things might escalate?</p>
+                            <Button color="link-color" size="md" className="mt-1" onClick={onStartPrepRecord}>
+                                Start a private record on your device
+                            </Button>
+                        </div>
                     </div>
                 </ShellContent>
             </ShellMain>

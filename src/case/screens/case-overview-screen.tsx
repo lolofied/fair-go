@@ -4,6 +4,7 @@ import { Button } from "@/components/base/buttons/button";
 import { PageHeading } from "@/case/components/case-layout";
 import { DeadlinePill } from "@/case/components/deadline-pill";
 import { computeDocumentationProgress, type DocProgressStatus, type DocSectionProgress } from "@/case/documentation-progress";
+import { isPrepDocumentationEntry } from "@/case/documentation-entry";
 import { useCase } from "@/case/store";
 import { cx } from "@/utils/cx";
 
@@ -95,14 +96,28 @@ export const CaseOverviewScreen = () => {
     if (!file) return null;
 
     const progress = computeDocumentationProgress(file);
+    const isPrepEntry = isPrepDocumentationEntry();
 
     return (
         <div>
             <PageHeading
-                title="Documentation overview"
-                description="Track what's done and what still needs your attention."
-                action={<DeadlinePill effectiveDate={file.profile.dismissal.effective_date} />}
+                title={isPrepEntry ? "Your private workplace record" : "Documentation overview"}
+                description={
+                    isPrepEntry
+                        ? "Capture dates, conversations, and documents as things happen. If this escalates, you'll have a contemporaneous record ready for a lawyer."
+                        : "Track what's done and what still needs your attention."
+                }
+                action={isPrepEntry ? undefined : <DeadlinePill effectiveDate={file.profile.dismissal.effective_date} />}
             />
+
+            {isPrepEntry && (
+                <div className="mb-6 rounded-2xl border border-brand bg-brand-primary p-4 sm:p-5">
+                    <p className="text-sm text-tertiary">
+                        You're preparing a contemporaneous record, not lodging a claim. Add timeline events, evidence, and
+                        witnesses as things happen — especially on a personal device, not work equipment.
+                    </p>
+                </div>
+            )}
 
             <div className="flex flex-col gap-6">
                 <section className="rounded-2xl border border-secondary bg-primary p-5 sm:p-6">

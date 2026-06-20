@@ -15,6 +15,7 @@ import { Countdown } from "@/checker/components/countdown";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { trackClaimOutcome } from "@/checker/analytics";
 import { trackDocumentationStarted } from "@/analytics/product-analytics";
+import { setDocumentationEntry } from "@/case/documentation-entry";
 import { toCapturedData } from "@/checker/claims";
 import { useChecker } from "@/checker/store";
 import type { ClaimAssessment, ClaimStatus, ClaimType, CheckerFlag } from "@/checker/types";
@@ -370,7 +371,10 @@ export const ResultScreen = () => {
                                         href="/case"
                                         iconTrailing={ArrowRight}
                                         className={mobileBtnClass}
-                                        onClick={() => trackDocumentationStarted()}
+                                        onClick={() => {
+                                            setDocumentationEntry("result");
+                                            trackDocumentationStarted("result");
+                                        }}
                                     >
                                         Start documenting
                                     </Button>
