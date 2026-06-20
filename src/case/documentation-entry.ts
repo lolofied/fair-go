@@ -1,4 +1,4 @@
-/** How someone entered the case documentation flow — for copy and analytics only. */
+/** How someone entered the case documentation flow, for copy and analytics only. */
 export type DocumentationEntry = "prep" | "result";
 
 const STORAGE_KEY = "fairgo.documentation.entry.v1";
