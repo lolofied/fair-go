@@ -16,13 +16,13 @@ import {
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { RecoverPassphrasePanel } from "@/case/components/recover-passphrase-panel";
-import { useCase } from "@/case/store";
+import { retrieveRemoteCase, SyncEngineError } from "@/case/sync/engine";
+import { getSyncDek } from "@/case/sync/session";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
 
 export const RetrieveCaseScreen = () => {
     const navigate = useNavigate();
-    const { replaceFile } = useCase();
-    const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn } = useSync();
+    const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn, setSyncState, markSynced } = useSync();
 
     const [email, setEmail] = useState("");
     const [passphrase, setPassphrase] = useState("");
@@ -52,8 +52,21 @@ export const RetrieveCaseScreen = () => {
         }
         setBusy(true);
         try {
-            await signIn(email, passphrase);
+            const nextUser = await signIn(email, passphrase);
+            const dek = getSyncDek();
+            if (!dek) {
+                throw new SyncEngineError("Unlock encryption with your passphrase first.");
+            }
+
+            setSyncState({ status: "syncing", error: null });
+            const retrieved = await retrieveRemoteCase(dek, nextUser.id);
+            markSynced(retrieved.meta.updatedAt);
+            setSyncState({ status: "synced", error: null });
+            navigate("/case", { replace: true });
         } catch (e) {
+            if (e instanceof SyncEngineError) {
+                setSyncState({ status: "error", error: e.message });
+            }
             setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Sign-in failed.");
         } finally {
             setBusy(false);
@@ -70,8 +83,7 @@ export const RetrieveCaseScreen = () => {
         try {
             const text = await f.text();
             const payload = await readEncryptedBackup(text, restorePass);
-            const restored = await restoreBackup(payload);
-            replaceFile(restored);
+            await restoreBackup(payload);
             navigate("/case", { replace: true });
         } catch (e) {
             setRestoreErr(e instanceof Error ? e.message : "Could not restore that backup.");
