@@ -97,9 +97,10 @@
     }
 
     .fg-hero-title {
+        font-family: var(--font-display);
         font-size: var(--fg-hero-size);
         line-height: var(--fg-hero-leading);
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: -0.02em;
         color: var(--color-text-primary);
     }
@@ -118,9 +119,10 @@
     }
 
     .fg-section-card-title {
+        font-family: var(--font-display);
         font-size: var(--text-md);
         line-height: var(--text-md--line-height);
-        font-weight: 600;
+        font-weight: 700;
         color: var(--color-text-primary);
     }
 
