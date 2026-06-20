@@ -214,7 +214,8 @@ export const PrivacyPolicy = () => (
         <LegalSection heading="Cookies and local storage">
             <LegalParagraph>
                 Fair Go uses your browser's local storage and IndexedDB to save your progress, case file, and anonymous usage
-                signals. This is essential to how the tool works. We do not use third party advertising or tracking cookies.
+                signals. This is essential to how the tool works. When analytics is enabled, we also set a first-party PostHog
+                cookie so we can understand returning use in aggregate. We do not use third party advertising or tracking cookies.
                 You can clear local data at any time through your browser settings, by erasing your case in Settings, or by
                 using "Start over" in the checker.
             </LegalParagraph>

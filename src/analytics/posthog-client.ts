@@ -8,7 +8,7 @@ const host = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
 
 let ready = false;
 
-/** Initialise locked-down PostHog: cookieless, explicit events only. No-op without VITE_POSTHOG_KEY. */
+/** Initialise locked-down PostHog: first-party cookies, explicit events only. No-op without VITE_POSTHOG_KEY. */
 export function initPostHog(): void {
     if (ready || !key || typeof window === "undefined") return;
 
@@ -25,10 +25,8 @@ export function initPostHog(): void {
 
         disable_session_recording: true,
 
-        cookieless_mode: "always",
-        persistence: "memory",
-
-        person_profiles: "identified_only",
+        persistence: "localStorage+cookie",
+        person_profiles: "always",
 
         before_send: (event) => (event && ALLOWED_EVENTS.has(event.event) ? event : null),
 
@@ -41,6 +39,18 @@ export function initPostHog(): void {
 export function capturePostHog(event: string, properties: Record<string, unknown>): void {
     if (!ready || !ALLOWED_EVENTS.has(event)) return;
     posthog.capture(event, properties, { send_instantly: true });
+}
+
+/** Link analytics to a sync account using the Supabase user ID only (never email). */
+export function identifyPostHogUser(userId: string): void {
+    if (!ready || !userId) return;
+    posthog.identify(userId);
+}
+
+/** Start a fresh anonymous person after sync sign-out. */
+export function resetPostHogIdentity(): void {
+    if (!ready) return;
+    posthog.reset();
 }
 
 export function shutdownPostHog(): void {

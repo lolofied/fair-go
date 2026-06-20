@@ -25,6 +25,7 @@ import { pushLocalCase, SyncEngineError } from "@/case/sync/engine";
 import { clearSyncSession } from "@/case/sync/session";
 import type { CaseFile } from "@/case/types";
 import { trackCaseSyncSaved, trackSyncAccountCreated, trackSyncAccountSignedIn } from "@/analytics/product-analytics";
+import { identifyPostHogUser, resetPostHogIdentity } from "@/analytics/posthog-client";
 import { isSyncConfigured } from "@/config/supabase";
 
 export type SyncStatus = "idle" | "syncing" | "synced" | "error";
@@ -64,6 +65,7 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
     const [syncError, setSyncError] = useState<string | null>(null);
     const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
     const lastPushedUpdatedAtRef = useRef<string | null>(null);
+    const identifiedPostHogUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (!configured) {
@@ -78,6 +80,10 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
                 if (cancelled) return;
                 setUser(next);
                 setDekUnlocked(getSyncDek() !== null);
+                if (next?.id) {
+                    identifyPostHogUser(next.id);
+                    identifiedPostHogUserIdRef.current = next.id;
+                }
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);
@@ -87,7 +93,17 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
+            const userId = session?.user?.id ?? null;
             setUser(session?.user ?? null);
+
+            if (userId) {
+                identifyPostHogUser(userId);
+                identifiedPostHogUserIdRef.current = userId;
+            } else if (identifiedPostHogUserIdRef.current) {
+                resetPostHogIdentity();
+                identifiedPostHogUserIdRef.current = null;
+            }
+
             if (!session?.user) {
                 clearSyncSession();
                 setDekUnlocked(false);
