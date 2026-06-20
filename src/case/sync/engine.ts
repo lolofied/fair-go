@@ -182,6 +182,15 @@ export async function applyRemoteCase(snapshot: RemoteCaseSnapshot, dek: Uint8Ar
     return snapshot.caseFile;
 }
 
+/** Retrieve an existing remote case without considering or pushing local state. */
+export async function retrieveRemoteCase(dek: Uint8Array, userId: string): Promise<CaseFile> {
+    const remote = await fetchRemoteCase(dek, userId);
+    if (!remote) {
+        throw new SyncEngineError("No synced case was found for that account.");
+    }
+    return applyRemoteCase(remote, dek);
+}
+
 /** LWW merge on login or unlock: push local, pull remote, or no-op. */
 export async function resolveOnLogin(local: CaseFile, dek: Uint8Array, userId: string): Promise<ResolveOnLoginResult> {
     const remote = await fetchRemoteCase(dek, userId);

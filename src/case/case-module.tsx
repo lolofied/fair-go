@@ -26,7 +26,6 @@ const CaseRoutes = () => {
 
     return (
         <Routes>
-            <Route path="retrieve" element={<RetrieveCaseScreen />} />
             <Route path="settings" element={<SettingsScreen />} />
             <Route
                 path="*"
@@ -48,16 +47,23 @@ const CaseRoutes = () => {
     );
 };
 
+const CaseWorkspace = () => (
+    <CaseProvider>
+        <SyncEngineBridge />
+        <CaseRoutes />
+    </CaseProvider>
+);
+
 export const CaseModule = () => (
     <SyncProvider>
-        <CaseProvider>
-            <PageMeta
-                title="Your case | Fair Go"
-                description="Your private Fair Go case workspace."
-                noindex
-            />
-            <SyncEngineBridge />
-            <CaseRoutes />
-        </CaseProvider>
+        <PageMeta
+            title="Your case | Fair Go"
+            description="Your private Fair Go case workspace."
+            noindex
+        />
+        <Routes>
+            <Route path="retrieve" element={<RetrieveCaseScreen />} />
+            <Route path="*" element={<CaseWorkspace />} />
+        </Routes>
     </SyncProvider>
 );
