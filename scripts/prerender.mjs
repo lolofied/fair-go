@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -8,6 +9,7 @@ const ROOT = join(__dirname, "..");
 const DIST = join(ROOT, "dist");
 const PREVIEW_PORT = 4173;
 const PREVIEW_ORIGIN = `http://localhost:${PREVIEW_PORT}`;
+const CHROME_TIMEOUT_MS = 30_000;
 
 const CHROME =
     process.env.CHROME_PATH ??
@@ -73,14 +75,22 @@ async function waitForPreview() {
 
 function dumpDom(url) {
     return new Promise((resolve, reject) => {
+        const profileDir = mkdtempSync(join(tmpdir(), "fairgo-prerender-"));
+        let settled = false;
         const child = spawn(
             CHROME,
             [
                 "--headless=new",
+                "--no-sandbox",
                 "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--disable-background-networking",
                 "--hide-scrollbars",
+                "--no-first-run",
+                "--no-default-browser-check",
                 "--virtual-time-budget=12000",
                 "--run-all-compositor-stages-before-draw",
+                `--user-data-dir=${profileDir}`,
                 "--dump-dom",
                 url,
             ],
@@ -97,13 +107,30 @@ function dumpDom(url) {
             stderr += chunk;
         });
 
-        child.on("error", reject);
+        const cleanup = () => {
+            clearTimeout(timeout);
+            rmSync(profileDir, { recursive: true, force: true });
+        };
+
+        const finish = (fn, value) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            fn(value);
+        };
+
+        const timeout = setTimeout(() => {
+            child.kill("SIGKILL");
+            finish(reject, new Error(`Chrome timed out after ${CHROME_TIMEOUT_MS / 1000}s while prerendering ${url}`));
+        }, CHROME_TIMEOUT_MS);
+
+        child.on("error", (error) => finish(reject, error));
         child.on("close", (code) => {
             if (code !== 0) {
-                reject(new Error(`Chrome exited with code ${code}\n${stderr}`));
+                finish(reject, new Error(`Chrome exited with code ${code}\n${stderr}`));
                 return;
             }
-            resolve(stdout);
+            finish(resolve, stdout);
         });
     });
 }
