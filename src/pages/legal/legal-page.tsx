@@ -3,6 +3,8 @@ import { ArrowLeft } from "@untitledui/icons";
 import { Link } from "react-router";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { Button } from "@/components/base/buttons/button";
+import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
+import { DONATION_URL } from "@/config/donation";
 
 interface LegalPageProps {
     title: string;
@@ -49,6 +51,15 @@ export const LegalPage = ({ title, lastUpdated, intro, children }: PropsWithChil
                 <Link to="/support" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     Support
                 </Link>
+                <a
+                    href={DONATION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 font-medium transition duration-100 ease-linear hover:text-secondary"
+                >
+                    <BuyMeACoffeeIcon className="size-3.5" />
+                    Support Fair Go
+                </a>
             </nav>
         </footer>
     </div>

@@ -5,6 +5,8 @@ import { Button } from "@/components/base/buttons/button";
 import { ShellFooter, ShellHeader, ShellHeaderBrand } from "@/components/layout/shell";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { isSyncConfigured } from "@/config/supabase";
+import { DONATION_URL } from "@/config/donation";
+import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
 import { cx } from "@/utils/cx";
 
 /**
@@ -83,6 +85,15 @@ export const LandingFooter = () => (
                 <Link to="/support" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     Support
                 </Link>
+                <a
+                    href={DONATION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 font-medium transition duration-100 ease-linear hover:text-secondary"
+                >
+                    <BuyMeACoffeeIcon className="size-3.5" />
+                    Support Fair Go
+                </a>
             </nav>
         </div>
     </ShellFooter>

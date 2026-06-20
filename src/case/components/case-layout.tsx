@@ -10,6 +10,7 @@ import {
 import { NavLink } from "react-router";
 import { CaseHeaderMenu } from "@/case/components/case-header-menu";
 import { CaseOnboarding } from "@/case/components/case-onboarding";
+import { DonationPrompt } from "@/case/components/donation-prompt";
 import { HeaderSaveStatus } from "@/case/components/header-save-status";
 import { ShellHeaderBrand } from "@/components/layout/shell";
 import { cx } from "@/utils/cx";
@@ -63,6 +64,7 @@ export const CaseLayout = ({ children }: { children: ReactNode }) => {
             <main className="mx-auto w-full max-w-5xl flex-1 fg-shell-main print:max-w-none print:p-0">
                 {children}
             </main>
+            <DonationPrompt />
         </div>
     );
 };
