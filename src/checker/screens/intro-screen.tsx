@@ -34,7 +34,7 @@ export const IntroScreen = () => {
             />
             <LandingHeader />
 
-            <ShellMain>
+            <ShellMain className="max-sm:pt-8 max-sm:pb-16">
                 <ShellContent width="marketing" className="text-center">
                     <HeroTitle>
                         Were you{" "}
