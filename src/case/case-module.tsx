@@ -10,6 +10,7 @@ import { RetrieveCaseScreen } from "@/case/screens/retrieve-case-screen";
 import { WitnessScreen } from "@/case/screens/witness-screen";
 import { CaseProvider, useCase } from "@/case/store";
 import { SyncEngineBridge } from "@/case/sync/sync-engine-bridge";
+import { CaseAnalyticsBridge } from "@/case/case-analytics-bridge";
 import { SyncProvider } from "@/case/sync/sync-provider";
 import { PageMeta } from "@/components/seo/page-meta";
 
@@ -57,6 +58,7 @@ export const CaseModule = () => (
                 noindex
             />
             <SyncEngineBridge />
+            <CaseAnalyticsBridge />
             <CaseRoutes />
         </CaseProvider>
     </SyncProvider>

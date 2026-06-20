@@ -13,6 +13,8 @@
 
 import { trackClaimOutcomePostHog } from "@/analytics/product-analytics";
 import { shutdownPostHog } from "@/analytics/posthog-client";
+import { toCapturedData } from "@/checker/claims";
+import { loadCheckerAnswers, loadCheckerScreen } from "@/checker/store";
 import type { CheckerFlag, ClaimAssessment, ClaimStatus, ClaimType } from "@/checker/types";
 
 export interface ClaimOutcomeEvent {
@@ -27,6 +29,39 @@ export interface ClaimOutcomeEvent {
 
 const STORAGE_KEY = "fairgo.analytics.v1";
 const MAX_BUFFERED = 200;
+
+function outcomeFingerprint(
+    claims: { claimType: ClaimType; status: ClaimStatus }[],
+    flags: CheckerFlag[],
+    electionRequired: boolean,
+): string {
+    return JSON.stringify({
+        claims,
+        flags: [...flags].sort(),
+        electionRequired,
+    });
+}
+
+function readBuffer(): ClaimOutcomeEvent[] {
+    if (typeof window === "undefined") return [];
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function alreadyTrackedOutcome(
+    claims: { claimType: ClaimType; status: ClaimStatus }[],
+    flags: CheckerFlag[],
+    electionRequired: boolean,
+): boolean {
+    const fingerprint = outcomeFingerprint(claims, flags, electionRequired);
+    const last = readBuffer().at(-1);
+    if (!last) return false;
+    return outcomeFingerprint(last.claims, last.flags, last.electionRequired) === fingerprint;
+}
 
 function persist(event: ClaimOutcomeEvent): void {
     if (typeof window === "undefined") return;
@@ -59,13 +94,34 @@ export function clearAnalytics(): void {
     }
 }
 
-/** Record the (anonymised) outcome of a completed assessment. */
+/** Record the (anonymised) outcome of a completed assessment. Idempotent for identical outcomes. */
 export function trackClaimOutcome(claims: ClaimAssessment[], flags: CheckerFlag[]): void {
-    persist({
-        type: "claim_outcome",
-        at: Date.now(),
+    const payload = {
         claims: claims.map((c) => ({ claimType: c.claimType, status: c.status })),
         flags,
         electionRequired: flags.includes("multiple_actions_election_required"),
+    };
+
+    if (alreadyTrackedOutcome(payload.claims, payload.flags, payload.electionRequired)) return;
+
+    persist({
+        type: "claim_outcome",
+        at: Date.now(),
+        ...payload,
     });
+}
+
+/**
+ * Record claim_outcome when the checker finished on "result" but the result screen
+ * was skipped (e.g. home redirects straight to /case). Safe to call on every case entry.
+ */
+export function trackClaimOutcomeIfCompleted(): void {
+    if (typeof window === "undefined") return;
+    if (loadCheckerScreen() !== "result") return;
+
+    const answers = loadCheckerAnswers();
+    if (Object.keys(answers).length === 0) return;
+
+    const captured = toCapturedData(answers);
+    trackClaimOutcome(captured.candidate_claims, captured.flags);
 }
