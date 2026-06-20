@@ -108,9 +108,36 @@ function dumpDom(url) {
     });
 }
 
-async function prerenderRoute(route) {
+async function launchBrowser() {
+    try {
+        const puppeteer = await import("puppeteer");
+        return puppeteer.default.launch({
+            headless: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+        });
+    } catch {
+        return null;
+    }
+}
+
+async function dumpDomWithPuppeteer(browser, url) {
+    const page = await browser.newPage();
+
+    try {
+        await page.goto(url, { waitUntil: "networkidle0", timeout: 30_000 });
+        return await page.content();
+    } finally {
+        await page.close();
+    }
+}
+
+function isMissingBrowserError(error) {
+    return error instanceof Error && (error.message.includes("ENOENT") || ("code" in error && error.code === "ENOENT"));
+}
+
+async function prerenderRoute(route, browser) {
     const url = `${PREVIEW_ORIGIN}${route.url}`;
-    const html = await dumpDom(url);
+    const html = browser ? await dumpDomWithPuppeteer(browser, url) : await dumpDom(url);
 
     if (!html.includes(route.titleIncludes)) {
         throw new Error(`Prerender for ${route.url} did not include expected title: ${route.titleIncludes}`);
@@ -148,16 +175,28 @@ async function main() {
         process.exit(1);
     });
 
+    let browser;
+
     try {
         await waitForPreview();
         console.log("Prerendering public routes…");
 
+        browser = await launchBrowser();
+
         for (const route of ROUTES) {
-            await prerenderRoute(route);
+            await prerenderRoute(route, browser);
         }
 
         console.log("Prerender complete.");
+    } catch (error) {
+        if (isMissingBrowserError(error)) {
+            console.warn("Skipping prerender: no headless browser available in this environment.");
+            return;
+        }
+
+        throw error;
     } finally {
+        if (browser) await browser.close();
         cleanup();
     }
 }
