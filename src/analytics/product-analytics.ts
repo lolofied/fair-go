@@ -22,7 +22,7 @@ export function trackCheckerStarted(entry: "new" | "resume"): void {
     track("checker_started", { entry });
     try {
         if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
-            (window as any).gtag("event", "conversion", { send_to: "AW-18259212747/udRxCPGclcIcEMvh4YBE" });
+            (window as any).gtag("event", "conversion", { send_to: "AW-18255212747/udRxCPGclcIcEMvh4YBE" });
         }
     } catch {
         /* analytics must never break the app */
