@@ -48,13 +48,13 @@ h4,
 h5,
 h6 {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 :is(h1, h2, h3, h4, h5, h6).font-semibold,
 :is(h1, h2, h3, h4, h5, h6).font-bold,
 :is(h1, h2, h3, h4, h5, h6).font-medium {
-    font-weight: 700;
+    font-weight: 600;
 }
 
 /* Hide the default expand arrow on Safari.  */

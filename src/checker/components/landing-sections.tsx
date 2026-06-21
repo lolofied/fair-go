@@ -1,4 +1,5 @@
 import type { FC, PropsWithChildren, ReactNode } from "react";
+import { Link } from "react-router";
 import { ArrowRight, CheckCircle, ChevronDown, Clock, Download01, Plus } from "@untitledui/icons";
 import {
     BanknotesIcon,
@@ -15,6 +16,7 @@ import { LandingFeatureIcon } from "@/checker/components/landing-nav-icon";
 import { LandingReveal, LandingRevealGroup, LandingRevealItem } from "@/checker/components/landing-reveal";
 import { arrowSlideClass, mobileBtnClass } from "@/components/layout/shell";
 import { getLegalConstants } from "@/config/legal-constants";
+import { getLandingFaqItems, GUIDE_ENTRIES, GUIDES_INDEX } from "@/config/site-seo";
 import { cx } from "@/utils/cx";
 
 type LandingBand = "primary" | "secondary" | "blue-wash" | "dark" | "brand";
@@ -328,36 +330,60 @@ export const LandingClosingCta = ({ onStart, hasProgress }: { onStart: () => voi
 );
 
 /* ------------------------------------------------------------------ */
+/* Guides preview                                                      */
+/* ------------------------------------------------------------------ */
+
+export const LandingGuidesSection = () => (
+    <Section band="secondary">
+        <LandingReveal variant="text">
+            <SectionHeading
+                eyebrow="Learn"
+                title="Unfair dismissal guides"
+                lead="Plain-English explainers on eligibility, deadlines, and what to do next. Not legal advice."
+            />
+        </LandingReveal>
+
+        <LandingRevealGroup className="mt-10 grid gap-4 sm:grid-cols-2" stagger={0.1}>
+            {GUIDE_ENTRIES.map((guide) => (
+                <LandingRevealItem key={guide.path} variant="text">
+                    <Link
+                        to={guide.path}
+                        className="group flex h-full flex-col rounded-2xl border border-secondary bg-primary p-6 transition duration-100 ease-linear hover:border-brand hover:bg-primary_hover"
+                    >
+                        <span className="text-xs font-semibold tracking-wide text-brand-secondary uppercase">
+                            {guide.category}
+                        </span>
+                        <h3 className="mt-2 text-lg font-semibold text-primary group-hover:text-brand-secondary">
+                            {guide.title}
+                        </h3>
+                        <p className="mt-2 flex-1 text-md text-tertiary">{guide.description}</p>
+                        <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-secondary">
+                            Read guide
+                            <ArrowRight
+                                aria-hidden="true"
+                                className="size-4 stroke-[1.5] transition duration-100 ease-linear group-hover:translate-x-0.5"
+                            />
+                        </span>
+                    </Link>
+                </LandingRevealItem>
+            ))}
+        </LandingRevealGroup>
+
+        <LandingReveal variant="text">
+            <div className="mt-8 flex justify-center">
+                <Button href={GUIDES_INDEX} size="md" color="link-color" iconTrailing={ArrowRight} className={arrowSlideClass}>
+                    View all guides
+                </Button>
+            </div>
+        </LandingReveal>
+    </Section>
+);
+
+/* ------------------------------------------------------------------ */
 /* FAQs                                                                */
 /* ------------------------------------------------------------------ */
 
-const FAQ_ITEMS = (unfairDismissalDays: number) =>
-    [
-        {
-            question: "Is Fair Go legal advice?",
-            answer: "No. Fair Go gives general information about unfair dismissal under the Fair Work Act. It does not replace advice from an employment lawyer about your specific situation.",
-        },
-        {
-            question: "Is the eligibility check free?",
-            answer: "Yes. The check takes about 90 seconds, costs nothing, and you do not need an account to get started.",
-        },
-        {
-            question: "Who can see my answers?",
-            answer: "Your record is encrypted on your own device. Fair Go cannot read it, sell it, or hand over what it cannot see. Use a personal email, not your work account.",
-        },
-        {
-            question: "What is unfair dismissal?",
-            answer: "Broadly, it is when you are dismissed from your job in a way that is harsh, unjust, or unreasonable, and you are covered by the unfair dismissal protections in the Fair Work Act. The free check helps you see whether you may be covered.",
-        },
-        {
-            question: "How long do I have to lodge a claim?",
-            answer: `For most unfair dismissal applications, you have ${unfairDismissalDays} days from the date your dismissal took effect to apply to the Fair Work Commission. Fair Go shows how much time you likely have left based on your answers.`,
-        },
-        {
-            question: "Do I need a lawyer?",
-            answer: "Not to use Fair Go. Many people start by checking their options and building a record themselves. For advice about your circumstances, or to lodge and run a claim, speak to an employment lawyer or contact the Fair Work Commission.",
-        },
-    ] as const;
+const FAQ_ITEMS = getLandingFaqItems;
 
 const FaqItem = ({ question, answer }: { question: string; answer: string }) => (
     <details className="group border-b border-secondary py-5 last:border-b-0">

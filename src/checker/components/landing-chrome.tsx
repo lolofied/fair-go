@@ -7,6 +7,7 @@ import { FairGoWordmark } from "@/checker/components/wordmark";
 import { LandingHeaderMenu } from "@/checker/components/landing-header-menu";
 import { isSyncConfigured } from "@/config/supabase";
 import { DONATION_URL } from "@/config/donation";
+import { GUIDES_INDEX } from "@/config/site-seo";
 import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
 import { cx } from "@/utils/cx";
 
@@ -43,30 +44,33 @@ export const LandingHeader = ({
             )}
         >
             {brandAsLink ? <ShellHeaderBrand /> : <FairGoWordmark />}
-            <div className="flex items-center gap-4">
-                <div className="hidden items-center gap-3 sm:flex">
+            <div className="flex shrink-0 items-center gap-3 lg:gap-4">
+                <div className="hidden items-center gap-3 lg:flex">
                     <Button href="/about" size="sm" color="link-gray">
                         About
+                    </Button>
+                    <Button href="/guides" size="sm" color="link-gray">
+                        Guides
                     </Button>
                     <Button href="/support" size="sm" color="link-gray">
                         Support
                     </Button>
                 </div>
                 {showRetrieve ? (
-                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01} className="hidden sm:flex">
+                    <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01} className="hidden lg:flex">
                         Retrieve case
                     </Button>
                 ) : null}
                 {onStartCheck ? (
-                    <Button size="sm" color="primary" iconTrailing={ArrowRight} className="hidden sm:flex" onClick={onStartCheck}>
+                    <Button size="sm" color="primary" iconTrailing={ArrowRight} className="hidden lg:flex" onClick={onStartCheck}>
                         Start free check
                     </Button>
                 ) : (
-                    <Button href="/" size="sm" color="primary" iconTrailing={ArrowRight} className="hidden sm:flex">
+                    <Button href="/" size="sm" color="primary" iconTrailing={ArrowRight} className="hidden lg:flex">
                         Start free check
                     </Button>
                 )}
-                <div className="sm:hidden">
+                <div className="lg:hidden">
                     <LandingHeaderMenu onStartCheck={onStartCheck} />
                 </div>
             </div>
@@ -92,6 +96,9 @@ export const LandingFooter = () => (
                 .
             </p>
             <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-tertiary">
+                <Link to={GUIDES_INDEX} className="font-medium transition duration-100 ease-linear hover:text-secondary">
+                    Guides
+                </Link>
                 <Link to="/about" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     About
                 </Link>

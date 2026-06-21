@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PRERENDER_ROUTES } from "./seo-routes.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -25,33 +26,7 @@ const CHROME =
  * about/index.html). If home is baked first, that shell carries home title/meta and
  * client routing appends page-specific tags on top (duplicate SEO head).
  */
-const ROUTES = [
-    {
-        url: "/about",
-        out: "about/index.html",
-        titleIncludes: "About Fair Go | Why I built it",
-    },
-    {
-        url: "/support",
-        out: "support/index.html",
-        titleIncludes: "Support | Fair Go",
-    },
-    {
-        url: "/privacy",
-        out: "privacy/index.html",
-        titleIncludes: "Privacy Policy | Fair Go",
-    },
-    {
-        url: "/terms",
-        out: "terms/index.html",
-        titleIncludes: "Terms of Use | Fair Go",
-    },
-    {
-        url: "/?prerender=1",
-        out: "index.html",
-        titleIncludes: "Fair Go | Free unfair dismissal eligibility check",
-    },
-];
+const ROUTES = PRERENDER_ROUTES;
 
 function shouldSkipPrerender() {
     return process.env.SKIP_PRERENDER === "1" || process.env.CI === "true" || process.env.CI === "1";

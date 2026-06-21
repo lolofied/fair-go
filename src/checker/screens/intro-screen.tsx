@@ -13,9 +13,14 @@ import {
     HowItWorksSection,
     LandingClosingCta,
     LandingFaqSection,
+    LandingGuidesSection,
     OutcomesAndFeaturesSection,
 } from "@/checker/components/landing-sections";
 import { LandingRevealGroup, LandingRevealItem } from "@/checker/components/landing-reveal";
+import { buildHomeStructuredData } from "@/components/seo/structured-data";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getLegalConstants } from "@/config/legal-constants";
+import { getLandingFaqItems } from "@/config/site-seo";
 import { PageMeta } from "@/components/seo/page-meta";
 import { useChecker } from "@/checker/store";
 import { trackCheckerStarted, trackDocumentationStarted } from "@/analytics/product-analytics";
@@ -39,12 +44,15 @@ export const IntroScreen = () => {
         navigate("/case");
     };
 
+    const faqItems = getLandingFaqItems(getLegalConstants().timeLimits.unfairDismissalDays);
+
     return (
         <Shell>
             <PageMeta
                 title="Fair Go | Free unfair dismissal eligibility check"
                 description="Free, 90-second check for whether you may have an Australian unfair dismissal claim under the Fair Work Act, and how long you have left to act. Not legal advice."
             />
+            <JsonLd data={buildHomeStructuredData(faqItems)} />
             <LandingHeader onStartCheck={onStart} />
 
             <div className="fg-landing-sections">
@@ -100,6 +108,7 @@ export const IntroScreen = () => {
                 <HowItWorksSection onStart={onStart} hasProgress={hasProgress} />
                 <OutcomesAndFeaturesSection />
                 <LandingClosingCta onStart={onStart} hasProgress={hasProgress} />
+                <LandingGuidesSection />
                 <LandingFaqSection />
             </div>
 

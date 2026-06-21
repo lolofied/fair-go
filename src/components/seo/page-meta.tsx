@@ -3,10 +3,7 @@
  * Render <PageMeta /> anywhere inside a page; React moves these tags into <head>.
  */
 
-const SITE_URL = "https://fair-go.ai";
-const SITE_NAME = "Fair Go";
-const OG_IMAGE = `${SITE_URL}/og-image.jpg?v=2`;
-const OG_IMAGE_ALT = "Fair Go: a free 90-second unfair dismissal eligibility check under Australia's Fair Work Act.";
+import { OG_IMAGE, OG_IMAGE_ALT, OG_LOCALE, SITE_NAME, SITE_URL } from "@/config/site-seo";
 
 interface PageMetaProps {
     /** Full document title, e.g. "About Fair Go". */
@@ -29,6 +26,7 @@ export const PageMeta = ({ title, description, path, noindex }: PageMetaProps) =
             {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={url} />}
 
             <meta property="og:type" content="website" />
+            <meta property="og:locale" content={OG_LOCALE} />
             <meta property="og:site_name" content={SITE_NAME} />
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />

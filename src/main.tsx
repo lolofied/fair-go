@@ -7,10 +7,15 @@ import { HomeRoute } from "@/routing/home-route";
 import {
     LazyAboutPage,
     LazyCaseModule,
+    LazyGuidesIndexPage,
     LazyNotFound,
     LazyPrivacyPolicy,
     LazySupportPage,
     LazyTermsOfService,
+    LazyUnfairDismissalEligibilityGuide,
+    LazyUnfairDismissalTimeLimitGuide,
+    LazyHowToLodgeUnfairDismissalGuide,
+    LazyUnfairDismissalCompensationGuide,
 } from "@/routing/lazy-routes";
 import { RouteProvider } from "@/providers/router-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -31,6 +36,11 @@ createRoot(document.getElementById("root")!).render(
                             <Route path="/terms" element={<LazyTermsOfService />} />
                             <Route path="/support" element={<LazySupportPage />} />
                             <Route path="/about" element={<LazyAboutPage />} />
+                            <Route path="/guides" element={<LazyGuidesIndexPage />} />
+                            <Route path="/guides/unfair-dismissal-time-limit" element={<LazyUnfairDismissalTimeLimitGuide />} />
+                            <Route path="/guides/unfair-dismissal-eligibility" element={<LazyUnfairDismissalEligibilityGuide />} />
+                            <Route path="/guides/how-to-lodge-unfair-dismissal" element={<LazyHowToLodgeUnfairDismissalGuide />} />
+                            <Route path="/guides/unfair-dismissal-compensation" element={<LazyUnfairDismissalCompensationGuide />} />
                             <Route path="*" element={<LazyNotFound />} />
                         </Routes>
                     </Suspense>

@@ -100,7 +100,7 @@
         font-family: var(--font-display);
         font-size: var(--fg-hero-size);
         line-height: var(--fg-hero-leading);
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: -0.02em;
         color: var(--color-text-primary);
     }
@@ -123,7 +123,7 @@
         font-family: var(--font-display);
         font-size: var(--text-md);
         line-height: var(--text-md--line-height);
-        font-weight: 700;
+        font-weight: 600;
         color: var(--color-text-primary);
     }
 
@@ -213,5 +213,69 @@
 
     .fg-landing-band-brand {
         background: var(--color-bg-brand-section);
+    }
+
+    /* Guides index (Aave blog-style) */
+    .fg-guides-index {
+        width: 100%;
+        max-width: var(--fg-marketing-max);
+        margin-inline: auto;
+    }
+
+    .fg-guides-thumb-deadlines {
+        background:
+            radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--color-brand-300) 50%, transparent) 0%, transparent 55%),
+            linear-gradient(135deg, var(--color-bg-brand-secondary) 0%, color-mix(in srgb, var(--color-brand-600) 35%, white) 100%);
+    }
+
+    .fg-guides-thumb-eligibility {
+        background:
+            radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--color-brand-200) 60%, transparent) 0%, transparent 50%),
+            linear-gradient(135deg, var(--color-bg-secondary) 0%, color-mix(in srgb, var(--color-brand-400) 25%, white) 100%);
+    }
+
+    .fg-guides-thumb-claims {
+        background:
+            radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--color-brand-400) 45%, transparent) 0%, transparent 55%),
+            linear-gradient(135deg, color-mix(in srgb, var(--color-brand-100) 80%, white) 0%, var(--color-bg-brand-secondary) 100%);
+    }
+
+    .fg-guides-thumb-outcomes {
+        background:
+            radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--color-brand-500) 35%, transparent) 0%, transparent 50%),
+            linear-gradient(135deg, var(--color-bg-secondary) 0%, color-mix(in srgb, var(--color-brand-300) 30%, white) 100%);
+    }
+
+    /* Guide article (Aave blog post layout) */
+    .fg-guide-article {
+        width: 100%;
+        max-width: var(--fg-marketing-max);
+        margin-inline: auto;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        html:has(.fg-guide-article) {
+            scroll-behavior: smooth;
+        }
+    }
+
+    .fg-guide-layout {
+        display: grid;
+        gap: 2.5rem;
+        margin-top: 2.5rem;
+    }
+
+    @media (min-width: 1024px) {
+        .fg-guide-layout {
+            grid-template-columns: minmax(0, 13.75rem) minmax(0, 1fr);
+            column-gap: 4rem;
+            margin-top: 3rem;
+        }
+
+        .fg-guide-toc {
+            position: sticky;
+            top: 6rem;
+            align-self: start;
+        }
     }
 }
