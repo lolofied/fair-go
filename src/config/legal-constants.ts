@@ -25,6 +25,12 @@ export interface LegalConstants {
     label: string;
     /** High income threshold (AUD, indexed 1 July, excludes superannuation). s.333. */
     highIncomeThreshold: number;
+    /**
+     * Maximum compensation an unfair dismissal order may include, expressed in
+     * weeks of the employee's pay. The actual cap is the lesser of this many
+     * weeks' pay or half the high income threshold. s.392(5)/(6).
+     */
+    maxCompensationWeeks: number;
     /** Headcount below which an employer is a "small business". s.23. */
     smallBusinessHeadcount: number;
     /** Minimum employment period before unfair dismissal protection applies. s.382, s.383. */
@@ -101,6 +107,7 @@ export const LEGAL_CONSTANTS: LegalConstants[] = [
         effectiveFrom: "2025-07-01",
         label: "FY2025-26",
         highIncomeThreshold: 183_100,
+        maxCompensationWeeks: 26,
         smallBusinessHeadcount: 15,
         minEmploymentMonths: { default: 6, smallBusiness: 12 },
         timeLimits: TIME_LIMITS,
@@ -113,6 +120,7 @@ export const LEGAL_CONSTANTS: LegalConstants[] = [
         effectiveFrom: "2024-07-01",
         label: "FY2024-25",
         highIncomeThreshold: 175_000,
+        maxCompensationWeeks: 26,
         smallBusinessHeadcount: 15,
         minEmploymentMonths: { default: 6, smallBusiness: 12 },
         timeLimits: TIME_LIMITS,
@@ -125,6 +133,7 @@ export const LEGAL_CONSTANTS: LegalConstants[] = [
         effectiveFrom: "2023-07-01",
         label: "FY2023-24",
         highIncomeThreshold: 167_500,
+        maxCompensationWeeks: 26,
         smallBusinessHeadcount: 15,
         minEmploymentMonths: { default: 6, smallBusiness: 12 },
         timeLimits: TIME_LIMITS,

@@ -28,6 +28,33 @@ export function getHighIncomeThreshold(dismissalDate?: Date | null): DatedAmount
     return { effectiveFrom: c.effectiveFrom, amount: c.highIncomeThreshold, label: c.label };
 }
 
+export interface CompensationCap {
+    /** ISO date (YYYY-MM-DD) this cap starts applying to a dismissal. */
+    effectiveFrom: string;
+    /** Hard dollar ceiling on a compensation order (half the high income threshold). */
+    amount: number;
+    /** The weeks-of-pay limb of the cap (the order is the lesser of this or `amount`). */
+    weeks: number;
+    /** Human label for the financial year, used in copy. */
+    label: string;
+}
+
+/**
+ * The maximum compensation an unfair dismissal order can include for a dismissal.
+ * Under s.392(5)/(6), the cap is the lesser of `weeks` of the employee's pay or
+ * half the high income threshold. The dollar figure returned is that hard ceiling
+ * (half the threshold); the per-person amount also depends on actual pay.
+ */
+export function getMaxCompensationCap(dismissalDate?: Date | null): CompensationCap {
+    const c = getLegalConstants(dismissalDate);
+    return {
+        effectiveFrom: c.effectiveFrom,
+        amount: c.highIncomeThreshold / 2,
+        weeks: c.maxCompensationWeeks,
+        label: c.label,
+    };
+}
+
 /** The window (in days) to lodge an unfair dismissal application with the FWC. s.394(2). */
 export const UNFAIR_DISMISSAL_TIME_LIMIT_DAYS = getLegalConstants().timeLimits.unfairDismissalDays;
 

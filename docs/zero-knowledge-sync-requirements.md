@@ -4,7 +4,7 @@ Backend design for encrypted cross-device sync on top of the local-first case do
 
 ## 1. Decision
 
-Build a thin zero-knowledge sync layer on top of the local-first app — a hybrid of Options A + B from the documentation doc, not a full custodial backend (Option C).
+Build a thin zero-knowledge sync layer on top of the local-first app, a hybrid of Options A + B from the documentation doc, not a full custodial backend (Option C).
 
 | Layer | Role |
 | --- | --- |
@@ -13,7 +13,7 @@ Build a thin zero-knowledge sync layer on top of the local-first app — a hybri
 
 **Account and sync are opt-in.** Anonymous device-local use needs no account; signing in turns on encrypted cross-device sync.
 
-**Why this and not the alternatives:** it fixes the retrieval-from-anywhere weakness of pure local-first while preserving the core promise — "we can't read your data, and we can't be compelled to hand over what we can't read." AU residency is built in; the breach/subpoena surface is minimal (ciphertext only); and it's managed, so ops stay near-zero.
+**Why this and not the alternatives:** it fixes the retrieval-from-anywhere weakness of pure local-first while preserving the core promise, "we can't read your data, and we can't be compelled to hand over what we can't read." AU residency is built in; the breach/subpoena surface is minimal (ciphertext only); and it's managed, so ops stay near-zero.
 
 ## 2. Shape
 
@@ -42,14 +42,14 @@ The server is deliberately "dumb" about case content: it does auth, stores opaqu
 | email (for auth), KDF salt + params | the entire CaseFile JSON (employer, events, witnesses, dismissal facts) |
 | wrapped DEK ×2 (passphrase- and recovery-wrapped) + nonces | all uploaded documents (contracts, letters, payslips) |
 | Supabase auth verifier (bcrypt of the auth hash, not the passphrase) | |
-| **deadline date — deliberate, disclosed exception (see below)** | |
+| **deadline date, deliberate, disclosed exception (see below)** | |
 | row ids, `updated_at`, `schemaVersion`, blob sizes | |
 
-**Never in plaintext on the server:** employer name, dismissal facts, event content, witness details, or any document contents. Metadata is minimised to what sync needs. (Residual: the email↔account link reveals that a user has a case file, not its contents — see §9.)
+**Never in plaintext on the server:** employer name, dismissal facts, event content, witness details, or any document contents. Metadata is minimised to what sync needs. (Residual: the email↔account link reveals that a user has a case file, not its contents, see §9.)
 
 ### The deadline-date exception (enables reminders)
 
-The 21-day clock is the product's most safety-critical feature, and a "your window closes in N days" email is its most valuable nudge — but a zero-knowledge server can't send it if it can't see the deadline. So the dismissal/effective date (and the derived deadline) is stored in plaintext by deliberate, disclosed choice, scoped to that single datum, to drive server-side reminder emails.
+The 21-day clock is the product's most safety-critical feature, and a "your window closes in N days" email is its most valuable nudge, but a zero-knowledge server can't send it if it can't see the deadline. So the dismissal/effective date (and the derived deadline) is stored in plaintext by deliberate, disclosed choice, scoped to that single datum, to drive server-side reminder emails.
 
 A bare date reveals little ("this account has a deadline around then") and never the case facts; the safety upside is large. This is the **one intentional crack in pure zero-knowledge** and must be called out in the privacy copy.
 
@@ -61,7 +61,7 @@ A bare date reveals little ("this account has a deadline around then") and never
 - **AEAD:** XChaCha20-Poly1305 (or AES-256-GCM) for all encryption, random nonce per message.
 - **Sub-key derivation:** HKDF for separating the encryption key from the auth hash.
 
-**Key hierarchy** (data is encrypted with a random DEK that is wrapped by keys derived from the passphrase and from a recovery key — so changing the passphrase never re-encrypts the data):
+**Key hierarchy** (data is encrypted with a random DEK that is wrapped by keys derived from the passphrase and from a recovery key, so changing the passphrase never re-encrypts the data):
 
 ```
 passphrase ──Argon2id(salt)──▶ masterKey ──HKDF──▶ encKey   (wraps DEK)
@@ -116,7 +116,7 @@ On debounced change (or explicit "back up now"):
 - encrypt each new/changed file with DEK + unique nonce → upload bytes to Storage;
 - update plaintext deadline fields on profile when the effective date changes.
 
-**Conflict handling:** last-write-wins on `updated_at` + `schemaVersion` (single-user, concurrent edits rare — acceptable for MVP).
+**Conflict handling:** last-write-wins on `updated_at` + `schemaVersion` (single-user, concurrent edits rare, acceptable for MVP).
 
 ### Passphrase change
 
@@ -124,11 +124,11 @@ User supplies current passphrase → unwrap DEK → derive new salt/`encKey`/`au
 
 ### Recovery (forgot passphrase)
 
-User enters the recovery key → `DEK = AEAD_decrypt(wrappedDEK_recovery, hkdf(recoveryKey,"enc"))` → set a new passphrase (as in passphrase change). Supabase's email-based password reset is **not** used for the crypto — it cannot recover the encryption key. The recovery key is the only passphrase-loss escape hatch, so the UX must force the user to save it at signup.
+User enters the recovery key → `DEK = AEAD_decrypt(wrappedDEK_recovery, hkdf(recoveryKey,"enc"))` → set a new passphrase (as in passphrase change). Supabase's email-based password reset is **not** used for the crypto, it cannot recover the encryption key. The recovery key is the only passphrase-loss escape hatch, so the UX must force the user to save it at signup.
 
 ## 6. Single passphrase, not two
 
-The user types one passphrase. The client derives both the encryption key (stays on device) and the auth hash (sent to Supabase as the "password"). Supabase never sees the real passphrase — only the derived `authHash`, which it bcrypts as usual. This gives the Bitwarden/Proton zero-knowledge property without a second secret and without leaving Supabase Auth.
+The user types one passphrase. The client derives both the encryption key (stays on device) and the auth hash (sent to Supabase as the "password"). Supabase never sees the real passphrase, only the derived `authHash`, which it bcrypts as usual. This gives the Bitwarden/Proton zero-knowledge property without a second secret and without leaving Supabase Auth.
 
 ## 7. Supabase setup
 
@@ -144,7 +144,7 @@ The user types one passphrase. The client derives both the encryption key (stays
 
 **Storage:** one bucket; objects hold encrypted bytes only; Storage RLS scoped to `auth.uid()`.
 
-**Edge Functions:** kept minimal — `prelogin(email)→{salt,params}`, and later the evaluator proxy (calls the model API with de-identified data; never reads case plaintext). Functions never have a path to decrypt user data.
+**Edge Functions:** kept minimal, `prelogin(email)→{salt,params}`, and later the evaluator proxy (calls the model API with de-identified data; never reads case plaintext). Functions never have a path to decrypt user data.
 
 **Reminder job:** scheduled function or cron reads `profiles.deadline_date` (plaintext) and sends reminder emails. Never reads `case_blobs`.
 
@@ -164,24 +164,24 @@ The evaluator does not read from this backend in plaintext. Per `ai-evaluator-re
 
 ### Does NOT protect against (be honest in security copy)
 
-- **Compromised user device/browser** (malware, keylogger) — out of scope of any server design.
-- **Weak passphrase under targeted brute force** — Argon2id raises the cost; enforce strength.
-- **User mishandling the recovery key** — lost recovery key + lost passphrase = unrecoverable (the inherent zero-knowledge trade).
-- **Browser-delivered-code risk** — because we serve the JS, a compromised server could in principle serve tampered code that captures keys. This is the known weakness of web E2E vs native apps. Mitigations: strict CSP, Subresource Integrity, locked/minimal dependencies, published build hashes, and a possible future signed desktop/native client for the most security-conscious users.
-- **Metadata** — the email↔account linkage reveals existence, not content; and the **plaintext deadline date** (the deliberate reminders exception, §3) reveals roughly when a dispute arose. Both reveal fact-of-use, never case contents; optional alias-email support later.
+- **Compromised user device/browser** (malware, keylogger), out of scope of any server design.
+- **Weak passphrase under targeted brute force**, Argon2id raises the cost; enforce strength.
+- **User mishandling the recovery key**, lost recovery key + lost passphrase = unrecoverable (the inherent zero-knowledge trade).
+- **Browser-delivered-code risk**, because we serve the JS, a compromised server could in principle serve tampered code that captures keys. This is the known weakness of web E2E vs native apps. Mitigations: strict CSP, Subresource Integrity, locked/minimal dependencies, published build hashes, and a possible future signed desktop/native client for the most security-conscious users.
+- **Metadata**, the email↔account linkage reveals existence, not content; and the **plaintext deadline date** (the deliberate reminders exception, §3) reveals roughly when a dispute arose. Both reveal fact-of-use, never case contents; optional alias-email support later.
 
 ## 10. MVP scope and sync-lite cuts
 
-Zero-knowledge sync is **in the documentation MVP** (not deferred). The crypto is shared with the encrypted backup file, so the marginal cost over local-first-only is moderate — and durable retrieval-from-anywhere plus deadline-reminder emails are core for an unattended D2C tool. The local-first IndexedDB working store and the encrypted export/import backup file both remain (the file is an offline escape hatch alongside sync).
+Zero-knowledge sync is **in the documentation MVP** (not deferred). The crypto is shared with the encrypted backup file, so the marginal cost over local-first-only is moderate, and durable retrieval-from-anywhere plus deadline-reminder emails are core for an unattended D2C tool. The local-first IndexedDB working store and the encrypted export/import backup file both remain (the file is an offline escape hatch alongside sync).
 
-**Build it sync-lite** — keep these cuts:
+**Build it sync-lite**, keep these cuts:
 
 - Last-write-wins conflict handling; no real-time or multi-device merge engine.
 - DEK + per-message nonce, not per-file content keys.
 - No native client yet (accept the browser-delivered-E2E caveat, §9).
 - No server-side search / OCR / content analytics (inherent to zero-knowledge; runs client-side or not at all).
 
-**Don't let the crypto gate validation.** Test export value with lawyers (hand-assembled examples) and documentation willingness (concierge users) in parallel — neither needs the backend.
+**Don't let the crypto gate validation.** Test export value with lawyers (hand-assembled examples) and documentation willingness (concierge users) in parallel, neither needs the backend.
 
 ## 11. Implementation checklist
 

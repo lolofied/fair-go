@@ -188,7 +188,7 @@ interface AvatarRowProps extends ComponentPropsWithRef<"div"> {
     children?: ReactNode;
 }
 
-/** Avatar sizes per root size — ordered smallest to largest (left edge → center). */
+/** Avatar sizes per root size, ordered smallest to largest (left edge → center). */
 const rowStyles = {
     sm: ["size-8 rounded-md", "size-9 rounded-[7px]", "size-10 rounded-lg", "size-11 rounded-[9px]"],
     md: ["size-10 rounded-lg", "size-11 rounded-[9px]", "size-12 rounded-[10px]"],

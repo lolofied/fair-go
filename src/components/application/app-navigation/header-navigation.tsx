@@ -59,8 +59,8 @@ interface HeaderNavigationBaseProps {
 
     /**
      * Controls how the secondary header renders sub-items.
-     * - "buttons" — NavButton pills (default)
-     * - "tabs" — Underline tabs
+     * - "buttons": NavButton pills (default)
+     * - "tabs": Underline tabs
      * @default "buttons"
      */
     secondaryType?: "buttons" | "tabs";

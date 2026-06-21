@@ -12,6 +12,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "@heroicons/react": "^2.2.0",
         "@react-aria/utils": "^3.34.1",
         "@react-stately/utils": "^3.12.1",
         "@react-types/overlays": "^3.10.0",

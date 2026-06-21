@@ -1,6 +1,6 @@
 /**
  * Privacy-safe product analytics forwarded to PostHog when configured.
- * Counts, enums, and funnel steps only — never answers, names, or file content.
+ * Counts, enums, and funnel steps only. Never answers, names, or file content.
  */
 
 import { capturePostHog } from "@/analytics/posthog-client";

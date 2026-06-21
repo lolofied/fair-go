@@ -6,7 +6,7 @@
 const SITE_URL = "https://fair-go.ai";
 const SITE_NAME = "Fair Go";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg?v=2`;
-const OG_IMAGE_ALT = "Fair Go — a free 90-second unfair dismissal eligibility check under Australia's Fair Work Act.";
+const OG_IMAGE_ALT = "Fair Go: a free 90-second unfair dismissal eligibility check under Australia's Fair Work Act.";
 
 interface PageMetaProps {
     /** Full document title, e.g. "About Fair Go". */

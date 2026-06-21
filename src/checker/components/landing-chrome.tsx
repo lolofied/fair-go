@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LogIn01 } from "@untitledui/icons";
+import { ArrowRight, LogIn01 } from "@untitledui/icons";
 import { Link } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { ShellFooter, ShellHeader, ShellHeaderBrand } from "@/components/layout/shell";
@@ -17,7 +17,14 @@ import { cx } from "@/utils/cx";
  *
  * The header is sticky; a light divider fades in along its bottom edge once the page scrolls.
  */
-export const LandingHeader = ({ brandAsLink = false }: { brandAsLink?: boolean }) => {
+export const LandingHeader = ({
+    brandAsLink = false,
+    onStartCheck,
+}: {
+    brandAsLink?: boolean;
+    /** When provided, the header CTA starts the check in place; otherwise it links home. */
+    onStartCheck?: () => void;
+}) => {
     const showRetrieve = isSyncConfigured();
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -47,11 +54,20 @@ export const LandingHeader = ({ brandAsLink = false }: { brandAsLink?: boolean }
                 </div>
                 {showRetrieve ? (
                     <Button href="/case/retrieve" size="sm" color="secondary" iconLeading={LogIn01} className="hidden sm:flex">
-                        Retrieve my case
+                        Retrieve case
                     </Button>
                 ) : null}
+                {onStartCheck ? (
+                    <Button size="sm" color="primary" iconTrailing={ArrowRight} className="hidden sm:flex" onClick={onStartCheck}>
+                        Start free check
+                    </Button>
+                ) : (
+                    <Button href="/" size="sm" color="primary" iconTrailing={ArrowRight} className="hidden sm:flex">
+                        Start free check
+                    </Button>
+                )}
                 <div className="sm:hidden">
-                    <LandingHeaderMenu />
+                    <LandingHeaderMenu onStartCheck={onStartCheck} />
                 </div>
             </div>
         </ShellHeader>
@@ -59,7 +75,7 @@ export const LandingHeader = ({ brandAsLink = false }: { brandAsLink?: boolean }
 };
 
 export const LandingFooter = () => (
-    <ShellFooter>
+    <ShellFooter className="bg-primary">
         <div className="mx-auto flex max-w-[968px] flex-col items-center gap-3 sm:gap-4">
             <p className="text-center text-sm text-tertiary">
                 Fair Go is not a law firm and this tool is not legal advice. It helps you document your situation and

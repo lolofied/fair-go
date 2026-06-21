@@ -19,7 +19,7 @@
         --fg-card-pad: 1rem;
         --fg-hero-size: clamp(2rem, 5.5vw + 1.25rem, 3.5rem);
         --fg-hero-leading: 1.12;
-        --fg-lead-size: 1.0625rem;
+        --fg-lead-size: 1rem;
     }
 
     @media (min-width: 640px) {
@@ -32,7 +32,7 @@
             --fg-stack-lg: 1.5rem;
             --fg-page-gap: 1.5rem;
             --fg-card-pad: 1.25rem;
-            --fg-lead-size: 1.25rem;
+            --fg-lead-size: 1.1875rem;
         }
     }
 }
@@ -108,6 +108,7 @@
     .fg-hero-lead {
         font-size: var(--fg-lead-size);
         line-height: 1.5;
+        font-weight: 500;
         color: var(--color-text-tertiary);
     }
 
@@ -148,5 +149,69 @@
         .fg-btn-block {
             width: auto;
         }
+    }
+
+    /* Landing page: white canvas with contained section panels (Aave-style) */
+    .fg-landing-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        background: var(--color-bg-primary);
+        padding-block: 2.5rem 3rem;
+        padding-inline: 1rem;
+    }
+
+    @media (min-width: 480px) {
+        .fg-landing-sections {
+            padding-inline: 1.5rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .fg-landing-sections {
+            padding-inline: 2rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .fg-landing-sections {
+            padding-inline: 3rem;
+        }
+    }
+
+    .fg-landing-section-content {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 60.5rem;
+        margin-inline: auto;
+        padding-inline: 2rem;
+    }
+
+    .fg-landing-blue-wash {
+        background:
+            radial-gradient(ellipse 85% 98% at 50% 100%, color-mix(in srgb, var(--color-brand-600) 36%, transparent) 0%, transparent 100%),
+            radial-gradient(ellipse 55% 68% at 100% 100%, color-mix(in srgb, var(--color-brand-500) 26%, transparent) 0%, transparent 93%),
+            radial-gradient(ellipse 45% 60% at 0% 100%, color-mix(in srgb, var(--color-brand-400) 20%, transparent) 0%, transparent 87%),
+            var(--color-bg-primary);
+    }
+
+    .fg-landing-panel {
+        border-radius: var(--radius-3xl);
+    }
+
+    .fg-landing-band-primary {
+        background: var(--color-bg-primary);
+    }
+
+    .fg-landing-band-secondary {
+        background: var(--color-bg-secondary);
+    }
+
+    .fg-landing-band-dark {
+        background: var(--color-bg-primary-solid);
+    }
+
+    .fg-landing-band-brand {
+        background: var(--color-bg-brand-section);
     }
 }

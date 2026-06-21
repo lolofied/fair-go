@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import { forwardRef, type PropsWithChildren } from "react";
 import { Link } from "react-router";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { cx } from "@/utils/cx";
@@ -26,12 +26,12 @@ export const ShellHeaderBrand = ({ className }: { className?: string }) => (
     </Link>
 );
 
-export const ShellMain = ({
-    className,
-    align = "center",
-    children,
-}: PropsWithChildren<{ className?: string; align?: "center" | "start" }>) => (
+export const ShellMain = forwardRef<
+    HTMLElement,
+    PropsWithChildren<{ className?: string; align?: "center" | "start" }>
+>(({ className, align = "center", children }, ref) => (
     <main
+        ref={ref}
         className={cx(
             "fg-shell-main flex flex-1 flex-col",
             align === "center" ? "items-center justify-center" : "items-start justify-start sm:items-center sm:justify-center",
@@ -40,7 +40,8 @@ export const ShellMain = ({
     >
         {children}
     </main>
-);
+));
+ShellMain.displayName = "ShellMain";
 
 export const ShellFooter = ({ className, children }: PropsWithChildren<{ className?: string }>) => (
     <footer className={cx("border-t border-secondary fg-shell-footer", className)}>{children}</footer>
@@ -90,3 +91,6 @@ export const ActionRow = ({ className, children }: PropsWithChildren<{ className
 
 /** Full-width primary actions on mobile; auto width from sm up. */
 export const mobileBtnClass = "w-full sm:w-auto";
+
+/** Slides a button's trailing icon 6px to the right on hover. */
+export const arrowSlideClass = "hover:[&_[data-icon=trailing]]:translate-x-1.5";

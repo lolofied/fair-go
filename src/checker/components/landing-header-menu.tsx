@@ -1,17 +1,28 @@
-import { HelpCircle, LogIn01, Menu02, User01 } from "@untitledui/icons";
+import { useState } from "react";
+import { ArrowRight, HelpCircle, LogIn01, Menu02, User01 } from "@untitledui/icons";
 import { useNavigate } from "react-router";
+import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
+import { arrowSlideClass } from "@/components/layout/shell";
 import { isSyncConfigured } from "@/config/supabase";
+import { cx } from "@/utils/cx";
 
-export const LandingHeaderMenu = () => {
+export const LandingHeaderMenu = ({ onStartCheck }: { onStartCheck?: () => void }) => {
     const navigate = useNavigate();
     const showRetrieve = isSyncConfigured();
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleStartCheck = () => {
+        setIsOpen(false);
+        if (onStartCheck) onStartCheck();
+        else navigate("/");
+    };
 
     return (
-        <Dropdown.Root>
+        <Dropdown.Root isOpen={isOpen} onOpenChange={setIsOpen}>
             <ButtonUtility size="sm" color="secondary" icon={Menu02} aria-label="Open menu" />
-            <Dropdown.Popover className="w-52" placement="bottom end">
+            <Dropdown.Popover className="flex w-52 flex-col overflow-hidden p-0" placement="bottom end">
                 <Dropdown.Menu
                     onAction={(key) => {
                         if (key === "about") navigate("/about");
@@ -27,10 +38,34 @@ export const LandingHeaderMenu = () => {
                     </Dropdown.Item>
                     {showRetrieve ? (
                         <Dropdown.Item id="retrieve" icon={LogIn01}>
-                            Retrieve my case
+                            Retrieve case
                         </Dropdown.Item>
                     ) : null}
                 </Dropdown.Menu>
+                <div className="border-t border-secondary p-2">
+                    {onStartCheck ? (
+                        <Button
+                            size="sm"
+                            color="primary"
+                            iconTrailing={ArrowRight}
+                            className={cx("w-full", arrowSlideClass)}
+                            onClick={handleStartCheck}
+                        >
+                            Start free check
+                        </Button>
+                    ) : (
+                        <Button
+                            href="/"
+                            size="sm"
+                            color="primary"
+                            iconTrailing={ArrowRight}
+                            className={cx("w-full", arrowSlideClass)}
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Start free check
+                        </Button>
+                    )}
+                </div>
             </Dropdown.Popover>
         </Dropdown.Root>
     );

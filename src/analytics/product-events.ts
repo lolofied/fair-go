@@ -1,4 +1,4 @@
-/** Explicit PostHog events — no PII, no free text, no answer payloads. */
+/** Explicit PostHog events. No PII, no free text, no answer payloads. */
 export const PRODUCT_EVENT_NAMES = [
     "checker_started",
     "claim_outcome",
