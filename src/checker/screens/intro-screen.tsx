@@ -15,6 +15,7 @@ import {
     LandingFaqSection,
     OutcomesAndFeaturesSection,
 } from "@/checker/components/landing-sections";
+import { LandingRevealGroup, LandingRevealItem } from "@/checker/components/landing-reveal";
 import { PageMeta } from "@/components/seo/page-meta";
 import { useChecker } from "@/checker/store";
 import { trackCheckerStarted, trackDocumentationStarted } from "@/analytics/product-analytics";
@@ -51,36 +52,46 @@ export const IntroScreen = () => {
                     <div className="fg-landing-panel fg-landing-blue-wash min-h-[calc(100svh-64px)] overflow-hidden pb-0 pt-8 sm:pt-12">
                         <div className="fg-landing-section-content">
                             <ShellContent width="marketing" className="text-center">
-                                <HeroTitle>
-                                    Were you{" "}
-                                    <span className="relative inline-block sm:whitespace-nowrap">
-                                        unfairly dismissed
-                                        <HighlightUnderline />
-                                    </span>
-                                    ?
-                                </HeroTitle>
+                                <LandingRevealGroup trigger="mount" stagger={0.15}>
+                                    <LandingRevealItem variant="text">
+                                        <HeroTitle>
+                                            Were you{" "}
+                                            <span className="relative inline-block sm:whitespace-nowrap">
+                                                unfairly dismissed
+                                                <HighlightUnderline />
+                                            </span>
+                                            ?
+                                        </HeroTitle>
+                                    </LandingRevealItem>
 
-                                <HeroLead className="mx-auto mt-3 max-w-[720px] sm:mt-4">
-                                    Find out in 90 seconds whether you likely have an unfair dismissal claim under the Fair Work Act,
-                                    and how long you have to act.
-                                </HeroLead>
+                                    <LandingRevealItem variant="text">
+                                        <HeroLead className="mx-auto mt-3 max-w-[720px] sm:mt-4">
+                                            Find out in 90 seconds whether you likely have an unfair dismissal claim under the Fair Work Act,
+                                            and how long you have to act.
+                                        </HeroLead>
+                                    </LandingRevealItem>
 
-                                <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8">
-                                    <Button
-                                        size="xl"
-                                        color="primary"
-                                        iconTrailing={ArrowRight}
-                                        className={cx(mobileBtnClass, arrowSlideClass)}
-                                        onClick={onStart}
-                                    >
-                                        {hasProgress ? "Resume my check" : "Start my free check"}
-                                    </Button>
-                                    <span className="text-sm text-tertiary">
-                                        No payment. No commitment. Your answers stay private.
-                                    </span>
-                                </div>
+                                    <LandingRevealItem variant="text">
+                                        <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8">
+                                            <Button
+                                                size="xl"
+                                                color="primary"
+                                                iconTrailing={ArrowRight}
+                                                className={cx(mobileBtnClass, arrowSlideClass)}
+                                                onClick={onStart}
+                                            >
+                                                {hasProgress ? "Resume my check" : "Start my free check"}
+                                            </Button>
+                                            <span className="text-sm text-tertiary">
+                                                No payment. No commitment. Your answers stay private.
+                                            </span>
+                                        </div>
+                                    </LandingRevealItem>
 
-                                <DocumentationPreview />
+                                    <LandingRevealItem variant="media">
+                                        <DocumentationPreview />
+                                    </LandingRevealItem>
+                                </LandingRevealGroup>
                             </ShellContent>
                         </div>
                     </div>

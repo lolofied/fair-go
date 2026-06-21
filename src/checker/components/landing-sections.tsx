@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/base/buttons/button";
 import { CompensationRangeVisual } from "@/checker/components/compensation-range-visual";
 import { LandingFeatureIcon } from "@/checker/components/landing-nav-icon";
+import { LandingReveal, LandingRevealGroup, LandingRevealItem } from "@/checker/components/landing-reveal";
 import { arrowSlideClass, mobileBtnClass } from "@/components/layout/shell";
 import { getLegalConstants } from "@/config/legal-constants";
 import { cx } from "@/utils/cx";
@@ -108,44 +109,54 @@ const FEATURES: { icon: FC<{ className?: string }>; hover: string; title: string
 
 export const OutcomesAndFeaturesSection = () => (
     <Section band="blue-wash">
-        <SectionHeading eyebrow="If your claim succeeds" title="Reinstatement or compensation" />
+        <LandingReveal variant="text">
+            <SectionHeading eyebrow="If your claim succeeds" title="Reinstatement or compensation" />
+        </LandingReveal>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-            <div className="group rounded-2xl border border-secondary bg-primary p-6">
-                <LandingFeatureIcon icon={UsersIcon} size="lg" hover="group-hover:text-violet-500" />
-                <h3 className="mt-4 text-lg font-semibold text-primary">Reinstatement</h3>
-                <p className="mt-2 text-md text-tertiary">
-                    The Fair Work Act's first option: getting your job back. The Commission must consider it, but it's
-                    granted rarely.
-                </p>
-            </div>
-            <div className="group rounded-2xl border border-secondary bg-primary p-6">
-                <LandingFeatureIcon icon={BanknotesIcon} size="lg" hover="group-hover:text-emerald-500" />
-                <h3 className="mt-4 text-lg font-semibold text-primary">Compensation</h3>
-                <p className="mt-2 text-md text-tertiary">
-                    Payment for lost income when reinstatement isn't workable. Most outcomes are a handful of weeks' pay,
-                    not the headline cap.
-                </p>
-                <CompensationRangeVisual />
-            </div>
-        </div>
-
-        <SectionHeading
-            className="mt-16 sm:mt-20"
-            eyebrow="What you get"
-            title="Everything you need, on your side"
-            lead="The other side has HR and lawyers. Fair Go gives you the tools to stand on equal footing."
-        />
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {FEATURES.map(({ icon, hover, title, body }) => (
-                <div key={title} className="group flex flex-col rounded-2xl bg-primary/90 p-7 sm:p-8">
-                    <LandingFeatureIcon icon={icon} size="lg" hover={hover} />
-                    <h3 className="mt-5 text-lg font-semibold text-primary">{title}</h3>
-                    <p className="mt-2 flex-1 text-md text-tertiary">{body}</p>
+        <LandingRevealGroup className="mt-10 grid gap-4 md:grid-cols-2" stagger={0.18}>
+            <LandingRevealItem variant="text">
+                <div className="group rounded-2xl border border-secondary bg-primary p-6">
+                    <LandingFeatureIcon icon={UsersIcon} size="lg" hover="group-hover:text-violet-500" />
+                    <h3 className="mt-4 text-lg font-semibold text-primary">Reinstatement</h3>
+                    <p className="mt-2 text-md text-tertiary">
+                        The Fair Work Act's first option: getting your job back. The Commission must consider it, but it's
+                        granted rarely.
+                    </p>
                 </div>
+            </LandingRevealItem>
+            <LandingRevealItem variant="text">
+                <div className="group rounded-2xl border border-secondary bg-primary p-6">
+                    <LandingFeatureIcon icon={BanknotesIcon} size="lg" hover="group-hover:text-emerald-500" />
+                    <h3 className="mt-4 text-lg font-semibold text-primary">Compensation</h3>
+                    <p className="mt-2 text-md text-tertiary">
+                        Payment for lost income when reinstatement isn't workable. Most outcomes are a handful of weeks' pay,
+                        not the headline cap.
+                    </p>
+                    <CompensationRangeVisual />
+                </div>
+            </LandingRevealItem>
+        </LandingRevealGroup>
+
+        <LandingReveal variant="text">
+            <SectionHeading
+                className="mt-16 sm:mt-20"
+                eyebrow="What you get"
+                title="Everything you need, on your side"
+                lead="The other side has HR and lawyers. Fair Go gives you the tools to stand on equal footing."
+            />
+        </LandingReveal>
+
+        <LandingRevealGroup className="mt-10 grid gap-4 sm:grid-cols-2" stagger={0.12}>
+            {FEATURES.map(({ icon, hover, title, body }) => (
+                <LandingRevealItem key={title} variant="text">
+                    <div className="group flex flex-col rounded-2xl bg-primary/90 p-7 sm:p-8">
+                        <LandingFeatureIcon icon={icon} size="lg" hover={hover} />
+                        <h3 className="mt-5 text-lg font-semibold text-primary">{title}</h3>
+                        <p className="mt-2 flex-1 text-md text-tertiary">{body}</p>
+                    </div>
+                </LandingRevealItem>
             ))}
-        </div>
+        </LandingRevealGroup>
     </Section>
 );
 
@@ -240,33 +251,43 @@ const STEPS: { title: string; body: string; mock: FC }[] = [
 
 export const HowItWorksSection = ({ onStart, hasProgress }: { onStart: () => void; hasProgress: boolean }) => (
     <Section band="dark">
-        <SectionHeading
-            inverted
-            eyebrow="How it works"
-            title="From confused to prepared, fast"
-            lead="Fair Go is there for you from the first sign of trouble"
-        />
+        <LandingReveal variant="text">
+            <SectionHeading
+                inverted
+                eyebrow="How it works"
+                title="From confused to prepared, fast"
+                lead="Fair Go is there for you from the first sign of trouble"
+            />
+        </LandingReveal>
 
-        <div className="mt-4 flex justify-center sm:mt-6">
-            <Button
-                size="xl"
-                color="secondary"
-                iconTrailing={ArrowRight}
-                className={cx(mobileBtnClass, arrowSlideClass)}
-                onClick={onStart}
-            >
-                {hasProgress ? "Resume my check" : "Get started"}
-            </Button>
-        </div>
+        <LandingReveal variant="text">
+            <div className="mt-4 flex justify-center sm:mt-6">
+                <Button
+                    size="xl"
+                    color="secondary"
+                    iconTrailing={ArrowRight}
+                    className={cx(mobileBtnClass, arrowSlideClass)}
+                    onClick={onStart}
+                >
+                    {hasProgress ? "Resume my check" : "Get started"}
+                </Button>
+            </div>
+        </LandingReveal>
 
         <ol className="mt-10 grid gap-6 lg:grid-cols-3">
             {STEPS.map((step) => {
                 const Mock = step.mock;
                 return (
-                    <li key={step.title} className="rounded-2xl border border-secondary bg-primary p-6">
-                        <Mock />
-                        <h3 className="mt-5 text-lg font-semibold text-primary">{step.title}</h3>
-                        <p className="mt-2 text-md text-tertiary">{step.body}</p>
+                    <li key={step.title} className="list-none">
+                        <LandingRevealGroup className="rounded-2xl border border-secondary bg-primary p-6" stagger={0.15}>
+                            <LandingRevealItem variant="media">
+                                <Mock />
+                            </LandingRevealItem>
+                            <LandingRevealItem variant="text">
+                                <h3 className="mt-5 text-lg font-semibold text-primary">{step.title}</h3>
+                                <p className="mt-2 text-md text-tertiary">{step.body}</p>
+                            </LandingRevealItem>
+                        </LandingRevealGroup>
                     </li>
                 );
             })}
@@ -280,25 +301,33 @@ export const HowItWorksSection = ({ onStart, hasProgress }: { onStart: () => voi
 
 export const LandingClosingCta = ({ onStart, hasProgress }: { onStart: () => void; hasProgress: boolean }) => (
     <Section band="brand" className="py-20 sm:py-28">
-        <div className="group flex flex-col items-center text-center">
-            <LandingFeatureIcon icon={HandRaisedIcon} size="lg" tone="on-dark" hover="group-hover:text-rose-400" />
-            <h2 className="mt-5 text-display-sm font-semibold tracking-tight text-primary_on-brand sm:text-display-md">
-                Find out where you stand
-            </h2>
-            <p className="mt-3 max-w-xl text-lg text-tertiary_on-brand">
-                It takes about 90 seconds, it's free, and your answers stay private. The clock is often already running, so
-                the sooner you check, the more options you have.
-            </p>
-            <Button
-                size="xl"
-                color="primary"
-                iconTrailing={ArrowRight}
-                className={cx("mt-8 w-full sm:w-auto", arrowSlideClass)}
-                onClick={onStart}
-            >
-                {hasProgress ? "Resume my check" : "Start my free check"}
-            </Button>
-        </div>
+        <LandingRevealGroup className="group flex flex-col items-center text-center" stagger={0.15}>
+            <LandingRevealItem variant="text">
+                <LandingFeatureIcon icon={HandRaisedIcon} size="lg" tone="on-dark" hover="group-hover:text-rose-400" />
+            </LandingRevealItem>
+            <LandingRevealItem variant="text">
+                <h2 className="mt-5 text-display-sm font-semibold tracking-tight text-primary_on-brand sm:text-display-md">
+                    Find out where you stand
+                </h2>
+            </LandingRevealItem>
+            <LandingRevealItem variant="text">
+                <p className="mt-3 max-w-xl text-lg text-tertiary_on-brand">
+                    It takes about 90 seconds, it's free, and your answers stay private. The clock is often already running, so
+                    the sooner you check, the more options you have.
+                </p>
+            </LandingRevealItem>
+            <LandingRevealItem variant="text">
+                <Button
+                    size="xl"
+                    color="primary"
+                    iconTrailing={ArrowRight}
+                    className={cx("mt-8 w-full sm:w-auto", arrowSlideClass)}
+                    onClick={onStart}
+                >
+                    {hasProgress ? "Resume my check" : "Start my free check"}
+                </Button>
+            </LandingRevealItem>
+        </LandingRevealGroup>
     </Section>
 );
 
@@ -353,15 +382,19 @@ export const LandingFaqSection = () => {
     return (
         <Section band="primary">
             <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12 lg:gap-20">
-                <h2 className="shrink-0 text-display-sm font-semibold tracking-tight text-primary sm:text-display-md md:max-w-[10rem] lg:max-w-[12rem]">
-                    FAQs
-                </h2>
+                <LandingReveal variant="text" className="shrink-0 md:max-w-[10rem] lg:max-w-[12rem]">
+                    <h2 className="text-display-sm font-semibold tracking-tight text-primary sm:text-display-md">
+                        FAQs
+                    </h2>
+                </LandingReveal>
 
-                <div className="min-w-0 flex-1 border-t border-secondary md:border-t-0">
+                <LandingRevealGroup className="min-w-0 flex-1 border-t border-secondary md:border-t-0" stagger={0.09}>
                     {FAQ_ITEMS(unfairDismissalDays).map(({ question, answer }) => (
-                        <FaqItem key={question} question={question} answer={answer} />
+                        <LandingRevealItem key={question} variant="text">
+                            <FaqItem question={question} answer={answer} />
+                        </LandingRevealItem>
                     ))}
-                </div>
+                </LandingRevealGroup>
             </div>
         </Section>
     );
