@@ -76,28 +76,24 @@ const SectionHeading = ({
     </div>
 );
 
-const FEATURES: { icon: FC<{ className?: string }>; hover: string; title: string; body: string }[] = [
+const FEATURES: { icon: FC<{ className?: string }>; title: string; body: string }[] = [
     {
         icon: DocumentMagnifyingGlassIcon,
-        hover: "group-hover:text-blue-500",
         title: "Free eligibility check",
         body: "Understand your options under the Fair Work Act in about 90 seconds. No payment, no account needed.",
     },
     {
         icon: LockClosedIcon,
-        hover: "group-hover:text-rose-500",
         title: "Private by design",
         body: "Your record is encrypted on your own device. We can't read it, sell it, or be made to hand over what we can't see.",
     },
     {
         icon: CalendarDaysIcon,
-        hover: "group-hover:text-amber-500",
         title: "Deadline tracking",
         body: "Unfair dismissal claims have a strict 21-day window. Fair Go shows exactly how long you have left.",
     },
     {
         icon: UserGroupIcon,
-        hover: "group-hover:text-cyan-500",
         title: "Timeline, evidence & witnesses",
         body: "Keep dates, messages, documents, and people who saw what happened together in one organised place.",
     },
@@ -115,8 +111,8 @@ export const OutcomesAndFeaturesSection = () => (
 
         <LandingRevealGroup className="mt-10 grid gap-4 md:grid-cols-2" stagger={0.18}>
             <LandingRevealItem variant="text">
-                <div className="group rounded-2xl border border-secondary bg-primary p-6">
-                    <LandingFeatureIcon icon={UsersIcon} size="lg" hover="group-hover:text-violet-500" />
+                <div className="rounded-2xl border border-secondary bg-primary p-6">
+                    <LandingFeatureIcon icon={UsersIcon} size="lg" />
                     <h3 className="mt-4 text-lg font-semibold text-primary">Reinstatement</h3>
                     <p className="mt-2 text-md text-tertiary">
                         The Fair Work Act's first option: getting your job back. The Commission must consider it, but it's
@@ -125,8 +121,8 @@ export const OutcomesAndFeaturesSection = () => (
                 </div>
             </LandingRevealItem>
             <LandingRevealItem variant="text">
-                <div className="group rounded-2xl border border-secondary bg-primary p-6">
-                    <LandingFeatureIcon icon={BanknotesIcon} size="lg" hover="group-hover:text-emerald-500" />
+                <div className="rounded-2xl border border-secondary bg-primary p-6">
+                    <LandingFeatureIcon icon={BanknotesIcon} size="lg" />
                     <h3 className="mt-4 text-lg font-semibold text-primary">Compensation</h3>
                     <p className="mt-2 text-md text-tertiary">
                         Payment for lost income when reinstatement isn't workable. Most outcomes are a handful of weeks' pay,
@@ -147,10 +143,10 @@ export const OutcomesAndFeaturesSection = () => (
         </LandingReveal>
 
         <LandingRevealGroup className="mt-10 grid gap-4 sm:grid-cols-2" stagger={0.12}>
-            {FEATURES.map(({ icon, hover, title, body }) => (
+            {FEATURES.map(({ icon, title, body }) => (
                 <LandingRevealItem key={title} variant="text">
-                    <div className="group flex flex-col rounded-2xl bg-primary/90 p-7 sm:p-8">
-                        <LandingFeatureIcon icon={icon} size="lg" hover={hover} />
+                    <div className="flex flex-col rounded-2xl bg-primary/90 p-7 sm:p-8">
+                        <LandingFeatureIcon icon={icon} size="lg" />
                         <h3 className="mt-5 text-lg font-semibold text-primary">{title}</h3>
                         <p className="mt-2 flex-1 text-md text-tertiary">{body}</p>
                     </div>
@@ -301,9 +297,9 @@ export const HowItWorksSection = ({ onStart, hasProgress }: { onStart: () => voi
 
 export const LandingClosingCta = ({ onStart, hasProgress }: { onStart: () => void; hasProgress: boolean }) => (
     <Section band="brand" className="py-20 sm:py-28">
-        <LandingRevealGroup className="group flex flex-col items-center text-center" stagger={0.15}>
+        <LandingRevealGroup className="flex flex-col items-center text-center" stagger={0.15}>
             <LandingRevealItem variant="text">
-                <LandingFeatureIcon icon={HandRaisedIcon} size="lg" tone="on-dark" hover="group-hover:text-rose-400" />
+                <LandingFeatureIcon icon={HandRaisedIcon} size="lg" tone="on-dark" />
             </LandingRevealItem>
             <LandingRevealItem variant="text">
                 <h2 className="mt-5 text-display-sm font-semibold tracking-tight text-primary_on-brand sm:text-display-md">

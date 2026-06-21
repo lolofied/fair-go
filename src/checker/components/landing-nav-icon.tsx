@@ -60,26 +60,23 @@ const TILE_TONE: Record<LandingFeatureIconTone, { tile: string; icon: string }> 
 
 /**
  * Aave-style icon tile: a rounded-square container with a soft border holding a
- * bold filled (solid) icon. The container stays static; on group hover only the
- * icon fill shifts to its accent color (`hover`, e.g. "group-hover:text-violet-500").
+ * bold filled (solid) icon.
  */
 export const LandingFeatureIcon = ({
     icon: Icon,
     size = "lg",
     tone = "default",
-    hover,
     className,
 }: {
     icon: FC<{ className?: string }>;
     size?: keyof typeof TILE_SIZE;
     tone?: LandingFeatureIconTone;
-    hover?: string;
     className?: string;
 }) => (
     <span
         aria-hidden="true"
         className={cx("inline-flex shrink-0 items-center justify-center", TILE_SIZE[size], TILE_TONE[tone].tile, className)}
     >
-        <Icon className={cx("transition duration-150 ease-linear", TILE_ICON_SIZE[size], TILE_TONE[tone].icon, hover)} />
+        <Icon className={cx(TILE_ICON_SIZE[size], TILE_TONE[tone].icon)} />
     </span>
 );
