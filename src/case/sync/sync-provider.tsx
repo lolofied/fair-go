@@ -183,6 +183,10 @@ export const SyncProvider = ({ children }: PropsWithChildren) => {
     }, []);
 
     const signOut = useCallback(async () => {
+        if (identifiedPostHogUserIdRef.current) {
+            resetPostHogIdentity();
+            identifiedPostHogUserIdRef.current = null;
+        }
         await signOutSync();
         setUser(null);
         setDekUnlocked(false);

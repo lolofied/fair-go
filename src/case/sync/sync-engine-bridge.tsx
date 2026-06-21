@@ -13,29 +13,38 @@ export const SyncEngineBridge = () => {
     const { user, dekUnlocked, configured, setSyncState, markSynced, lastPushedUpdatedAtRef } = useSync();
 
     const hydratedForUserRef = useRef<string | null>(null);
+    const hydratingForUserRef = useRef<string | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (!user) {
             hydratedForUserRef.current = null;
+            hydratingForUserRef.current = null;
         }
     }, [user]);
 
     useEffect(() => {
         if (!configured || !user || !dekUnlocked || !file) return;
         if (hydratedForUserRef.current === user.id) return;
+        if (hydratingForUserRef.current === user.id) return;
 
         let cancelled = false;
-        hydratedForUserRef.current = user.id;
+        hydratingForUserRef.current = user.id;
 
         (async () => {
             const dek = getSyncDek();
-            if (!dek) return;
+            if (!dek) {
+                hydratingForUserRef.current = null;
+                return;
+            }
 
             setSyncState({ status: "syncing", error: null });
             try {
                 const result = await resolveOnLogin(file, dek, user.id);
                 if (cancelled) return;
+
+                hydratingForUserRef.current = null;
+                hydratedForUserRef.current = user.id;
 
                 if (result.applied === "remote") {
                     replaceFile(result.caseFile);
@@ -47,6 +56,7 @@ export const SyncEngineBridge = () => {
                 setSyncState({ status: "synced", error: null });
             } catch (error) {
                 if (cancelled) return;
+                hydratingForUserRef.current = null;
                 hydratedForUserRef.current = null;
                 setSyncState({
                     status: "error",
@@ -57,6 +67,9 @@ export const SyncEngineBridge = () => {
 
         return () => {
             cancelled = true;
+            if (hydratingForUserRef.current === user.id) {
+                hydratingForUserRef.current = null;
+            }
         };
     }, [configured, user, dekUnlocked, file, replaceFile, setSyncState, markSynced]);
 
