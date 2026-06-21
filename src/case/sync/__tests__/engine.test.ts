@@ -80,7 +80,7 @@ function caseFile(updatedAt: string): CaseFile {
             schemaVersion: 1,
             seededFromChecker: false,
         },
-    } as CaseFile;
+    } as unknown as CaseFile;
 }
 
 describe("sync engine", () => {
