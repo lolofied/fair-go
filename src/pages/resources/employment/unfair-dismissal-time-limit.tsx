@@ -1,9 +1,15 @@
 import { UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
-import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
+import { EMPLOYMENT_RESOURCE_ROUTES, LEGAL_CITATIONS } from "@/config/site-seo";
 import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import {
+    FairWorkActLink,
+    FwcLink,
+    FwoLink,
+    GuideSourceItem,
+    GuideSources,
+} from "@/pages/resources/legal-citations";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.timeLimit;
-const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 
 const FAQ_ITEMS = [
     {
@@ -12,7 +18,7 @@ const FAQ_ITEMS = [
     },
     {
         question: "Can the Fair Work Commission extend the deadline?",
-        answer: "In limited circumstances, the Commission may accept a late application if you can show exceptional reasons. You should not rely on an extension: lodge within the time limit if you can.",
+        answer: "In limited circumstances, the Commission may accept a late application if you can show exceptional reasons under section 394(3). You should not rely on an extension: lodge within the time limit if you can.",
     },
     {
         question: "Is the time limit the same for general protections?",
@@ -26,7 +32,6 @@ export const UnfairDismissalTimeLimitGuide = () => (
         metaTitle={`Unfair Dismissal Time Limit (${UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} Days) | Fair Go`}
         description={`How long you have to lodge an unfair dismissal application with the Fair Work Commission in Australia, when the ${UNFAIR_DISMISSAL_TIME_LIMIT_DAYS}-day clock starts, and what to do if time is running out.`}
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="Unfair dismissal time limit"
         faqItems={FAQ_ITEMS}
         relatedResources={[
@@ -42,33 +47,39 @@ export const UnfairDismissalTimeLimitGuide = () => (
     >
         <GuideSection heading="The short answer">
             <GuideParagraph>
-                For most unfair dismissal applications in Australia, you must apply to the Fair Work Commission within{" "}
+                For most unfair dismissal applications in Australia, you must apply to the{" "}
+                <FwcLink>Fair Work Commission</FwcLink> within{" "}
                 <strong className="text-secondary">{UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days</strong> after your dismissal took
-                effect. Missing that window can mean you lose the chance to pursue an unfair dismissal remedy, even if you had
-                a strong case.
+                effect — see <FairWorkActLink section="s394">section 394(1)</FairWorkActLink> of the Fair Work Act. Missing
+                that window can mean you lose the chance to pursue an unfair dismissal remedy, even if you had a strong case
+                on the facts.
             </GuideParagraph>
         </GuideSection>
 
         <GuideSection heading="When the clock starts">
             <GuideParagraph>
-                The time limit usually runs from the day your dismissal took effect. That is typically your last day of work,
-                but the exact date can matter if your employer gave notice, paid you in lieu, or disputed when employment
-                ended.
+                The time limit usually runs from the day your dismissal <strong className="text-secondary">took effect</strong>.
+                That is typically your last day of work, but the exact date can matter if your employer gave notice, paid you in
+                lieu, or disputed when employment ended.
             </GuideParagraph>
             <GuideParagraph>
-                If you received a termination letter, read it carefully for the effective date. If anything is unclear, note
-                the dates now while they are fresh and consider speaking to the Fair Work Commission or an employment lawyer.
+                Example: if your letter says employment ends on Friday but you were sent home on Monday and not paid beyond
+                Monday, the effective date may not be obvious without advice. If you received a termination letter, read it for
+                the stated effective date and cross-check your final payslip. If anything is unclear, note the dates now while
+                they are fresh.
             </GuideParagraph>
         </GuideSection>
 
         <GuideSection heading="Why the deadline matters so much">
             <GuideParagraph>
                 Unfair dismissal is one of the few workplace claims where a short, fixed window applies. Many people only
-                realise they may have a claim after the shock wears off, by which point days or weeks have already passed.
+                realise they may have a claim after the shock wears off — often a week or more after the last day — by which
+                point a third of the {UNFAIR_DISMISSAL_TIME_LIMIT_DAYS}-day period can already be gone.
             </GuideParagraph>
             <GuideParagraph>
                 Fair Go shows how much time you likely have left based on your answers, so you can decide whether to act,
-                document what happened, or seek advice before the window closes.
+                document what happened, or seek advice before the window closes. The{" "}
+                <FwoLink>Fair Work Ombudsman</FwoLink> also explains time limits in plain English.
             </GuideParagraph>
             <GuideArticleCta
                 variant="check"
@@ -79,18 +90,31 @@ export const UnfairDismissalTimeLimitGuide = () => (
 
         <GuideSection heading="Practical steps before time runs out">
             <GuideList>
-                <li>Confirm the date your dismissal took effect</li>
+                <li>Confirm the date your dismissal took effect from your letter and payslip</li>
                 <li>Run the free eligibility check to see whether you may be covered</li>
                 <li>Start a timeline of key events, messages, and witnesses while details are clear</li>
-                <li>Contact the Fair Work Commission or a lawyer if you need advice about lodging</li>
+                <li>Contact the <FwcLink>Fair Work Commission</FwcLink> or a lawyer if you need advice about lodging</li>
             </GuideList>
         </GuideSection>
 
         <GuideSection heading="Late applications">
             <GuideParagraph>
-                The Commission may accept a late application in exceptional circumstances, but this is not guaranteed. Treat
-                the {UNFAIR_DISMISSAL_TIME_LIMIT_DAYS}-day limit as firm and act as early as you can.
+                The Commission <em>may</em> accept a late application in exceptional circumstances under{" "}
+                <FairWorkActLink section="s394">section 394(3)</FairWorkActLink>, but this is discretionary and not
+                guaranteed. Treat the {UNFAIR_DISMISSAL_TIME_LIMIT_DAYS}-day limit as firm and act as early as you can.
             </GuideParagraph>
         </GuideSection>
+
+        <GuideSources>
+            <GuideSourceItem href={LEGAL_CITATIONS.fairWorkActSection("s394")}>
+                Fair Work Act s394 — time limit for unfair dismissal applications
+            </GuideSourceItem>
+            <GuideSourceItem href={LEGAL_CITATIONS.fwcLodgement}>
+                Fair Work Commission — Lodge an application
+            </GuideSourceItem>
+            <GuideSourceItem href={LEGAL_CITATIONS.fwoUnfairDismissal}>
+                Fair Work Ombudsman — Unfair dismissal
+            </GuideSourceItem>
+        </GuideSources>
     </GuidePage>
 );

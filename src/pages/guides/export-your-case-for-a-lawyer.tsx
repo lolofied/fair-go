@@ -2,16 +2,14 @@ import { HELP_RESOURCE_ENTRIES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
 import { GuideList, GuidePage, GuideParagraph, GuideScreenshot, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = HELP_RESOURCE_ROUTES.exportCase;
-const LAST_UPDATED = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const IMAGE = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.image;
 
 export const ExportYourCaseForALawyerGuide = () => (
     <GuidePage
         title="Export your case for a lawyer"
-        metaTitle="Export Your Case for a Lawyer | Fair Go Guides"
+        metaTitle="Export Your Case for a Lawyer | Fair Go Product Guides"
         description="How to review findings and save a PDF package from your Fair Go case file."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="Export your case for a lawyer"
         relatedResources={[
             { label: "Add events and evidence", path: HELP_RESOURCE_ROUTES.eventsEvidence },

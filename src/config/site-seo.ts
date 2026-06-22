@@ -44,6 +44,37 @@ export function getLandingFaqItems(unfairDismissalDays: number): FaqItem[] {
 export const BLOG_INDEX = "/blog";
 export const PRODUCT_GUIDES_INDEX = "/guides";
 
+/** Author shown on blog and product guide articles. */
+export const ARTICLE_AUTHOR = {
+    name: "Tony",
+    role: "Founder of Fair Go",
+    url: `${SITE_URL}/about`,
+} as const;
+
+/** Authoritative external sources for employment law citations. */
+export const LEGAL_CITATIONS = {
+    fwc: "https://www.fwc.gov.au",
+    fwcLodgement: "https://www.fwc.gov.au/apply-or-lodge/lodge-application",
+    fwo: "https://www.fairwork.gov.au",
+    fwoUnfairDismissal: "https://www.fairwork.gov.au/disputes-at-work/unfair-dismissal",
+    fairWorkAct: "https://www.austlii.edu.au/cgi-bin/viewdoc/au/legis/cth/consol_act/fwa2009114/",
+    fairWorkActSection(section: string) {
+        return `${this.fairWorkAct}${section.replace(/^s\.?/i, "s")}.html`;
+    },
+} as const;
+
+/**
+ * YMYL content review policy.
+ * Update `lastReviewed` / `lastReviewedIso` on every employment article when:
+ * - legal constants change (usually 1 July), or
+ * - copy or figures are edited.
+ * Run `npm run check-content-freshness` before release.
+ */
+export const CONTENT_REVIEW_POLICY = {
+    maxReviewAgeDays: 365,
+    annualLegalReviewMonth: 7,
+} as const;
+
 /** @deprecated Use BLOG_INDEX. Kept for legacy redirects. */
 export const RESOURCES_INDEX = "/resources";
 
@@ -80,8 +111,12 @@ export interface ResourceEntry {
     category: EmploymentResourceCategory | HelpResourceCategory;
     /** Public path to preview/hero image, e.g. /images/guides/run-the-eligibility-check.png */
     image: string;
-    /** Human-readable last updated date, e.g. "21 June 2026". */
-    lastUpdated: string;
+    /** ISO date first published, for schema.org. */
+    datePublished: string;
+    /** Human-readable last legal/content review date shown on the page. */
+    lastReviewed: string;
+    /** ISO date of last review for schema.org dateModified. */
+    lastReviewedIso: string;
     /** Highlight on the resources index as the large featured card. */
     featured?: boolean;
 }
@@ -94,7 +129,9 @@ export const EMPLOYMENT_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "employment",
         category: "Deadlines",
         image: "/images/blog/unfair-dismissal-time-limit.png",
-        lastUpdated: "21 June 2026",
+        datePublished: "2026-06-21",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
         featured: true,
     },
     {
@@ -104,7 +141,9 @@ export const EMPLOYMENT_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "employment",
         category: "Eligibility",
         image: "/images/blog/unfair-dismissal-eligibility.png",
-        lastUpdated: "21 June 2026",
+        datePublished: "2026-06-21",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
@@ -113,7 +152,9 @@ export const EMPLOYMENT_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "employment",
         category: "Claims",
         image: "/images/blog/how-to-lodge-unfair-dismissal.png",
-        lastUpdated: "21 June 2026",
+        datePublished: "2026-06-21",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: EMPLOYMENT_RESOURCE_ROUTES.compensation,
@@ -122,7 +163,9 @@ export const EMPLOYMENT_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "employment",
         category: "Outcomes",
         image: "/images/blog/unfair-dismissal-compensation.png",
-        lastUpdated: "21 June 2026",
+        datePublished: "2026-06-21",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
 ];
 
@@ -135,7 +178,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Getting started",
         image: "/images/guides/run-the-eligibility-check.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.afterCheck,
@@ -144,7 +189,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Getting started",
         image: "/images/guides/after-your-eligibility-check.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.retrieveCase,
@@ -153,7 +200,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Getting started",
         image: "/images/guides/retrieve-a-saved-case.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.caseProfile,
@@ -162,7 +211,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Case file",
         image: "/images/guides/build-your-case-profile.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.eventsEvidence,
@@ -171,7 +222,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Case file",
         image: "/images/guides/add-events-and-evidence.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.exportCase,
@@ -180,7 +233,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Case file",
         image: "/images/guides/export-your-case-for-a-lawyer.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
     {
         path: HELP_RESOURCE_ROUTES.encryptedSync,
@@ -189,7 +244,9 @@ export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
         section: "help",
         category: "Sync",
         image: "/images/guides/how-encrypted-sync-works.png",
-        lastUpdated: "22 June 2026",
+        datePublished: "2026-06-22",
+        lastReviewed: "23 June 2026",
+        lastReviewedIso: "2026-06-23",
     },
 ];
 
@@ -204,7 +261,7 @@ export function resourceSectionIndex(section: ResourceSection): string {
 
 export const RESOURCE_SECTION_LABELS: Record<ResourceSection, string> = {
     employment: "Blog",
-    help: "Guides",
+    help: "Product Guides",
 };
 
 /** Permanent redirects from legacy URLs. */

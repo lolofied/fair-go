@@ -30,7 +30,7 @@ export const PUBLIC_ROUTES = [
         prerender: {
             url: "/guides",
             out: "guides/index.html",
-            titleIncludes: "Guides | Fair Go",
+            titleIncludes: "Product Guides | Fair Go",
         },
     },
     {

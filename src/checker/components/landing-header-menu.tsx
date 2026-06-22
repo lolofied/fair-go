@@ -40,7 +40,7 @@ export const LandingHeaderMenu = ({ onStartCheck }: { onStartCheck?: () => void 
                         Blog
                     </Dropdown.Item>
                     <Dropdown.Item id="guides" icon={Route}>
-                        Guides
+                        Product Guides
                     </Dropdown.Item>
                     <Dropdown.Item id="support" icon={HelpCircle}>
                         Support

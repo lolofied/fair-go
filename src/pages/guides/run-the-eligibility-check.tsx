@@ -2,16 +2,14 @@ import { HELP_RESOURCE_ENTRIES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
 import { GuideList, GuidePage, GuideParagraph, GuideScreenshot, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = HELP_RESOURCE_ROUTES.runCheck;
-const LAST_UPDATED = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const IMAGE = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.image;
 
 export const RunTheEligibilityCheckGuide = () => (
     <GuidePage
         title="Run the free eligibility check"
-        metaTitle="Run the Free Eligibility Check | Fair Go Guides"
+        metaTitle="Run the Free Eligibility Check | Fair Go Product Guides"
         description="How Fair Go's 90-second check works, what questions it asks, and what you see in your result."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="Run the free eligibility check"
         relatedResources={[
             { label: "After your eligibility check", path: HELP_RESOURCE_ROUTES.afterCheck },

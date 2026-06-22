@@ -1,12 +1,17 @@
 import { FWC_APPLICATION_FEE, UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
 import { getLegalConstants } from "@/config/legal-constants";
-import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
+import { EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES, LEGAL_CITATIONS } from "@/config/site-seo";
 import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import {
+    FairWorkActLink,
+    FwcLink,
+    FwoLink,
+    GuideSourceItem,
+    GuideSources,
+} from "@/pages/resources/legal-citations";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim;
-const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const UNFAIR_DISMISSAL_FORM = getLegalConstants().formRefs.unfairDismissal;
-const FWC_LODGEMENT_URL = "https://www.fwc.gov.au/apply-or-lodge/lodge-application";
 
 const FAQ_ITEMS = [
     {
@@ -19,7 +24,7 @@ const FAQ_ITEMS = [
     },
     {
         question: "What if I miss the 21-day deadline?",
-        answer: "The Commission may accept a late application in limited circumstances, but you should not rely on an extension. Lodge within the time limit if you can.",
+        answer: "The Commission may accept a late application in limited circumstances under section 394(3), but you should not rely on an extension. Lodge within the time limit if you can.",
     },
 ];
 
@@ -29,7 +34,6 @@ export const HowToLodgeUnfairDismissalGuide = () => (
         metaTitle="How to Lodge an Unfair Dismissal Claim | Fair Go"
         description="Step-by-step overview of applying to the Fair Work Commission, what to prepare, and what happens after you lodge."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="How to lodge an unfair dismissal claim"
         faqItems={FAQ_ITEMS}
         relatedResources={[
@@ -46,17 +50,10 @@ export const HowToLodgeUnfairDismissalGuide = () => (
         <GuideSection heading="The short answer">
             <GuideParagraph>
                 If you may be covered by unfair dismissal laws, you lodge an application with the{" "}
-                <a
-                    className="font-medium text-brand-secondary underline"
-                    href="https://www.fwc.gov.au"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    Fair Work Commission
-                </a>{" "}
-                using Form {UNFAIR_DISMISSAL_FORM}. For most applications, you must lodge within{" "}
-                <strong className="text-secondary">{UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days</strong> of your dismissal taking
-                effect. Lodging starts a formal process that usually includes a conciliation conference before any hearing.
+                <FwcLink>Fair Work Commission</FwcLink> using Form {UNFAIR_DISMISSAL_FORM}. For most applications, you must
+                lodge within <strong className="text-secondary">{UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days</strong> of your
+                dismissal taking effect — see <FairWorkActLink section="s394">section 394</FairWorkActLink>. Lodging starts a
+                formal process that usually includes a conciliation conference before any hearing.
             </GuideParagraph>
         </GuideSection>
 
@@ -68,8 +65,8 @@ export const HowToLodgeUnfairDismissalGuide = () => (
             </GuideParagraph>
             <GuideParagraph>
                 Fair Go&apos;s free check can help you understand coverage and how much time you likely have left. It is general
-                information only, not legal advice. If you are unsure, speak to an employment lawyer or contact the Fair Work
-                Commission.
+                information only, not legal advice. If you are unsure, speak to an employment lawyer or contact the{" "}
+                <FwoLink>Fair Work Ombudsman</FwoLink> for general guidance and the Commission for process questions.
             </GuideParagraph>
             <GuideArticleCta
                 variant="check"
@@ -79,6 +76,11 @@ export const HowToLodgeUnfairDismissalGuide = () => (
         </GuideSection>
 
         <GuideSection heading="What to have ready">
+            <GuideParagraph>
+                You do not need a perfect bundle on day one, but having dates and documents organised makes the application
+                stronger and saves time if the matter proceeds to conciliation or a hearing. The Commission&apos;s Form{" "}
+                {UNFAIR_DISMISSAL_FORM} asks for factual summaries — keep them chronological and stick to what you can prove.
+            </GuideParagraph>
             <GuideList>
                 <li>The date your dismissal took effect and your last day of work</li>
                 <li>Your employer&apos;s legal name and contact details</li>
@@ -87,10 +89,6 @@ export const HowToLodgeUnfairDismissalGuide = () => (
                 <li>Details of any warnings, performance management, or meetings leading up to the dismissal</li>
                 <li>Witness names and contact details, if anyone saw relevant events</li>
             </GuideList>
-            <GuideParagraph>
-                You do not need a perfect bundle on day one, but having dates and documents organised makes the application
-                stronger and saves time if the matter proceeds to conciliation or a hearing.
-            </GuideParagraph>
             <GuideArticleCta
                 variant="guides"
                 title="Organise your case in Fair Go"
@@ -102,7 +100,7 @@ export const HowToLodgeUnfairDismissalGuide = () => (
 
         <GuideSection heading="Lodging with the Fair Work Commission">
             <GuideParagraph>
-                Unfair dismissal applications are lodged with the Fair Work Commission online. You will complete Form{" "}
+                Unfair dismissal applications are lodged with the Commission online. You will complete Form{" "}
                 {UNFAIR_DISMISSAL_FORM}, which asks for your details, your employer&apos;s details, the dismissal date, and the
                 remedy you are seeking.
             </GuideParagraph>
@@ -111,7 +109,7 @@ export const HowToLodgeUnfairDismissalGuide = () => (
                 information about fee waivers on its website. Start at the{" "}
                 <a
                     className="font-medium text-brand-secondary underline"
-                    href={FWC_LODGEMENT_URL}
+                    href={LEGAL_CITATIONS.fwcLodgement}
                     target="_blank"
                     rel="noreferrer"
                 >
@@ -143,5 +141,17 @@ export const HowToLodgeUnfairDismissalGuide = () => (
                 <li>Get advice before agreeing to or rejecting a settlement offer at conciliation</li>
             </GuideList>
         </GuideSection>
+
+        <GuideSources>
+            <GuideSourceItem href={LEGAL_CITATIONS.fwcLodgement}>
+                Fair Work Commission — Lodge an application
+            </GuideSourceItem>
+            <GuideSourceItem href={LEGAL_CITATIONS.fairWorkActSection("s394")}>
+                Fair Work Act s394 — time limit for applications
+            </GuideSourceItem>
+            <GuideSourceItem href={LEGAL_CITATIONS.fwoUnfairDismissal}>
+                Fair Work Ombudsman — Unfair dismissal
+            </GuideSourceItem>
+        </GuideSources>
     </GuidePage>
 );

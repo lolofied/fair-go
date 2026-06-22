@@ -67,7 +67,7 @@ export function ResourceListItem({ resource }: { resource: ResourceEntry }) {
                     </h3>
                     <p className="mt-3 text-md text-tertiary">{resource.description}</p>
                     <span className="mt-4 inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-medium text-tertiary">
-                        {resource.lastUpdated}
+                        {resource.lastReviewed}
                     </span>
                 </div>
             </Link>

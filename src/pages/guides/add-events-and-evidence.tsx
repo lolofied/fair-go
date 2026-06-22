@@ -2,16 +2,14 @@ import { HELP_RESOURCE_ENTRIES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
 import { GuideList, GuidePage, GuideParagraph, GuideScreenshot, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = HELP_RESOURCE_ROUTES.eventsEvidence;
-const LAST_UPDATED = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const IMAGE = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.image;
 
 export const AddEventsAndEvidenceGuide = () => (
     <GuidePage
         title="Add events and evidence"
-        metaTitle="Add Events and Evidence | Fair Go Guides"
+        metaTitle="Add Events and Evidence | Fair Go Product Guides"
         description="How to build a timeline of what happened and attach documents in your Fair Go case file."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="Add events and evidence"
         relatedResources={[
             { label: "Build your case profile", path: HELP_RESOURCE_ROUTES.caseProfile },

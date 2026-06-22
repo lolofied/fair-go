@@ -6,11 +6,16 @@ import {
     MEDIAN_DECISION_AWARD,
     TYPICAL_AWARD_WEEKS,
 } from "@/config/unfair-dismissal-outcomes";
-import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
+import { EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES, LEGAL_CITATIONS } from "@/config/site-seo";
 import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import {
+    FairWorkActLink,
+    FwcLink,
+    GuideSourceItem,
+    GuideSources,
+} from "@/pages/resources/legal-citations";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.compensation;
-const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const compensationCap = getMaxCompensationCap();
 
 const FAQ_ITEMS = [
@@ -34,7 +39,6 @@ export const UnfairDismissalCompensationGuide = () => (
         metaTitle="Unfair Dismissal Compensation and Remedies | Fair Go"
         description="What reinstatement and compensation orders involve, how caps work under the Fair Work Act, and typical unfair dismissal outcomes in Australia."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="Unfair dismissal compensation"
         faqItems={FAQ_ITEMS}
         relatedResources={[
@@ -50,11 +54,12 @@ export const UnfairDismissalCompensationGuide = () => (
     >
         <GuideSection heading="The short answer">
             <GuideParagraph>
-                If the Fair Work Commission finds that your dismissal was unfair, it can order{" "}
+                If the <FwcLink>Fair Work Commission</FwcLink> finds that your dismissal was unfair, it can order{" "}
                 <strong className="text-secondary">reinstatement</strong> (your job back),{" "}
-                <strong className="text-secondary">compensation</strong> (payment for lost income), or both. Reinstatement is
-                the primary remedy the Act expects the Commission to consider first. In practice, many resolved matters end in
-                compensation rather than reinstatement.
+                <strong className="text-secondary">compensation</strong> (payment for lost income), or both under{" "}
+                <FairWorkActLink section="s390">sections 390–392</FairWorkActLink>. Reinstatement is the remedy the Act
+                expects the Commission to consider first. In practice, many resolved matters end in compensation rather than
+                returning to the same workplace.
             </GuideParagraph>
         </GuideSection>
 
@@ -67,15 +72,16 @@ export const UnfairDismissalCompensationGuide = () => (
             <GuideParagraph>
                 Factors such as trust breakdown, the size of the employer, and whether working together is practical can all
                 affect whether reinstatement is realistic. Even when reinstatement is not ordered, compensation may still be
-                available.
+                available if the dismissal is found to be unfair.
             </GuideParagraph>
         </GuideSection>
 
         <GuideSection heading="How compensation is calculated">
             <GuideParagraph>
-                Compensation is intended to compensate for lost income caused by the dismissal. The Commission looks at what
-                you would have earned if you had not been dismissed, then may reduce the amount for reasons such as your efforts
-                to find other work or your conduct.
+                Compensation is intended to compensate for lost income caused by the dismissal — not to punish the employer.
+                The Commission looks at what you would have earned if you had not been dismissed, then may reduce the amount
+                for reasons such as your efforts to find other work or your conduct — see{" "}
+                <FairWorkActLink section="s392">section 392</FairWorkActLink>.
             </GuideParagraph>
             <GuideParagraph>
                 There is a statutory cap: the lesser of{" "}
@@ -87,8 +93,8 @@ export const UnfairDismissalCompensationGuide = () => (
 
         <GuideSection heading="Typical outcomes">
             <GuideParagraph>
-                Published Fair Work Commission and research figures suggest most unfair dismissal matters settle at conciliation.
-                Median compensation agreed at conciliation is often cited around{" "}
+                Published <FwcLink>Fair Work Commission</FwcLink> and research figures suggest most unfair dismissal matters
+                settle at conciliation. Median compensation agreed at conciliation is often cited around{" "}
                 <strong className="text-secondary">${MEDIAN_CONCILIATION_SETTLEMENT.toLocaleString("en-AU")}</strong>, with
                 median amounts ordered after a formal decision often lower still (around $
                 {MEDIAN_DECISION_AWARD.toLocaleString("en-AU")}).
@@ -126,5 +132,14 @@ export const UnfairDismissalCompensationGuide = () => (
                 be understood before you accept it. Consider getting advice if you are unsure.
             </GuideParagraph>
         </GuideSection>
+
+        <GuideSources>
+            <GuideSourceItem href={LEGAL_CITATIONS.fairWorkActSection("s390")}>
+                Fair Work Act ss390–392 — remedies for unfair dismissal
+            </GuideSourceItem>
+            <GuideSourceItem href={LEGAL_CITATIONS.fwc}>
+                Fair Work Commission — unfair dismissal outcomes and conciliation
+            </GuideSourceItem>
+        </GuideSources>
     </GuidePage>
 );

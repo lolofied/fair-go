@@ -99,7 +99,7 @@ export const LandingFooter = () => (
                     Blog
                 </Link>
                 <Link to={PRODUCT_GUIDES_INDEX} className="font-medium transition duration-100 ease-linear hover:text-secondary">
-                    Guides
+                    Product Guides
                 </Link>
                 <Link to="/about" className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     About

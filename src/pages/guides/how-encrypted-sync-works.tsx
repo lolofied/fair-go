@@ -2,16 +2,14 @@ import { HELP_RESOURCE_ENTRIES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
 import { GuideList, GuidePage, GuideParagraph, GuideScreenshot, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = HELP_RESOURCE_ROUTES.encryptedSync;
-const LAST_UPDATED = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const IMAGE = HELP_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.image;
 
 export const HowEncryptedSyncWorksGuide = () => (
     <GuidePage
         title="How encrypted sync works"
-        metaTitle="How Encrypted Sync Works | Fair Go Guides"
+        metaTitle="How Encrypted Sync Works | Fair Go Product Guides"
         description="How Fair Go syncs your case across devices without being able to read your data."
         path={PATH}
-        dateModified={LAST_UPDATED}
         breadcrumbLabel="How encrypted sync works"
         relatedResources={[
             { label: "Retrieve a saved case", path: HELP_RESOURCE_ROUTES.retrieveCase },

@@ -20,6 +20,7 @@ import { FairGoWordmark } from "@/checker/components/wordmark";
 import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
 import { Shell, ShellMain } from "@/components/layout/shell";
 import {
+    ARTICLE_AUTHOR,
     RESOURCE_ENTRIES,
     RESOURCE_SECTION_LABELS,
     PRODUCT_GUIDES_INDEX,
@@ -48,6 +49,12 @@ function slugify(text: string) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
+}
+
+function formatPublishedDate(isoDate: string) {
+    const date = new Date(`${isoDate}T00:00:00`);
+
+    return date.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
 }
 
 function scrollToGuideSection(id: string) {
@@ -215,6 +222,24 @@ export const GuideArticleCta = ({
     );
 };
 
+/** Visible author line and product-guide labelling for article trust signals. */
+export function GuideArticleByline({ section }: { section: ResourceSection }) {
+    return (
+        <div className="mt-4 flex flex-col gap-1.5 text-sm text-tertiary">
+            <p>
+                Written by{" "}
+                <Link to={ARTICLE_AUTHOR.url} className="font-medium text-secondary transition duration-100 ease-linear hover:text-brand-secondary">
+                    {ARTICLE_AUTHOR.name}
+                </Link>
+                , {ARTICLE_AUTHOR.role}
+            </p>
+            {section === "help" ? (
+                <p className="text-quaternary">Product guide — explains how Fair Go works, not legal advice.</p>
+            ) : null}
+        </div>
+    );
+}
+
 const GuideFaq = ({ items }: { items: FaqItem[] }) => (
     <section className="border-t border-secondary pt-10">
         <h2 className="text-xl font-semibold text-primary sm:text-display-xs">Common questions</h2>
@@ -234,7 +259,6 @@ export const GuidePage = ({
     metaTitle,
     description,
     path,
-    dateModified,
     breadcrumbLabel,
     faqItems,
     relatedResources,
@@ -244,7 +268,6 @@ export const GuidePage = ({
     metaTitle: string;
     description: string;
     path: string;
-    dateModified: string;
     breadcrumbLabel: string;
     faqItems?: FaqItem[];
     relatedResources?: { label: string; path: string }[];
@@ -256,6 +279,9 @@ export const GuidePage = ({
     const sectionIndex = resourceSectionIndex(section);
     const showHeroVisual = section !== "help";
     const heroThumbClass = resourceEntry ? getResourceThumbClass(resourceEntry) : "fg-guides-thumb-eligibility";
+    const datePublished = resourceEntry?.datePublished ?? "2026-06-21";
+    const lastReviewed = resourceEntry?.lastReviewed ?? "23 June 2026";
+    const lastReviewedIso = resourceEntry?.lastReviewedIso ?? "2026-06-23";
 
     useEffect(() => {
         const hash = window.location.hash.slice(1);
@@ -278,7 +304,8 @@ export const GuidePage = ({
                     title,
                     description,
                     path,
-                    dateModified,
+                    datePublished,
+                    dateModified: lastReviewedIso,
                     faqItems,
                     breadcrumbs: [
                         { name: "Home", path: "/" },
@@ -305,12 +332,15 @@ export const GuidePage = ({
                                 {title}
                             </h1>
 
+                            <GuideArticleByline section={section} />
+
                             <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-b border-secondary pb-8">
                                 <div className="flex items-center gap-2.5">
                                     <FairGoWordmark className="scale-90 origin-left" />
                                 </div>
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <span className="text-sm text-quaternary">Updated {dateModified}</span>
+                                <div className="flex flex-col items-start gap-1 sm:items-end">
+                                    <span className="text-sm text-quaternary">Last reviewed {lastReviewed}</span>
+                                    <span className="text-xs text-quaternary">Published {formatPublishedDate(datePublished)}</span>
                                 </div>
                             </div>
                         </header>

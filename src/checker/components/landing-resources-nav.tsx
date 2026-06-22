@@ -7,10 +7,10 @@ import { cx } from "@/utils/cx";
 
 const RESOURCE_NAV_ITEMS = [
     { id: "blog", label: "Blog", href: BLOG_INDEX },
-    { id: "guides", label: "Guides", href: PRODUCT_GUIDES_INDEX },
+    { id: "guides", label: "Product Guides", href: PRODUCT_GUIDES_INDEX },
 ] as const;
 
-/** Desktop header dropdown: Resources → Blog | Guides */
+/** Desktop header dropdown: Resources → Blog | Product Guides */
 export const LandingResourcesNav = () => {
     const navigate = useNavigate();
 

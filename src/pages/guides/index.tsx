@@ -45,7 +45,7 @@ export const GuidesIndexPage = () => {
     return (
         <Shell>
             <PageMeta
-                title="Guides | Fair Go"
+                title="Product Guides | Fair Go"
                 description="Step-by-step product guides for using Fair Go."
                 path={PRODUCT_GUIDES_INDEX}
             />
@@ -53,7 +53,7 @@ export const GuidesIndexPage = () => {
                 data={[
                     buildBreadcrumbSchema([
                         { name: "Home", path: "/" },
-                        { name: "Guides", path: PRODUCT_GUIDES_INDEX },
+                        { name: "Product Guides", path: PRODUCT_GUIDES_INDEX },
                     ]),
                     buildItemListSchema(
                         HELP_RESOURCE_ENTRIES.map((resource) => ({
@@ -69,7 +69,7 @@ export const GuidesIndexPage = () => {
                 <div className="fg-guides-index">
                     <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:gap-10">
                         <h1 className="shrink-0 text-display-sm font-semibold tracking-tight text-primary sm:text-display-md">
-                            Guides
+                            Product Guides
                         </h1>
                         <p className="text-lg font-medium text-tertiary md:max-w-md md:text-right lg:max-w-lg">
                             Step-by-step product guides
@@ -88,7 +88,7 @@ export const GuidesIndexPage = () => {
                         </div>
                     ) : (
                         <p className="mt-10 rounded-2xl border border-secondary bg-secondary_subtle px-5 py-4 text-md text-tertiary">
-                            No guides match your search. Try different keywords or{" "}
+                            No product guides match your search. Try different keywords or{" "}
                             <Link to="/support" className="font-medium text-brand-secondary underline">
                                 contact support
                             </Link>

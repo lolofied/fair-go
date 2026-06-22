@@ -1,5 +1,6 @@
 import type { FaqItem } from "@/config/site-seo";
-import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/config/site-seo";
+import { ARTICLE_AUTHOR, OG_IMAGE, SITE_NAME, SITE_URL } from "@/config/site-seo";
+import { SUPPORT_EMAIL } from "@/config/support-contact";
 
 type JsonLdObject = Record<string, unknown>;
 
@@ -27,6 +28,13 @@ export function buildOrganizationSchema(): JsonLdObject {
         name: SITE_NAME,
         url: SITE_URL,
         logo: `${SITE_URL}/fair-go-logo.png`,
+        contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer support",
+            email: SUPPORT_EMAIL,
+            url: absoluteUrl("/support"),
+            availableLanguage: ["English"],
+        },
     };
 }
 
@@ -37,6 +45,11 @@ export function buildWebSiteSchema(): JsonLdObject {
         name: SITE_NAME,
         url: SITE_URL,
         inLanguage: "en-AU",
+        publisher: {
+            "@type": "Organization",
+            name: SITE_NAME,
+            url: SITE_URL,
+        },
     };
 }
 
@@ -57,6 +70,12 @@ export function buildWebApplicationSchema(): JsonLdObject {
             "Free unfair dismissal eligibility check for Australian employees under the Fair Work Act, with deadline tracking and private case documentation.",
         inLanguage: "en-AU",
         image: OG_IMAGE,
+        author: {
+            "@type": "Person",
+            name: ARTICLE_AUTHOR.name,
+            jobTitle: ARTICLE_AUTHOR.role,
+            url: ARTICLE_AUTHOR.url,
+        },
     };
 }
 
@@ -79,11 +98,13 @@ export function buildArticleSchema({
     title,
     description,
     path,
+    datePublished,
     dateModified,
 }: {
     title: string;
     description: string;
     path: string;
+    datePublished: string;
     dateModified: string;
 }): JsonLdObject {
     return {
@@ -92,12 +113,14 @@ export function buildArticleSchema({
         headline: title,
         description,
         url: absoluteUrl(path),
+        datePublished,
         dateModified,
         inLanguage: "en-AU",
         author: {
-            "@type": "Organization",
-            name: SITE_NAME,
-            url: SITE_URL,
+            "@type": "Person",
+            name: ARTICLE_AUTHOR.name,
+            jobTitle: ARTICLE_AUTHOR.role,
+            url: ARTICLE_AUTHOR.url,
         },
         publisher: {
             "@type": "Organization",
@@ -138,6 +161,7 @@ export function buildGuideStructuredData({
     title,
     description,
     path,
+    datePublished,
     dateModified,
     faqItems,
     breadcrumbs,
@@ -145,12 +169,13 @@ export function buildGuideStructuredData({
     title: string;
     description: string;
     path: string;
+    datePublished: string;
     dateModified: string;
     faqItems?: FaqItem[];
     breadcrumbs: { name: string; path: string }[];
 }): JsonLdObject[] {
     const data: JsonLdObject[] = [
-        buildArticleSchema({ title, description, path, dateModified }),
+        buildArticleSchema({ title, description, path, datePublished, dateModified }),
         buildBreadcrumbSchema(breadcrumbs),
     ];
 

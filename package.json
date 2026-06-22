@@ -9,6 +9,7 @@
         "preview": "vite preview",
         "prerender": "node scripts/prerender.mjs",
         "capture-guide-images": "node scripts/capture-guide-images.mjs",
+        "check-content-freshness": "node scripts/check-content-freshness.mjs",
         "test": "vitest run",
         "test:watch": "vitest"
     },
