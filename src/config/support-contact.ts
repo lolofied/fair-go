@@ -19,7 +19,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type SupportContactPayload = {
     topic: string;
-    email?: string;
+    email: string;
     message: string;
     company?: string;
 };
@@ -27,7 +27,7 @@ export type SupportContactPayload = {
 export type ValidatedSupportContact = {
     topic: SupportTopicValue;
     topicLabel: string;
-    email?: string;
+    email: string;
     message: string;
 };
 
@@ -66,21 +66,23 @@ export function validateSupportContactPayload(
         return { ok: false, error: "message_too_long" };
     }
 
-    let email: string | undefined;
+    let email: string;
 
-    if (payload.email !== undefined && payload.email !== null && payload.email !== "") {
-        if (typeof payload.email !== "string") {
-            return { ok: false, error: "invalid_email" };
-        }
-
-        const trimmedEmail = payload.email.trim();
-
-        if (trimmedEmail && !EMAIL_PATTERN.test(trimmedEmail)) {
-            return { ok: false, error: "invalid_email" };
-        }
-
-        email = trimmedEmail || undefined;
+    if (typeof payload.email !== "string") {
+        return { ok: false, error: "invalid_email" };
     }
+
+    const trimmedEmail = payload.email.trim();
+
+    if (!trimmedEmail) {
+        return { ok: false, error: "email_required" };
+    }
+
+    if (!EMAIL_PATTERN.test(trimmedEmail)) {
+        return { ok: false, error: "invalid_email" };
+    }
+
+    email = trimmedEmail;
 
     return {
         ok: true,
@@ -103,6 +105,6 @@ export function buildSupportEmailBody(data: ValidatedSupportContact): string {
         "",
         "---",
         `Topic: ${data.topicLabel}`,
-        data.email ? `Reply email: ${data.email}` : "Reply email: not provided",
+        `Reply email: ${data.email}`,
     ].join("\n");
 }

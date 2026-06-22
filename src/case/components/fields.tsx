@@ -22,15 +22,18 @@ interface BaseProps {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    type?: "text" | "email";
+    isRequired?: boolean;
 }
 
-export const TextField = ({ id, label, help, value, onChange, placeholder }: BaseProps) => (
+export const TextField = ({ id, label, help, value, onChange, placeholder, type = "text", isRequired }: BaseProps) => (
     <FieldShell label={label} help={help} htmlFor={id}>
         <input
             id={id}
-            type="text"
+            type={type}
             value={value}
             placeholder={placeholder}
+            required={isRequired}
             onChange={(e) => onChange(e.target.value)}
             className={controlClass}
         />

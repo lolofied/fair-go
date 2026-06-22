@@ -35,8 +35,9 @@ export const SupportPage = () => {
         event.preventDefault();
 
         const trimmed = message.trim();
+        const trimmedEmail = email.trim();
 
-        if (!trimmed || isSubmitting) {
+        if (!trimmed || !trimmedEmail || isSubmitting) {
             return;
         }
 
@@ -45,7 +46,7 @@ export const SupportPage = () => {
 
         const result = await submitSupportContact({
             topic,
-            email,
+            email: trimmedEmail,
             message: trimmed,
             company,
         });
@@ -94,7 +95,7 @@ export const SupportPage = () => {
                         <div>
                             <p className="text-sm font-medium text-primary">Message sent</p>
                             <p className="mt-1 text-sm text-tertiary">
-                                Thanks for reaching out. If you included an email address, we will reply as soon as we can.
+                                Thanks for reaching out. We will reply to your email as soon as we can.
                             </p>
                             <Button
                                 type="button"
@@ -128,11 +129,13 @@ export const SupportPage = () => {
                             options={[...SUPPORT_TOPICS]}
                         />
                         <TextField
-                            label="Your email (optional)"
+                            label="Your email"
                             value={email}
                             onChange={setEmail}
                             placeholder="you@example.com"
-                            help="Include this if you would like a reply."
+                            type="email"
+                            isRequired
+                            help="We need this so we can reply."
                         />
                         <TextAreaField
                             label="Message"
@@ -151,7 +154,7 @@ export const SupportPage = () => {
                             size="md"
                             iconLeading={Send01}
                             isLoading={isSubmitting}
-                            isDisabled={!message.trim() || isSubmitting}
+                            isDisabled={!message.trim() || !email.trim() || isSubmitting}
                         >
                             Send message
                         </Button>

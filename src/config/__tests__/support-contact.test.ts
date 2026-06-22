@@ -33,11 +33,12 @@ describe("validateSupportContactPayload", () => {
         expect(result).toEqual({ ok: false, error: "spam_detected" });
     });
 
-    it("rejects unknown topics and empty messages", () => {
+    it("rejects unknown topics, empty messages, and missing email", () => {
         expect(
             validateSupportContactPayload({
                 topic: "legal-advice",
                 message: "Help",
+                email: "user@example.com",
             }),
         ).toEqual({ ok: false, error: "invalid_topic" });
 
@@ -45,8 +46,17 @@ describe("validateSupportContactPayload", () => {
             validateSupportContactPayload({
                 topic: "product",
                 message: "   ",
+                email: "user@example.com",
             }),
         ).toEqual({ ok: false, error: "message_required" });
+
+        expect(
+            validateSupportContactPayload({
+                topic: "product",
+                message: "Help",
+                email: "   ",
+            }),
+        ).toEqual({ ok: false, error: "email_required" });
     });
 });
 

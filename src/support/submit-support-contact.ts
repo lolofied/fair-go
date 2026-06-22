@@ -1,6 +1,12 @@
 import { SUPPORT_CONTACT_PATH, type SupportContactPayload } from "@/config/support-contact";
 
-export type SupportContactError = "network" | "rate_limited" | "send_failed" | "invalid" | "unknown";
+export type SupportContactError =
+    | "network"
+    | "rate_limited"
+    | "send_failed"
+    | "invalid"
+    | "email_required"
+    | "unknown";
 
 export type SupportContactResult = { ok: true } | { ok: false; error: SupportContactError };
 
@@ -40,6 +46,10 @@ export async function submitSupportContact(payload: SupportContactPayload): Prom
     }
 
     if (response.status >= 400 && response.status < 500) {
+        if (body?.error === "email_required" || body?.error === "invalid_email") {
+            return { ok: false, error: body.error === "email_required" ? "email_required" : "invalid" };
+        }
+
         return { ok: false, error: "invalid" };
     }
 
@@ -55,7 +65,9 @@ export function supportContactErrorMessage(error: SupportContactError): string {
         case "send_failed":
             return "We could not send your message right now. Email us directly at support@fair-go.ai instead.";
         case "invalid":
-            return "Check your message and try again.";
+            return "Enter a valid email address and check your message.";
+        case "email_required":
+            return "Enter your email address so we can reply.";
         default:
             return "Something went wrong. Please try again or email support@fair-go.ai directly.";
     }
