@@ -1,23 +1,29 @@
 import posthog from "posthog-js";
 import { ALLOWED_PRODUCT_EVENTS } from "@/analytics/product-events";
-
-const ALLOWED_EVENTS = ALLOWED_PRODUCT_EVENTS;
+import { ALLOWED_WEB_ANALYTICS_EVENTS, sanitizeWebAnalyticsEvent } from "@/analytics/web-analytics";
 
 const key = import.meta.env.VITE_POSTHOG_KEY;
-const host = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const defaultHost = import.meta.env.PROD ? "/ingest" : "https://us.i.posthog.com";
+const host = import.meta.env.VITE_POSTHOG_HOST ?? defaultHost;
+const uiHost = import.meta.env.VITE_POSTHOG_UI_HOST ?? "https://us.posthog.com";
 
 let ready = false;
 
-/** Initialise locked-down PostHog: first-party cookies, explicit events only. No-op without VITE_POSTHOG_KEY. */
+function shouldSendEvent(eventName: string) {
+    return ALLOWED_PRODUCT_EVENTS.has(eventName) || ALLOWED_WEB_ANALYTICS_EVENTS.has(eventName);
+}
+
+/** Initialise PostHog with privacy-safe product events and pathname-only web analytics. */
 export function initPostHog(): void {
     if (ready || !key || typeof window === "undefined") return;
 
     posthog.init(key, {
         api_host: host,
+        ui_host: uiHost,
 
         autocapture: false,
-        capture_pageview: false,
-        capture_pageleave: false,
+        capture_pageview: "history_change",
+        capture_pageleave: true,
         capture_dead_clicks: false,
         rageclick: false,
         enable_heatmaps: false,
@@ -28,7 +34,17 @@ export function initPostHog(): void {
         persistence: "localStorage+cookie",
         person_profiles: "always",
 
-        before_send: (event) => (event && ALLOWED_EVENTS.has(event.event) ? event : null),
+        before_send: (event) => {
+            if (!event || !shouldSendEvent(event.event)) {
+                return null;
+            }
+
+            if (ALLOWED_WEB_ANALYTICS_EVENTS.has(event.event)) {
+                return sanitizeWebAnalyticsEvent(event);
+            }
+
+            return event;
+        },
 
         property_denylist: ["email", "name", "salary", "employer", "passphrase", "abn"],
     });
@@ -37,7 +53,7 @@ export function initPostHog(): void {
 }
 
 export function capturePostHog(event: string, properties: Record<string, unknown>): void {
-    if (!ready || !ALLOWED_EVENTS.has(event)) return;
+    if (!ready || !ALLOWED_PRODUCT_EVENTS.has(event)) return;
     posthog.capture(event, properties, { send_instantly: true });
 }
 
