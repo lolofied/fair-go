@@ -3,6 +3,10 @@
   "name": "fair-go",
   "main": "worker/index.ts",
   "compatibility_date": "2026-06-13",
+  "vars": {
+    "SUPPORT_TO_EMAIL": "support@fair-go.ai",
+    "SUPPORT_FROM_EMAIL": "Fair Go <noreply@fair-go.ai>"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

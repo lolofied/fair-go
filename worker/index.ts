@@ -1,9 +1,15 @@
+import { handleSupportContactRequest } from "./support-contact";
+
 const API_HOST = "us.i.posthog.com";
 const ASSET_HOST = "us-assets.i.posthog.com";
 const INGEST_PREFIX = "/ingest";
+const SUPPORT_CONTACT_PATH = "/api/support";
 
 interface Env {
     ASSETS: Fetcher;
+    RESEND_API_KEY?: string;
+    SUPPORT_TO_EMAIL?: string;
+    SUPPORT_FROM_EMAIL?: string;
 }
 
 function stripIngestPrefix(pathname: string): string {
@@ -103,6 +109,10 @@ export default {
 
         if (isPostHogPath(pathname)) {
             return handlePostHogRequest(request, ctx);
+        }
+
+        if (pathname === SUPPORT_CONTACT_PATH) {
+            return handleSupportContactRequest(request, env);
         }
 
         return env.ASSETS.fetch(request);
