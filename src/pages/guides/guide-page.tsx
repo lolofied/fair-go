@@ -291,6 +291,7 @@ export const GuidePage = ({
                                         size="lg"
                                         color="primary"
                                         href="/"
+                                        routerOptions={{ state: { forceChecker: true } }}
                                         iconTrailing={ArrowRight}
                                         className={cx("mt-5")}
                                     >
