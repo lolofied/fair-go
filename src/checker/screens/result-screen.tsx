@@ -10,6 +10,7 @@ import {
     RefreshCcw01,
 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
+import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
 import { mobileBtnClass, Shell, ShellContent, ShellHeader, ShellMain } from "@/components/layout/shell";
 import { Countdown } from "@/checker/components/countdown";
 import { FairGoWordmark } from "@/checker/components/wordmark";
@@ -19,6 +20,7 @@ import { setDocumentationEntry } from "@/case/documentation-entry";
 import { toCapturedData } from "@/checker/claims";
 import { useChecker } from "@/checker/store";
 import type { ClaimAssessment, ClaimStatus, ClaimType, CheckerFlag } from "@/checker/types";
+import { DONATION_URL } from "@/config/donation";
 import { cx } from "@/utils/cx";
 
 const dateFmt = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric" });
@@ -406,6 +408,32 @@ export const ResultScreen = () => {
                             </ul>
                         </section>
                     )}
+
+                    <section className="mt-8 rounded-2xl border border-secondary bg-secondary_subtle p-5 sm:mt-10 sm:p-6">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <BuyMeACoffeeIcon size={28} className="mt-0.5" />
+                                <div>
+                                    <h2 className="text-md font-semibold text-primary">Found the checker helpful?</h2>
+                                    <p className="mt-1 text-sm text-tertiary">
+                                        Fair Go is free to use. If it helped you feel clearer about your options, you can buy me a
+                                        coffee to help keep it running.
+                                    </p>
+                                </div>
+                            </div>
+                            <Button
+                                size="md"
+                                color="secondary"
+                                href={DONATION_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                iconLeading={BuyMeACoffeeIcon}
+                                className={cx(mobileBtnClass, "shrink-0 sm:w-auto")}
+                            >
+                                Buy me a coffee
+                            </Button>
+                        </div>
+                    </section>
 
                     <p className="mt-8 border-t border-secondary pt-5 text-sm text-tertiary sm:mt-10 sm:pt-6">
                         This is general information, not legal advice, and isn't a guarantee of any outcome. Eligibility and
