@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { initPostHog } from "@/analytics/posthog-client";
 import { RouteLoadingFallback } from "@/components/layout/route-loading-fallback";
 import { HomeRoute } from "@/routing/home-route";
+import { ScrollToTop } from "@/routing/scroll-to-top";
 import {
     LazyAboutPage,
     LazyCaseModule,
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <ThemeProvider>
             <BrowserRouter>
+                <ScrollToTop />
                 <RouteProvider>
                     <Suspense fallback={<RouteLoadingFallback />}>
                         <Routes>
