@@ -1,8 +1,8 @@
 import { SUPPORT_CONTACT_PATH, type SupportContactPayload } from "@/config/support-contact";
 
-export type SupportContactResult =
-    | { ok: true }
-    | { ok: false; error: "network" | "rate_limited" | "send_failed" | "invalid" | "unknown" };
+export type SupportContactError = "network" | "rate_limited" | "send_failed" | "invalid" | "unknown";
+
+export type SupportContactResult = { ok: true } | { ok: false; error: SupportContactError };
 
 export async function submitSupportContact(payload: SupportContactPayload): Promise<SupportContactResult> {
     let response: Response;
@@ -46,7 +46,7 @@ export async function submitSupportContact(payload: SupportContactPayload): Prom
     return { ok: false, error: "unknown" };
 }
 
-export function supportContactErrorMessage(error: SupportContactResult["error"]): string {
+export function supportContactErrorMessage(error: SupportContactError): string {
     switch (error) {
         case "network":
             return "We could not reach the server. Check your connection and try again.";
