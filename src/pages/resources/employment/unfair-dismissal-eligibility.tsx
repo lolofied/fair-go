@@ -5,7 +5,7 @@ import {
     getHighIncomeThreshold,
 } from "@/config/fair-work";
 import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.eligibility;
 const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
@@ -100,6 +100,11 @@ export const UnfairDismissalEligibilityGuide = () => (
                 Fair Go&apos;s free check walks through coverage, timing, and next steps in plain English, then helps you build a
                 private record if you want to prepare.
             </GuideParagraph>
+            <GuideArticleCta
+                variant="check"
+                title="See if you may be covered"
+                description="Answer a few questions about your employment and dismissal. The free check estimates whether unfair dismissal may apply and how much time you likely have left."
+            />
         </GuideSection>
     </GuidePage>
 );

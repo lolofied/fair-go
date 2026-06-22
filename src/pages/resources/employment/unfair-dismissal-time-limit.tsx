@@ -1,6 +1,6 @@
 import { UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
 import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.timeLimit;
 const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
@@ -70,6 +70,11 @@ export const UnfairDismissalTimeLimitGuide = () => (
                 Fair Go shows how much time you likely have left based on your answers, so you can decide whether to act,
                 document what happened, or seek advice before the window closes.
             </GuideParagraph>
+            <GuideArticleCta
+                variant="check"
+                title="Check how much time you have left"
+                description="The free eligibility check includes a countdown based on your dismissal date, so you can see whether the 21-day window is still open."
+            />
         </GuideSection>
 
         <GuideSection heading="Practical steps before time runs out">

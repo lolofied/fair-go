@@ -22,6 +22,7 @@ import { Shell, ShellMain } from "@/components/layout/shell";
 import {
     RESOURCE_ENTRIES,
     RESOURCE_SECTION_LABELS,
+    PRODUCT_GUIDES_INDEX,
     resourceSectionIndex,
     type FaqItem,
     type ResourceSection,
@@ -149,6 +150,70 @@ export const GuideScreenshot = ({ src, alt }: { src: string; alt: string }) => (
         <img src={src} alt={alt} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover object-top" />
     </figure>
 );
+
+type GuideArticleCtaVariant = "check" | "guides" | "both";
+
+const GUIDE_ARTICLE_CTA_DEFAULTS: Record<
+    GuideArticleCtaVariant,
+    { title: string; description: string; guideLabel: string }
+> = {
+    check: {
+        title: "Check where you stand",
+        description:
+            "Fair Go's free check takes about 90 seconds and shows whether you may have an unfair dismissal claim and how long you likely have to act. Not legal advice.",
+        guideLabel: "Browse product guides",
+    },
+    guides: {
+        title: "Need help using Fair Go?",
+        description:
+            "Step-by-step guides show how to run the eligibility check, build your case file, and export a package for your lawyer.",
+        guideLabel: "Browse product guides",
+    },
+    both: {
+        title: "Take the next step",
+        description:
+            "Run the free check to see if you may have a claim, or follow our product guides to start documenting your case.",
+        guideLabel: "Browse product guides",
+    },
+};
+
+/** Inline call-to-action for blog articles: free check, product guides, or both. */
+export const GuideArticleCta = ({
+    variant = "check",
+    title,
+    description,
+    guideHref = PRODUCT_GUIDES_INDEX,
+    guideLabel,
+}: {
+    variant?: GuideArticleCtaVariant;
+    title?: string;
+    description?: string;
+    guideHref?: string;
+    guideLabel?: string;
+}) => {
+    const defaults = GUIDE_ARTICLE_CTA_DEFAULTS[variant];
+    const showCheck = variant === "check" || variant === "both";
+    const showGuides = variant === "guides" || variant === "both";
+
+    return (
+        <aside className="rounded-2xl border border-brand bg-brand-primary p-5 sm:p-6">
+            <h3 className="text-md font-semibold text-primary sm:text-lg">{title ?? defaults.title}</h3>
+            <p className="mt-2 text-sm text-tertiary sm:text-md">{description ?? defaults.description}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+                {showCheck ? (
+                    <Button size="md" color="primary" href="/" iconTrailing={ArrowRight}>
+                        Start free check
+                    </Button>
+                ) : null}
+                {showGuides ? (
+                    <Button size="md" color="secondary" href={guideHref}>
+                        {guideLabel ?? defaults.guideLabel}
+                    </Button>
+                ) : null}
+            </div>
+        </aside>
+    );
+};
 
 const GuideFaq = ({ items }: { items: FaqItem[] }) => (
     <section className="border-t border-secondary pt-10">
@@ -297,22 +362,11 @@ export const GuidePage = ({
                                     </section>
                                 ) : null}
 
-                                <div className="mt-12 border-t border-secondary pt-10 sm:mt-16">
-                                    <h2 className="text-lg font-semibold text-primary">Check where you stand</h2>
-                                    <p className="mt-3 max-w-2xl text-md text-tertiary">
-                                        Fair Go&apos;s free check takes about 90 seconds and shows whether you may have an unfair
-                                        dismissal claim and how long you likely have to act. Not legal advice.
-                                    </p>
-                                    <Button
-                                        size="lg"
-                                        color="primary"
-                                        href="/"
-                                        iconTrailing={ArrowRight}
-                                        className={cx("mt-5")}
-                                    >
-                                        Start free check
-                                    </Button>
-                                </div>
+                                {section === "employment" ? (
+                                    <div className="mt-12 border-t border-secondary pt-10 sm:mt-16">
+                                        <GuideArticleCta variant="both" />
+                                    </div>
+                                ) : null}
 
                                 {section === "employment" ? (
                                     <p className="mt-10 text-sm text-quaternary">

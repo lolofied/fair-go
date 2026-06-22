@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, BookOpen01, HelpCircle, LogIn01, Menu02, User01 } from "@untitledui/icons";
+import { ArrowRight, BookOpen01, HelpCircle, LogIn01, Menu02, Route, User01 } from "@untitledui/icons";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
@@ -39,7 +39,7 @@ export const LandingHeaderMenu = ({ onStartCheck }: { onStartCheck?: () => void 
                     <Dropdown.Item id="blog" icon={BookOpen01}>
                         Blog
                     </Dropdown.Item>
-                    <Dropdown.Item id="guides" icon={BookOpen01}>
+                    <Dropdown.Item id="guides" icon={Route}>
                         Guides
                     </Dropdown.Item>
                     <Dropdown.Item id="support" icon={HelpCircle}>

@@ -1,7 +1,7 @@
 import { FWC_APPLICATION_FEE, UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
 import { getLegalConstants } from "@/config/legal-constants";
-import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim;
 const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
@@ -71,6 +71,11 @@ export const HowToLodgeUnfairDismissalGuide = () => (
                 information only, not legal advice. If you are unsure, speak to an employment lawyer or contact the Fair Work
                 Commission.
             </GuideParagraph>
+            <GuideArticleCta
+                variant="check"
+                title="Check before you lodge"
+                description="Confirm whether you may be covered and how many days you likely have left before starting your Fair Work Commission application."
+            />
         </GuideSection>
 
         <GuideSection heading="What to have ready">
@@ -86,6 +91,13 @@ export const HowToLodgeUnfairDismissalGuide = () => (
                 You do not need a perfect bundle on day one, but having dates and documents organised makes the application
                 stronger and saves time if the matter proceeds to conciliation or a hearing.
             </GuideParagraph>
+            <GuideArticleCta
+                variant="guides"
+                title="Organise your case in Fair Go"
+                description="Use the case file to capture key dates, upload evidence, and note witnesses while the details are still clear."
+                guideHref={HELP_RESOURCE_ROUTES.caseProfile}
+                guideLabel="Build your case profile"
+            />
         </GuideSection>
 
         <GuideSection heading="Lodging with the Fair Work Commission">

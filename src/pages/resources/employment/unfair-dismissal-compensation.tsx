@@ -6,8 +6,8 @@ import {
     MEDIAN_DECISION_AWARD,
     TYPICAL_AWARD_WEEKS,
 } from "@/config/unfair-dismissal-outcomes";
-import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES, HELP_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideArticleCta, GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
 const PATH = EMPLOYMENT_RESOURCE_ROUTES.compensation;
 const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
@@ -110,6 +110,13 @@ export const UnfairDismissalCompensationGuide = () => (
                 <li>Strength of evidence about why the dismissal happened</li>
                 <li>What each side offers or accepts at conciliation</li>
             </GuideList>
+            <GuideArticleCta
+                variant="both"
+                title="Prepare before conciliation"
+                description="If you may have a claim, run the free check first, then use Fair Go to build a private record you can export and share with a lawyer."
+                guideHref={HELP_RESOURCE_ROUTES.exportCase}
+                guideLabel="Export for your lawyer"
+            />
         </GuideSection>
 
         <GuideSection heading="Other outcomes at conciliation">
