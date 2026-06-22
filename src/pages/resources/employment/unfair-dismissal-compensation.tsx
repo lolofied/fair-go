@@ -6,11 +6,11 @@ import {
     MEDIAN_DECISION_AWARD,
     TYPICAL_AWARD_WEEKS,
 } from "@/config/unfair-dismissal-outcomes";
-import { GUIDE_ENTRIES, GUIDE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/guides/guide-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
-const PATH = GUIDE_ROUTES.compensation;
-const LAST_UPDATED = GUIDE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
+const PATH = EMPLOYMENT_RESOURCE_ROUTES.compensation;
+const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const compensationCap = getMaxCompensationCap();
 
 const FAQ_ITEMS = [
@@ -37,14 +37,14 @@ export const UnfairDismissalCompensationGuide = () => (
         dateModified={LAST_UPDATED}
         breadcrumbLabel="Unfair dismissal compensation"
         faqItems={FAQ_ITEMS}
-        relatedGuides={[
+        relatedResources={[
             {
                 label: "How to lodge an unfair dismissal claim",
-                path: GUIDE_ROUTES.lodgeClaim,
+                path: EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
             },
             {
                 label: "Unfair dismissal eligibility in Australia",
-                path: GUIDE_ROUTES.eligibility,
+                path: EMPLOYMENT_RESOURCE_ROUTES.eligibility,
             },
         ]}
     >

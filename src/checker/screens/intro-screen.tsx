@@ -13,7 +13,7 @@ import {
     HowItWorksSection,
     LandingClosingCta,
     LandingFaqSection,
-    LandingGuidesSection,
+    LandingResourcesSection,
     OutcomesAndFeaturesSection,
 } from "@/checker/components/landing-sections";
 import { LandingRevealGroup, LandingRevealItem } from "@/checker/components/landing-reveal";
@@ -108,7 +108,7 @@ export const IntroScreen = () => {
                 <HowItWorksSection onStart={onStart} hasProgress={hasProgress} />
                 <OutcomesAndFeaturesSection />
                 <LandingClosingCta onStart={onStart} hasProgress={hasProgress} />
-                <LandingGuidesSection />
+                <LandingResourcesSection />
                 <LandingFaqSection />
             </div>
 

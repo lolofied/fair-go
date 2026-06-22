@@ -1,84 +1,64 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { JsonLd } from "@/components/seo/json-ld";
 import { PageMeta } from "@/components/seo/page-meta";
 import { buildBreadcrumbSchema, buildItemListSchema } from "@/components/seo/structured-data";
 import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
 import { Shell, ShellMain } from "@/components/layout/shell";
-import { FEATURED_GUIDE, GUIDE_ENTRIES, GUIDES_INDEX, type GuideEntry } from "@/config/site-seo";
-import { cx } from "@/utils/cx";
+import {
+    HELP_RESOURCE_CATEGORIES,
+    HELP_RESOURCE_ENTRIES,
+    PRODUCT_GUIDES_INDEX,
+    type HelpResourceCategory,
+    type ResourceEntry,
+} from "@/config/site-seo";
+import { GuidesSearch } from "@/pages/guides/guides-search";
+import { GuideListItem } from "@/pages/guides/guide-preview-visual";
 
-const THUMB_CLASS: Record<GuideEntry["category"], string> = {
-    Deadlines: "fg-guides-thumb-deadlines",
-    Eligibility: "fg-guides-thumb-eligibility",
-    Claims: "fg-guides-thumb-claims",
-    Outcomes: "fg-guides-thumb-outcomes",
-};
+function matchesQuery(resource: ResourceEntry, query: string): boolean {
+    const haystack = `${resource.title} ${resource.description} ${resource.category}`.toLowerCase();
 
-function FeaturedGuideCard({ guide }: { guide: GuideEntry }) {
-    return (
-        <Link to={guide.path} className="group block">
-            <div
-                aria-hidden="true"
-                className={cx(
-                    "aspect-[16/9] w-full overflow-hidden rounded-[1.75rem]",
-                    THUMB_CLASS[guide.category],
-                )}
-            />
-            <div className="py-8 text-left sm:py-10">
-                <h2 className="max-w-2xl text-display-sm font-semibold tracking-tight text-primary transition duration-100 ease-linear group-hover:text-brand-secondary sm:text-display-md">
-                    {guide.title}
-                </h2>
-                <p className="mt-4 max-w-2xl text-md text-tertiary">{guide.description}</p>
-            </div>
-        </Link>
-    );
-}
-
-function GuideListItem({ guide }: { guide: GuideEntry }) {
-    return (
-        <li className="border-b border-secondary last:border-b-0">
-            <Link to={guide.path} className="group flex flex-col gap-5 py-8 sm:flex-row sm:items-center sm:gap-8">
-                <div
-                    aria-hidden="true"
-                    className={cx(
-                        "aspect-[16/9] w-full shrink-0 overflow-hidden rounded-2xl sm:w-56 lg:w-64",
-                        THUMB_CLASS[guide.category],
-                    )}
-                />
-                <div className="min-w-0 flex-1">
-                    <h3 className="text-xl font-semibold tracking-tight text-primary transition duration-100 ease-linear group-hover:text-brand-secondary sm:text-display-xs">
-                        {guide.title}
-                    </h3>
-                    <p className="mt-3 text-md text-tertiary">{guide.description}</p>
-                    <span className="mt-4 inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-medium text-tertiary">
-                        {guide.lastUpdated}
-                    </span>
-                </div>
-            </Link>
-        </li>
-    );
+    return haystack.includes(query);
 }
 
 export const GuidesIndexPage = () => {
-    const listGuides = GUIDE_ENTRIES.filter((guide) => guide.path !== FEATURED_GUIDE.path);
+    const [query, setQuery] = useState("");
+    const normalizedQuery = query.trim().toLowerCase();
+
+    const filteredGuides = useMemo(() => {
+        if (!normalizedQuery) {
+            return HELP_RESOURCE_ENTRIES;
+        }
+
+        return HELP_RESOURCE_ENTRIES.filter((resource) => matchesQuery(resource, normalizedQuery));
+    }, [normalizedQuery]);
+
+    const sections = useMemo(
+        () =>
+            HELP_RESOURCE_CATEGORIES.map((category) => ({
+                category,
+                guides: filteredGuides.filter((resource) => resource.category === category),
+            })).filter((section) => section.guides.length > 0),
+        [filteredGuides],
+    );
 
     return (
         <Shell>
             <PageMeta
-                title="Guides | Unfair Dismissal Resources | Fair Go"
-                description="Plain-English guides on unfair dismissal in Australia: eligibility, the 21-day deadline, and what to do next. General information only, not legal advice."
-                path={GUIDES_INDEX}
+                title="Guides | Fair Go"
+                description="Step-by-step product guides for using Fair Go."
+                path={PRODUCT_GUIDES_INDEX}
             />
             <JsonLd
                 data={[
                     buildBreadcrumbSchema([
                         { name: "Home", path: "/" },
-                        { name: "Guides", path: GUIDES_INDEX },
+                        { name: "Guides", path: PRODUCT_GUIDES_INDEX },
                     ]),
                     buildItemListSchema(
-                        GUIDE_ENTRIES.map((guide) => ({
-                            name: guide.title,
-                            path: guide.path,
+                        HELP_RESOURCE_ENTRIES.map((resource) => ({
+                            name: resource.title,
+                            path: resource.path,
                         })),
                     ),
                 ]}
@@ -92,23 +72,29 @@ export const GuidesIndexPage = () => {
                             Guides
                         </h1>
                         <p className="text-lg font-medium text-tertiary md:max-w-md md:text-right lg:max-w-lg">
-                            The latest guides and articles from Fair Go
+                            Step-by-step product guides
                         </p>
                     </header>
 
-                    <div className="mt-10 sm:mt-12">
-                        <FeaturedGuideCard guide={FEATURED_GUIDE} />
+                    <div className="mt-8 sm:mt-10">
+                        <GuidesSearch value={query} onChange={setQuery} />
                     </div>
 
-                    <section className="mt-14 border-t border-secondary pt-14 sm:mt-16 sm:pt-16">
-                        <h2 className="text-lg font-semibold text-primary">Recent guides</h2>
-
-                        <ul className="mt-2">
-                            {listGuides.map((guide) => (
-                                <GuideListItem key={guide.path} guide={guide} />
+                    {sections.length > 0 ? (
+                        <div className="mt-10 flex flex-col gap-14 sm:mt-12 sm:gap-16">
+                            {sections.map(({ category, guides }) => (
+                                <GuideSection key={category} category={category} guides={guides} />
                             ))}
-                        </ul>
-                    </section>
+                        </div>
+                    ) : (
+                        <p className="mt-10 rounded-2xl border border-secondary bg-secondary_subtle px-5 py-4 text-md text-tertiary">
+                            No guides match your search. Try different keywords or{" "}
+                            <Link to="/support" className="font-medium text-brand-secondary underline">
+                                contact support
+                            </Link>
+                            .
+                        </p>
+                    )}
                 </div>
             </ShellMain>
 
@@ -116,3 +102,16 @@ export const GuidesIndexPage = () => {
         </Shell>
     );
 };
+
+function GuideSection({ category, guides }: { category: HelpResourceCategory; guides: ResourceEntry[] }) {
+    return (
+        <section>
+            <h2 className="text-lg font-semibold text-primary">{category}</h2>
+            <ul className="mt-2">
+                {guides.map((resource) => (
+                    <GuideListItem key={resource.path} resource={resource} />
+                ))}
+            </ul>
+        </section>
+    );
+}

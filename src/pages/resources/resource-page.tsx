@@ -19,8 +19,15 @@ import { buildGuideStructuredData } from "@/components/seo/structured-data";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { LandingFooter, LandingHeader } from "@/checker/components/landing-chrome";
 import { Shell, ShellMain } from "@/components/layout/shell";
-import { GUIDE_ENTRIES, GUIDES_INDEX, type FaqItem, type GuideCategory } from "@/config/site-seo";
+import {
+    RESOURCE_ENTRIES,
+    RESOURCE_SECTION_LABELS,
+    resourceSectionIndex,
+    type FaqItem,
+    type ResourceSection,
+} from "@/config/site-seo";
 import { cx } from "@/utils/cx";
+import { getResourceThumbClass } from "@/pages/resources/resource-list";
 
 type TocEntry = {
     id: string;
@@ -34,13 +41,6 @@ type GuideTocContextValue = {
 };
 
 const GuideTocContext = createContext<GuideTocContextValue | null>(null);
-
-const THUMB_CLASS: Record<GuideCategory, string> = {
-    Deadlines: "fg-guides-thumb-deadlines",
-    Eligibility: "fg-guides-thumb-eligibility",
-    Claims: "fg-guides-thumb-claims",
-    Outcomes: "fg-guides-thumb-outcomes",
-};
 
 function slugify(text: string) {
     return text
@@ -105,7 +105,7 @@ function GuideTocNav() {
     }
 
     return (
-        <nav aria-label="Guide sections" className="fg-guide-toc hidden lg:block">
+        <nav aria-label="Article sections" className="fg-guide-toc hidden lg:block">
             <ul className="flex flex-col gap-3">
                 {entries.map(({ id, heading, level }) => (
                     <li key={id} className={level === 3 ? "pl-4" : undefined}>
@@ -143,6 +143,13 @@ export const GuideList = ({ children }: PropsWithChildren) => (
     <ul className="flex list-disc flex-col gap-2 pl-5 marker:text-quaternary">{children}</ul>
 );
 
+/** Inline screenshot for guide articles. */
+export const GuideScreenshot = ({ src, alt }: { src: string; alt: string }) => (
+    <figure className="overflow-hidden rounded-2xl border border-secondary bg-secondary">
+        <img src={src} alt={alt} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover object-top" />
+    </figure>
+);
+
 const GuideFaq = ({ items }: { items: FaqItem[] }) => (
     <section className="border-t border-secondary pt-10">
         <h2 className="text-xl font-semibold text-primary sm:text-display-xs">Common questions</h2>
@@ -165,7 +172,7 @@ export const GuidePage = ({
     dateModified,
     breadcrumbLabel,
     faqItems,
-    relatedGuides,
+    relatedResources,
     children,
 }: PropsWithChildren<{
     title: string;
@@ -175,11 +182,15 @@ export const GuidePage = ({
     dateModified: string;
     breadcrumbLabel: string;
     faqItems?: FaqItem[];
-    relatedGuides?: { label: string; path: string }[];
+    relatedResources?: { label: string; path: string }[];
     children: ReactNode;
 }>) => {
-    const guideEntry = GUIDE_ENTRIES.find((guide) => guide.path === path);
-    const category = guideEntry?.category ?? "Eligibility";
+    const resourceEntry = RESOURCE_ENTRIES.find((resource) => resource.path === path);
+    const section: ResourceSection = resourceEntry?.section ?? "employment";
+    const sectionLabel = RESOURCE_SECTION_LABELS[section];
+    const sectionIndex = resourceSectionIndex(section);
+    const showHeroVisual = section !== "help";
+    const heroThumbClass = resourceEntry ? getResourceThumbClass(resourceEntry) : "fg-guides-thumb-eligibility";
 
     useEffect(() => {
         const hash = window.location.hash.slice(1);
@@ -206,6 +217,7 @@ export const GuidePage = ({
                     faqItems,
                     breadcrumbs: [
                         { name: "Home", path: "/" },
+                        { name: sectionLabel, path: sectionIndex },
                         { name: breadcrumbLabel, path },
                     ],
                 })}
@@ -217,11 +229,11 @@ export const GuidePage = ({
                     <div className="fg-guide-article">
                         <header>
                             <Link
-                                to={GUIDES_INDEX}
+                                to={sectionIndex}
                                 className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-tertiary transition duration-100 ease-linear hover:bg-secondary_hover hover:text-secondary"
                             >
                                 <ArrowLeft aria-hidden="true" className="size-4 stroke-[1.5]" data-icon />
-                                Back to Guides
+                                Back to {sectionLabel}
                             </Link>
 
                             <h1 className="mt-6 max-w-4xl text-display-sm font-semibold tracking-tight text-primary sm:text-display-md">
@@ -243,14 +255,18 @@ export const GuidePage = ({
 
                             <div className="min-w-0">
                                 <article>
-                                    <div
-                                        aria-hidden="true"
-                                        className={cx(
-                                            "fg-guide-hero aspect-[16/9] w-full overflow-hidden rounded-[1.75rem]",
-                                            THUMB_CLASS[category],
-                                        )}
-                                    />
-                                    <p className="mt-8 max-w-3xl text-lg text-tertiary">{description}</p>
+                                    {showHeroVisual ? (
+                                        <div
+                                            aria-hidden="true"
+                                            className={cx(
+                                                "fg-guide-hero aspect-[16/9] w-full overflow-hidden rounded-[1.75rem]",
+                                                heroThumbClass,
+                                            )}
+                                        />
+                                    ) : null}
+                                    <p className={cx("max-w-3xl text-lg text-tertiary", showHeroVisual ? "mt-8" : "mt-0")}>
+                                        {description}
+                                    </p>
 
                                     <div className="fg-guide-body mt-10 flex flex-col gap-10 sm:mt-12 sm:gap-12">
                                         {children}
@@ -263,14 +279,14 @@ export const GuidePage = ({
                                     </div>
                                 ) : null}
 
-                                {relatedGuides?.length ? (
+                                {relatedResources?.length ? (
                                     <section className="mt-12 border-t border-secondary pt-10 sm:mt-16">
-                                        <h2 className="text-md font-semibold text-primary">Related guides</h2>
+                                        <h2 className="text-md font-semibold text-primary">Related articles</h2>
                                         <ul className="mt-4 flex flex-col gap-2">
-                                            {relatedGuides.map(({ label, path: guidePath }) => (
-                                                <li key={guidePath}>
+                                            {relatedResources.map(({ label, path: resourcePath }) => (
+                                                <li key={resourcePath}>
                                                     <Link
-                                                        to={guidePath}
+                                                        to={resourcePath}
                                                         className="text-md font-medium text-brand-secondary transition duration-100 ease-linear hover:text-brand-secondary_hover"
                                                     >
                                                         {label}
@@ -298,19 +314,21 @@ export const GuidePage = ({
                                     </Button>
                                 </div>
 
-                                <p className="mt-10 text-sm text-quaternary">
-                                    This guide is general information only, not legal advice. For advice about your situation,
-                                    speak to an employment lawyer or contact the{" "}
-                                    <a
-                                        className="font-medium text-brand-secondary underline"
-                                        href="https://www.fwc.gov.au"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        Fair Work Commission
-                                    </a>
-                                    .
-                                </p>
+                                {section === "employment" ? (
+                                    <p className="mt-10 text-sm text-quaternary">
+                                        This article is general information only, not legal advice. For advice about your
+                                        situation, speak to an employment lawyer or contact the{" "}
+                                        <a
+                                            className="font-medium text-brand-secondary underline"
+                                            href="https://www.fwc.gov.au"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            Fair Work Commission
+                                        </a>
+                                        .
+                                    </p>
+                                ) : null}
                             </div>
                         </div>
                     </div>

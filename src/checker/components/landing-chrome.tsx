@@ -5,9 +5,10 @@ import { Button } from "@/components/base/buttons/button";
 import { ShellFooter, ShellHeader, ShellHeaderBrand } from "@/components/layout/shell";
 import { FairGoWordmark } from "@/checker/components/wordmark";
 import { LandingHeaderMenu } from "@/checker/components/landing-header-menu";
+import { LandingResourcesNav } from "@/checker/components/landing-resources-nav";
 import { isSyncConfigured } from "@/config/supabase";
 import { DONATION_URL } from "@/config/donation";
-import { GUIDES_INDEX } from "@/config/site-seo";
+import { BLOG_INDEX, PRODUCT_GUIDES_INDEX } from "@/config/site-seo";
 import { BuyMeACoffeeIcon } from "@/components/foundations/buy-me-a-coffee-icon";
 import { cx } from "@/utils/cx";
 
@@ -49,9 +50,7 @@ export const LandingHeader = ({
                     <Button href="/about" size="sm" color="link-gray">
                         About
                     </Button>
-                    <Button href="/guides" size="sm" color="link-gray">
-                        Guides
-                    </Button>
+                    <LandingResourcesNav />
                     <Button href="/support" size="sm" color="link-gray">
                         Support
                     </Button>
@@ -96,7 +95,10 @@ export const LandingFooter = () => (
                 .
             </p>
             <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-tertiary">
-                <Link to={GUIDES_INDEX} className="font-medium transition duration-100 ease-linear hover:text-secondary">
+                <Link to={BLOG_INDEX} className="font-medium transition duration-100 ease-linear hover:text-secondary">
+                    Blog
+                </Link>
+                <Link to={PRODUCT_GUIDES_INDEX} className="font-medium transition duration-100 ease-linear hover:text-secondary">
                     Guides
                 </Link>
                 <Link to="/about" className="font-medium transition duration-100 ease-linear hover:text-secondary">

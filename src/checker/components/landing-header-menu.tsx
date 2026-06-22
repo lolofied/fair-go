@@ -6,6 +6,7 @@ import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { arrowSlideClass } from "@/components/layout/shell";
 import { isSyncConfigured } from "@/config/supabase";
+import { BLOG_INDEX, PRODUCT_GUIDES_INDEX } from "@/config/site-seo";
 import { cx } from "@/utils/cx";
 
 export const LandingHeaderMenu = ({ onStartCheck }: { onStartCheck?: () => void }) => {
@@ -26,13 +27,17 @@ export const LandingHeaderMenu = ({ onStartCheck }: { onStartCheck?: () => void 
                 <Dropdown.Menu
                     onAction={(key) => {
                         if (key === "about") navigate("/about");
-                        if (key === "guides") navigate("/guides");
+                        if (key === "blog") navigate(BLOG_INDEX);
+                        if (key === "guides") navigate(PRODUCT_GUIDES_INDEX);
                         if (key === "support") navigate("/support");
                         if (key === "retrieve") navigate("/case/retrieve");
                     }}
                 >
                     <Dropdown.Item id="about" icon={User01}>
                         About
+                    </Dropdown.Item>
+                    <Dropdown.Item id="blog" icon={BookOpen01}>
+                        Blog
                     </Dropdown.Item>
                     <Dropdown.Item id="guides" icon={BookOpen01}>
                         Guides

@@ -1,9 +1,9 @@
 import { UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
-import { GUIDE_ENTRIES, GUIDE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/guides/guide-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
-const PATH = GUIDE_ROUTES.timeLimit;
-const LAST_UPDATED = GUIDE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
+const PATH = EMPLOYMENT_RESOURCE_ROUTES.timeLimit;
+const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 
 const FAQ_ITEMS = [
     {
@@ -29,14 +29,14 @@ export const UnfairDismissalTimeLimitGuide = () => (
         dateModified={LAST_UPDATED}
         breadcrumbLabel="Unfair dismissal time limit"
         faqItems={FAQ_ITEMS}
-        relatedGuides={[
+        relatedResources={[
             {
                 label: "Unfair dismissal eligibility in Australia",
-                path: GUIDE_ROUTES.eligibility,
+                path: EMPLOYMENT_RESOURCE_ROUTES.eligibility,
             },
             {
                 label: "How to lodge an unfair dismissal claim",
-                path: GUIDE_ROUTES.lodgeClaim,
+                path: EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
             },
         ]}
     >

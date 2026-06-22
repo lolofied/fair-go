@@ -222,6 +222,94 @@
         margin-inline: auto;
     }
 
+    .fg-guides-search-banner {
+        border-radius: 1.25rem;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        background: var(--color-bg-brand-section);
+    }
+
+    .fg-guides-search-lead {
+        font-size: var(--text-lg);
+        line-height: var(--text-lg--line-height);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary_on-brand);
+    }
+
+    .fg-guides-search-field {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: min(100%, 36rem);
+        margin: 1.5rem auto 0;
+        padding: 0.875rem 1rem 0.875rem 1.125rem;
+        border-radius: 9999px;
+        background: color-mix(in srgb, var(--color-white) 14%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-white) 18%, transparent);
+        backdrop-filter: blur(10px);
+        transition: background-color 100ms linear, box-shadow 100ms linear;
+    }
+
+    .fg-guides-search-field:focus-within {
+        background: color-mix(in srgb, var(--color-white) 20%, transparent);
+        box-shadow:
+            inset 0 0 0 1px color-mix(in srgb, var(--color-white) 28%, transparent),
+            0 0 0 3px color-mix(in srgb, var(--color-white) 10%, transparent);
+    }
+
+    .fg-guides-search-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        flex-shrink: 0;
+        color: color-mix(in srgb, var(--color-text-primary_on-brand) 88%, transparent);
+        stroke-width: 2px;
+    }
+
+    .fg-guides-search-input {
+        min-width: 0;
+        flex: 1;
+        border: 0;
+        background: transparent;
+        font-size: var(--text-md);
+        line-height: var(--text-md--line-height);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-primary_on-brand);
+        outline: none;
+    }
+
+    .fg-guides-search-input::placeholder {
+        color: color-mix(in srgb, var(--color-text-primary_on-brand) 72%, transparent);
+    }
+
+    .fg-guides-search-input::-webkit-search-cancel-button {
+        filter: brightness(0) invert(1);
+        opacity: 0.7;
+    }
+
+    .fg-guides-search-shortcut {
+        display: none;
+        flex-shrink: 0;
+        border-radius: 9999px;
+        padding: 0.125rem 0.5rem;
+        font-size: var(--text-xs);
+        line-height: var(--text-xs--line-height);
+        font-weight: var(--font-weight-medium);
+        color: color-mix(in srgb, var(--color-text-primary_on-brand) 88%, transparent);
+        background: color-mix(in srgb, var(--color-white) 12%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-white) 16%, transparent);
+    }
+
+    @media (min-width: 48rem) {
+        .fg-guides-search-banner {
+            padding: 3rem 2rem;
+        }
+
+        .fg-guides-search-shortcut {
+            display: inline-flex;
+            align-items: center;
+        }
+    }
+
     .fg-guides-thumb-deadlines {
         background:
             radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--color-brand-300) 50%, transparent) 0%, transparent 55%),
@@ -244,6 +332,24 @@
         background:
             radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--color-brand-500) 35%, transparent) 0%, transparent 50%),
             linear-gradient(135deg, var(--color-bg-secondary) 0%, color-mix(in srgb, var(--color-brand-300) 30%, white) 100%);
+    }
+
+    .fg-guides-thumb-getting-started {
+        background:
+            radial-gradient(circle at 25% 25%, color-mix(in srgb, var(--color-brand-300) 55%, transparent) 0%, transparent 55%),
+            linear-gradient(135deg, var(--color-bg-brand-secondary) 0%, color-mix(in srgb, var(--color-brand-500) 30%, white) 100%);
+    }
+
+    .fg-guides-thumb-case-file {
+        background:
+            radial-gradient(circle at 75% 30%, color-mix(in srgb, var(--color-brand-400) 40%, transparent) 0%, transparent 50%),
+            linear-gradient(135deg, var(--color-bg-secondary) 0%, color-mix(in srgb, var(--color-brand-200) 35%, white) 100%);
+    }
+
+    .fg-guides-thumb-sync {
+        background:
+            radial-gradient(circle at 40% 75%, color-mix(in srgb, var(--color-brand-600) 35%, transparent) 0%, transparent 55%),
+            linear-gradient(135deg, color-mix(in srgb, var(--color-brand-100) 70%, white) 0%, var(--color-bg-brand-secondary) 100%);
     }
 
     /* Guide article (Aave blog post layout) */

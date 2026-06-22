@@ -1,10 +1,10 @@
 import { FWC_APPLICATION_FEE, UNFAIR_DISMISSAL_TIME_LIMIT_DAYS } from "@/config/fair-work";
 import { getLegalConstants } from "@/config/legal-constants";
-import { GUIDE_ENTRIES, GUIDE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/guides/guide-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
-const PATH = GUIDE_ROUTES.lodgeClaim;
-const LAST_UPDATED = GUIDE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
+const PATH = EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim;
+const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 const UNFAIR_DISMISSAL_FORM = getLegalConstants().formRefs.unfairDismissal;
 const FWC_LODGEMENT_URL = "https://www.fwc.gov.au/apply-or-lodge/lodge-application";
 
@@ -32,14 +32,14 @@ export const HowToLodgeUnfairDismissalGuide = () => (
         dateModified={LAST_UPDATED}
         breadcrumbLabel="How to lodge an unfair dismissal claim"
         faqItems={FAQ_ITEMS}
-        relatedGuides={[
+        relatedResources={[
             {
                 label: `Unfair dismissal time limit (${UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days)`,
-                path: GUIDE_ROUTES.timeLimit,
+                path: EMPLOYMENT_RESOURCE_ROUTES.timeLimit,
             },
             {
                 label: "Unfair dismissal eligibility in Australia",
-                path: GUIDE_ROUTES.eligibility,
+                path: EMPLOYMENT_RESOURCE_ROUTES.eligibility,
             },
         ]}
     >

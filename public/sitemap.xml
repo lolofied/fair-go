@@ -7,31 +7,79 @@
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://fair-go.ai/guides</loc>
+        <loc>https://fair-go.ai/blog</loc>
         <lastmod>2026-06-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     <url>
-        <loc>https://fair-go.ai/guides/unfair-dismissal-time-limit</loc>
+        <loc>https://fair-go.ai/guides</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.75</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/run-the-eligibility-check</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/after-your-eligibility-check</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/retrieve-a-saved-case</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/build-your-case-profile</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/add-events-and-evidence</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/export-your-case-for-a-lawyer</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/guides/how-encrypted-sync-works</loc>
+        <lastmod>2026-06-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://fair-go.ai/blog/unfair-dismissal-time-limit</loc>
         <lastmod>2026-06-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://fair-go.ai/guides/unfair-dismissal-eligibility</loc>
+        <loc>https://fair-go.ai/blog/unfair-dismissal-eligibility</loc>
         <lastmod>2026-06-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://fair-go.ai/guides/how-to-lodge-unfair-dismissal</loc>
+        <loc>https://fair-go.ai/blog/how-to-lodge-unfair-dismissal</loc>
         <lastmod>2026-06-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://fair-go.ai/guides/unfair-dismissal-compensation</loc>
+        <loc>https://fair-go.ai/blog/unfair-dismissal-compensation</loc>
         <lastmod>2026-06-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>

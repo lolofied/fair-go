@@ -1,4 +1,5 @@
 import { handleSupportContactRequest } from "./support-contact";
+import { LEGACY_GUIDE_REDIRECTS } from "../src/config/site-seo";
 
 const API_HOST = "us.i.posthog.com";
 const ASSET_HOST = "us-assets.i.posthog.com";
@@ -103,6 +104,16 @@ function isPostHogPath(pathname: string): boolean {
     return pathname === INGEST_PREFIX || pathname.startsWith(`${INGEST_PREFIX}/`);
 }
 
+function legacyRedirect(request: Request, pathname: string): Response | null {
+    const target = LEGACY_GUIDE_REDIRECTS[pathname];
+
+    if (!target) {
+        return null;
+    }
+
+    return Response.redirect(new URL(target, request.url), 301);
+}
+
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         const { pathname } = new URL(request.url);
@@ -113,6 +124,12 @@ export default {
 
         if (pathname === SUPPORT_CONTACT_PATH) {
             return handleSupportContactRequest(request, env);
+        }
+
+        const redirect = legacyRedirect(request, pathname);
+
+        if (redirect) {
+            return redirect;
         }
 
         return env.ASSETS.fetch(request);

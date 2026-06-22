@@ -4,11 +4,11 @@ import {
     UNFAIR_DISMISSAL_TIME_LIMIT_DAYS,
     getHighIncomeThreshold,
 } from "@/config/fair-work";
-import { GUIDE_ENTRIES, GUIDE_ROUTES } from "@/config/site-seo";
-import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/guides/guide-page";
+import { EMPLOYMENT_RESOURCE_ENTRIES, EMPLOYMENT_RESOURCE_ROUTES } from "@/config/site-seo";
+import { GuideList, GuidePage, GuideParagraph, GuideSection } from "@/pages/resources/resource-page";
 
-const PATH = GUIDE_ROUTES.eligibility;
-const LAST_UPDATED = GUIDE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
+const PATH = EMPLOYMENT_RESOURCE_ROUTES.eligibility;
+const LAST_UPDATED = EMPLOYMENT_RESOURCE_ENTRIES.find((guide) => guide.path === PATH)!.lastUpdated;
 
 const FAQ_ITEMS = [
     {
@@ -34,14 +34,14 @@ export const UnfairDismissalEligibilityGuide = () => (
         dateModified={LAST_UPDATED}
         breadcrumbLabel="Unfair dismissal eligibility"
         faqItems={FAQ_ITEMS}
-        relatedGuides={[
+        relatedResources={[
             {
                 label: `Unfair dismissal time limit (${UNFAIR_DISMISSAL_TIME_LIMIT_DAYS} days)`,
-                path: GUIDE_ROUTES.timeLimit,
+                path: EMPLOYMENT_RESOURCE_ROUTES.timeLimit,
             },
             {
                 label: "Unfair dismissal compensation and remedies",
-                path: GUIDE_ROUTES.compensation,
+                path: EMPLOYMENT_RESOURCE_ROUTES.compensation,
             },
         ]}
     >

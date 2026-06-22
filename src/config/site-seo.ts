@@ -41,65 +41,181 @@ export function getLandingFaqItems(unfairDismissalDays: number): FaqItem[] {
     ];
 }
 
-export const GUIDES_INDEX = "/guides";
+export const BLOG_INDEX = "/blog";
+export const PRODUCT_GUIDES_INDEX = "/guides";
 
-export const GUIDE_ROUTES = {
-    timeLimit: "/guides/unfair-dismissal-time-limit",
-    eligibility: "/guides/unfair-dismissal-eligibility",
-    lodgeClaim: "/guides/how-to-lodge-unfair-dismissal",
-    compensation: "/guides/unfair-dismissal-compensation",
+/** @deprecated Use BLOG_INDEX. Kept for legacy redirects. */
+export const RESOURCES_INDEX = "/resources";
+
+export const EMPLOYMENT_RESOURCE_ROUTES = {
+    timeLimit: "/blog/unfair-dismissal-time-limit",
+    eligibility: "/blog/unfair-dismissal-eligibility",
+    lodgeClaim: "/blog/how-to-lodge-unfair-dismissal",
+    compensation: "/blog/unfair-dismissal-compensation",
 } as const;
 
-export type GuideCategory = "Deadlines" | "Eligibility" | "Claims" | "Outcomes";
+export const HELP_RESOURCE_ROUTES = {
+    runCheck: "/guides/run-the-eligibility-check",
+    afterCheck: "/guides/after-your-eligibility-check",
+    retrieveCase: "/guides/retrieve-a-saved-case",
+    caseProfile: "/guides/build-your-case-profile",
+    eventsEvidence: "/guides/add-events-and-evidence",
+    exportCase: "/guides/export-your-case-for-a-lawyer",
+    encryptedSync: "/guides/how-encrypted-sync-works",
+} as const;
 
-export const GUIDE_CATEGORIES = ["All", "Deadlines", "Eligibility", "Claims", "Outcomes"] as const;
-export type GuideCategoryFilter = (typeof GUIDE_CATEGORIES)[number];
+export type ResourceSection = "employment" | "help";
 
-export interface GuideEntry {
+export type EmploymentResourceCategory = "Deadlines" | "Eligibility" | "Claims" | "Outcomes";
+
+export type HelpResourceCategory = "Getting started" | "Case file" | "Sync";
+
+export const HELP_RESOURCE_CATEGORIES: HelpResourceCategory[] = ["Getting started", "Case file", "Sync"];
+
+export interface ResourceEntry {
     path: string;
     title: string;
     description: string;
-    category: GuideCategory;
+    section: ResourceSection;
+    category: EmploymentResourceCategory | HelpResourceCategory;
+    /** Public path to preview/hero image, e.g. /images/guides/run-the-eligibility-check.png */
+    image: string;
     /** Human-readable last updated date, e.g. "21 June 2026". */
     lastUpdated: string;
-    /** Highlight on the guides index as the large featured card. */
+    /** Highlight on the resources index as the large featured card. */
     featured?: boolean;
-    /** Optional second line in the featured title, rendered in wordmark serif italic. */
-    featuredTitleAccent?: string;
 }
 
-/** Canonical list of published guides for the index, nav, and landing section. */
-export const GUIDE_ENTRIES: GuideEntry[] = [
+export const EMPLOYMENT_RESOURCE_ENTRIES: ResourceEntry[] = [
     {
-        path: GUIDE_ROUTES.timeLimit,
+        path: EMPLOYMENT_RESOURCE_ROUTES.timeLimit,
         title: "Unfair dismissal time limit",
         description: "How long you have to lodge with the Fair Work Commission and when the clock starts.",
+        section: "employment",
         category: "Deadlines",
+        image: "/images/blog/unfair-dismissal-time-limit.png",
         lastUpdated: "21 June 2026",
         featured: true,
-        featuredTitleAccent: "time limit",
     },
     {
-        path: GUIDE_ROUTES.eligibility,
+        path: EMPLOYMENT_RESOURCE_ROUTES.eligibility,
         title: "Unfair dismissal eligibility",
         description: "Who may be covered under the Fair Work Act, including minimum employment periods.",
+        section: "employment",
         category: "Eligibility",
+        image: "/images/blog/unfair-dismissal-eligibility.png",
         lastUpdated: "21 June 2026",
     },
     {
-        path: GUIDE_ROUTES.lodgeClaim,
+        path: EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
         title: "How to lodge an unfair dismissal claim",
         description: "Step-by-step overview of applying to the Fair Work Commission, what to prepare, and what happens next.",
+        section: "employment",
         category: "Claims",
+        image: "/images/blog/how-to-lodge-unfair-dismissal.png",
         lastUpdated: "21 June 2026",
     },
     {
-        path: GUIDE_ROUTES.compensation,
+        path: EMPLOYMENT_RESOURCE_ROUTES.compensation,
         title: "Unfair dismissal compensation",
         description: "Reinstatement, compensation caps, and typical outcomes if your unfair dismissal claim succeeds.",
+        section: "employment",
         category: "Outcomes",
+        image: "/images/blog/unfair-dismissal-compensation.png",
         lastUpdated: "21 June 2026",
     },
 ];
 
-export const FEATURED_GUIDE = GUIDE_ENTRIES.find((guide) => guide.featured) ?? GUIDE_ENTRIES[0];
+/** Product how-to articles for Fair Go itself. */
+export const HELP_RESOURCE_ENTRIES: ResourceEntry[] = [
+    {
+        path: HELP_RESOURCE_ROUTES.runCheck,
+        title: "Run the free eligibility check",
+        description: "What the 90-second check covers, how to answer the questions, and what you get at the end.",
+        section: "help",
+        category: "Getting started",
+        image: "/images/guides/run-the-eligibility-check.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.afterCheck,
+        title: "After your eligibility check",
+        description: "How to read your result, what to do next, and when to start building a case file.",
+        section: "help",
+        category: "Getting started",
+        image: "/images/guides/after-your-eligibility-check.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.retrieveCase,
+        title: "Retrieve a saved case",
+        description: "Open an existing case on a new device using your recovery details.",
+        section: "help",
+        category: "Getting started",
+        image: "/images/guides/retrieve-a-saved-case.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.caseProfile,
+        title: "Build your case profile",
+        description: "Record employment details, key dates, and what you want to achieve from your claim.",
+        section: "help",
+        category: "Case file",
+        image: "/images/guides/build-your-case-profile.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.eventsEvidence,
+        title: "Add events and evidence",
+        description: "Log what happened on a timeline and attach documents linked to each event.",
+        section: "help",
+        category: "Case file",
+        image: "/images/guides/add-events-and-evidence.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.exportCase,
+        title: "Export your case for a lawyer",
+        description: "Review findings, then save a PDF package a lawyer can act on quickly.",
+        section: "help",
+        category: "Case file",
+        image: "/images/guides/export-your-case-for-a-lawyer.png",
+        lastUpdated: "22 June 2026",
+    },
+    {
+        path: HELP_RESOURCE_ROUTES.encryptedSync,
+        title: "How encrypted sync works",
+        description: "Optional sync across devices with encryption that Fair Go cannot read.",
+        section: "help",
+        category: "Sync",
+        image: "/images/guides/how-encrypted-sync-works.png",
+        lastUpdated: "22 June 2026",
+    },
+];
+
+export const RESOURCE_ENTRIES: ResourceEntry[] = [...EMPLOYMENT_RESOURCE_ENTRIES, ...HELP_RESOURCE_ENTRIES];
+
+export const FEATURED_EMPLOYMENT_RESOURCE =
+    EMPLOYMENT_RESOURCE_ENTRIES.find((resource) => resource.featured) ?? EMPLOYMENT_RESOURCE_ENTRIES[0];
+
+export function resourceSectionIndex(section: ResourceSection): string {
+    return section === "employment" ? BLOG_INDEX : PRODUCT_GUIDES_INDEX;
+}
+
+export const RESOURCE_SECTION_LABELS: Record<ResourceSection, string> = {
+    employment: "Blog",
+    help: "Guides",
+};
+
+/** Permanent redirects from legacy URLs. */
+export const LEGACY_GUIDE_REDIRECTS: Record<string, string> = {
+    "/guides/unfair-dismissal-time-limit": EMPLOYMENT_RESOURCE_ROUTES.timeLimit,
+    "/guides/unfair-dismissal-eligibility": EMPLOYMENT_RESOURCE_ROUTES.eligibility,
+    "/guides/how-to-lodge-unfair-dismissal": EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
+    "/guides/unfair-dismissal-compensation": EMPLOYMENT_RESOURCE_ROUTES.compensation,
+    "/resources": BLOG_INDEX,
+    "/resources/employment/unfair-dismissal-time-limit": EMPLOYMENT_RESOURCE_ROUTES.timeLimit,
+    "/resources/employment/unfair-dismissal-eligibility": EMPLOYMENT_RESOURCE_ROUTES.eligibility,
+    "/resources/employment/how-to-lodge-unfair-dismissal": EMPLOYMENT_RESOURCE_ROUTES.lodgeClaim,
+    "/resources/employment/unfair-dismissal-compensation": EMPLOYMENT_RESOURCE_ROUTES.compensation,
+};
