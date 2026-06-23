@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { ArrowLeft, LogIn01, UploadCloud02 } from "@untitledui/icons";
 import { useNavigate } from "react-router";
-import { FairGoWordmark } from "@/checker/components/wordmark";
 import { Button } from "@/components/base/buttons/button";
 import { readEncryptedBackup, restoreBackup } from "@/case/backup";
 import {
@@ -11,6 +10,7 @@ import {
     ShellContent,
     ShellFooter,
     ShellHeader,
+    ShellHeaderBrand,
     ShellMain,
 } from "@/components/layout/shell";
 import { PasswordField, TextField } from "@/case/components/fields";
@@ -188,7 +188,7 @@ export const RetrieveCaseScreen = () => {
 function RetrieveHeader() {
     return (
         <ShellHeader>
-            <FairGoWordmark />
+            <ShellHeaderBrand />
             <Button href="/" size="sm" color="secondary" iconLeading={ArrowLeft}>
                 <span className="sm:hidden">Back</span>
                 <span className="hidden sm:inline">Back to home</span>
