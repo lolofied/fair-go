@@ -312,6 +312,7 @@
 
     .fg-guides-thumb-deadlines {
         background:
+            url("/images/blog/unfair-dismissal-alarm-clock.png") center / min(63%, 21rem) no-repeat,
             radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--color-brand-300) 50%, transparent) 0%, transparent 55%),
             linear-gradient(135deg, var(--color-bg-brand-secondary) 0%, color-mix(in srgb, var(--color-brand-600) 35%, white) 100%);
     }
