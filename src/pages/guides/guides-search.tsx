@@ -19,7 +19,7 @@ export function GuidesSearch({ value, onChange }: { value: string; onChange: (va
 
     return (
         <div className="fg-guides-search-banner">
-            <p className="fg-guides-search-lead">Find the answers you need.</p>
+            <p className="fg-guides-search-lead">Find the answers you need</p>
 
             <label className="fg-guides-search-field">
                 <SearchLg aria-hidden="true" className="fg-guides-search-icon" data-icon />
