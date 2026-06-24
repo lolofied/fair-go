@@ -1,4 +1,4 @@
-/** Last-write-wins using ISO timestamps from case metadata / case_blobs.updated_at. */
+/** Last-write-wins using ISO timestamps from the encrypted case metadata. */
 
 export type SyncWinner = "local" | "remote" | "tie";
 

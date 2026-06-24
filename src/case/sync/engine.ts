@@ -17,6 +17,7 @@ export class SyncEngineError extends Error {
 
 export interface RemoteCaseSnapshot {
     caseFile: CaseFile;
+    /** Case content timestamp from encrypted metadata; DB row updated_at is only server receive time. */
     updatedAt: string;
     fileRows: FileRow[];
 }
@@ -143,7 +144,7 @@ export async function fetchRemoteCase(dek: Uint8Array, userId: string): Promise<
 
     return {
         caseFile,
-        updatedAt: blobRow.updated_at as string,
+        updatedAt: caseFile.meta.updatedAt,
         fileRows: (fileRows ?? []) as FileRow[],
     };
 }
