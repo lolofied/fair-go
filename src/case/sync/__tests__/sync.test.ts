@@ -3,9 +3,12 @@ import { deadlineDateForDays } from "@/checker/logic";
 import { getLegalConstants } from "@/config/legal-constants";
 import { bytesToPgBytea, pgByteaToBytes } from "@/case/sync/encoding";
 import { deadlineMetadataFromCase } from "@/case/sync/deadline-metadata";
+import { chooseLoginSyncAction } from "@/case/sync/engine";
 import { profileInsertFromSignup } from "@/case/sync/profile";
 import { createSignupBundle } from "@/case/crypto";
+import { seedCaseFromChecker } from "@/case/seed";
 import type { CaseFile } from "@/case/types";
+import type { CheckerAnswers } from "@/checker/types";
 
 describe("sync encoding", () => {
     it("round-trips bytes through pg bytea hex", () => {
@@ -56,5 +59,31 @@ describe("profile insert", () => {
         expect(row.kdf_params.algorithm).toBe("argon2id");
         expect(row.kdf_salt.startsWith("\\x")).toBe(true);
         expect(row.wrapped_dek_passphrase.startsWith("\\x")).toBe(true);
+    });
+});
+
+describe("login sync action", () => {
+    it("applies remote over a pristine auto-seeded local case even when local is newer", () => {
+        const local = seedCaseFromChecker({} as CheckerAnswers);
+        const remoteUpdatedAt = new Date(Date.parse(local.meta.updatedAt) - 1_000).toISOString();
+
+        expect(chooseLoginSyncAction(local, remoteUpdatedAt)).toBe("apply_remote");
+    });
+
+    it("pushes an edited local case when it is newer than remote", () => {
+        const local = seedCaseFromChecker({} as CheckerAnswers);
+        const edited = {
+            ...local,
+            profile: {
+                ...local.profile,
+                desiredOutcome: "Reinstatement",
+            },
+            meta: {
+                ...local.meta,
+                updatedAt: "2025-06-02T00:00:00.000Z",
+            },
+        };
+
+        expect(chooseLoginSyncAction(edited, "2025-06-01T00:00:00.000Z")).toBe("push_local");
     });
 });
