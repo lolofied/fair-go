@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { ArrowLeft, LogIn01, UploadCloud02 } from "@untitledui/icons";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/base/buttons/button";
@@ -16,12 +16,12 @@ import {
 import { PasswordField, TextField } from "@/case/components/fields";
 import { GuardrailBanner } from "@/case/components/guardrail";
 import { RecoverPassphrasePanel } from "@/case/components/recover-passphrase-panel";
-import { useCase } from "@/case/store";
 import { SyncAuthError, useSync } from "@/case/sync/sync-provider";
+import { retrieveRemoteCase, SyncEngineError } from "@/case/sync/engine";
+import { getSyncDek } from "@/case/sync/session";
 
 export const RetrieveCaseScreen = () => {
     const navigate = useNavigate();
-    const { replaceFile } = useCase();
     const { configured, loading, user, dekUnlocked, syncStatus, syncError, signIn } = useSync();
 
     const [email, setEmail] = useState("");
@@ -33,16 +33,43 @@ export const RetrieveCaseScreen = () => {
     const [restorePass, setRestorePass] = useState("");
     const [restoreBusy, setRestoreBusy] = useState(false);
     const [restoreErr, setRestoreErr] = useState<string | null>(null);
+    const retrievingUserRef = useRef<string | null>(null);
 
-    const syncing = user && dekUnlocked && syncStatus === "syncing";
+    const syncing = Boolean(user && dekUnlocked && (busy || syncStatus === "syncing"));
+
+    const retrieveForUser = useCallback(
+        async (userId: string) => {
+            if (retrievingUserRef.current === userId) return;
+            retrievingUserRef.current = userId;
+            setBusy(true);
+            setError(null);
+
+            try {
+                const dek = getSyncDek();
+                if (!dek) {
+                    throw new SyncEngineError("Unlock encryption with your passphrase first.");
+                }
+                await retrieveRemoteCase(dek, userId);
+                navigate("/case", { replace: true });
+            } catch (e) {
+                setError(e instanceof SyncEngineError ? e.message : e instanceof Error ? e.message : "Retrieve failed.");
+            } finally {
+                if (retrievingUserRef.current === userId) {
+                    retrievingUserRef.current = null;
+                }
+                setBusy(false);
+            }
+        },
+        [navigate],
+    );
 
     useEffect(() => {
         if (loading) return;
         if (!configured) return;
-        if (user && dekUnlocked && syncStatus === "synced") {
-            navigate("/case", { replace: true });
+        if (user && dekUnlocked) {
+            void retrieveForUser(user.id);
         }
-    }, [loading, configured, user, dekUnlocked, syncStatus, navigate]);
+    }, [loading, configured, user, dekUnlocked, retrieveForUser]);
 
     const onSubmit = async () => {
         setError(null);
@@ -52,7 +79,8 @@ export const RetrieveCaseScreen = () => {
         }
         setBusy(true);
         try {
-            await signIn(email, passphrase);
+            const next = await signIn(email, passphrase);
+            await retrieveForUser(next.id);
         } catch (e) {
             setError(e instanceof SyncAuthError ? e.message : e instanceof Error ? e.message : "Sign-in failed.");
         } finally {
@@ -70,8 +98,7 @@ export const RetrieveCaseScreen = () => {
         try {
             const text = await f.text();
             const payload = await readEncryptedBackup(text, restorePass);
-            const restored = await restoreBackup(payload);
-            replaceFile(restored);
+            await restoreBackup(payload);
             navigate("/case", { replace: true });
         } catch (e) {
             setRestoreErr(e instanceof Error ? e.message : "Could not restore that backup.");

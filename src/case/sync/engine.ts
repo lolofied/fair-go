@@ -26,6 +26,26 @@ export interface ResolveOnLoginResult {
     applied: "local" | "remote" | "none";
 }
 
+export type LoginSyncAction = "apply_remote" | "push_local" | "none";
+
+function isPristineSeedCase(caseFile: CaseFile): boolean {
+    return (
+        caseFile.meta.seededFromChecker &&
+        caseFile.meta.createdAt === caseFile.meta.updatedAt &&
+        caseFile.documents.length === 0 &&
+        caseFile.witnesses.length === 0
+    );
+}
+
+export function chooseLoginSyncAction(local: CaseFile, remoteUpdatedAt: string): LoginSyncAction {
+    if (isPristineSeedCase(local)) return "apply_remote";
+
+    const winner = pickSyncWinner(local.meta.updatedAt, remoteUpdatedAt);
+    if (shouldApplyRemote(winner)) return "apply_remote";
+    if (shouldPushLocal(winner)) return "push_local";
+    return "none";
+}
+
 async function updateProfileDeadlines(userId: string, caseFile: CaseFile): Promise<void> {
     const deadlines = deadlineMetadataFromCase(caseFile);
     const { error } = await getSupabaseClient()
@@ -148,6 +168,15 @@ export async function fetchRemoteCase(dek: Uint8Array, userId: string): Promise<
     };
 }
 
+/** Retrieve the server copy without considering any local bootstrap file. */
+export async function retrieveRemoteCase(dek: Uint8Array, userId: string): Promise<CaseFile> {
+    const remote = await fetchRemoteCase(dek, userId);
+    if (!remote) {
+        throw new SyncEngineError("No synced case was found for this account.");
+    }
+    return applyRemoteCase(remote, dek);
+}
+
 async function downloadRemoteFiles(caseFile: CaseFile, dek: Uint8Array, fileRows: FileRow[]): Promise<void> {
     const supabase = getSupabaseClient();
     const activeRefs = new Set(caseFile.documents.map((doc) => doc.fileRef));
@@ -191,16 +220,15 @@ export async function resolveOnLogin(local: CaseFile, dek: Uint8Array, userId: s
         return { caseFile: local, applied: "local" };
     }
 
-    const winner = pickSyncWinner(local.meta.updatedAt, remote.updatedAt);
-
-    if (shouldApplyRemote(winner)) {
+    const action = chooseLoginSyncAction(local, remote.updatedAt);
+    if (action === "apply_remote") {
         const caseFile = await applyRemoteCase(remote, dek);
         return { caseFile, applied: "remote" };
     }
 
-    if (shouldPushLocal(winner)) {
+    if (action === "push_local") {
         await pushLocalCase(local, dek, userId);
-        return { caseFile: local, applied: winner === "tie" ? "none" : "local" };
+        return { caseFile: local, applied: local.meta.updatedAt === remote.updatedAt ? "none" : "local" };
     }
 
     return { caseFile: local, applied: "none" };
