@@ -12,29 +12,43 @@ export const SyncEngineBridge = () => {
     const { file, replaceFile } = useCase();
     const { user, dekUnlocked, configured, setSyncState, markSynced, lastPushedUpdatedAtRef } = useSync();
 
+    const fileRef = useRef(file);
     const hydratedForUserRef = useRef<string | null>(null);
+    const hydratingForUserRef = useRef<string | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        fileRef.current = file;
+    }, [file]);
 
     useEffect(() => {
         if (!user) {
             hydratedForUserRef.current = null;
+            hydratingForUserRef.current = null;
         }
     }, [user]);
 
     useEffect(() => {
-        if (!configured || !user || !dekUnlocked || !file) return;
+        if (!configured || !user || !dekUnlocked || !fileRef.current) return;
         if (hydratedForUserRef.current === user.id) return;
+        if (hydratingForUserRef.current === user.id) return;
 
         let cancelled = false;
-        hydratedForUserRef.current = user.id;
+        hydratingForUserRef.current = user.id;
 
         (async () => {
             const dek = getSyncDek();
-            if (!dek) return;
+            const current = fileRef.current;
+            if (!dek || !current) {
+                if (hydratingForUserRef.current === user.id) {
+                    hydratingForUserRef.current = null;
+                }
+                return;
+            }
 
             setSyncState({ status: "syncing", error: null });
             try {
-                const result = await resolveOnLogin(file, dek, user.id);
+                const result = await resolveOnLogin(current, dek, user.id);
                 if (cancelled) return;
 
                 if (result.applied === "remote") {
@@ -43,6 +57,7 @@ export const SyncEngineBridge = () => {
                     trackCaseSyncSaved("login");
                 }
 
+                hydratedForUserRef.current = user.id;
                 markSynced(result.caseFile.meta.updatedAt);
                 setSyncState({ status: "synced", error: null });
             } catch (error) {
@@ -52,13 +67,17 @@ export const SyncEngineBridge = () => {
                     status: "error",
                     error: error instanceof SyncEngineError ? error.message : "Sync failed.",
                 });
+            } finally {
+                if (!cancelled && hydratingForUserRef.current === user.id) {
+                    hydratingForUserRef.current = null;
+                }
             }
         })();
 
         return () => {
             cancelled = true;
         };
-    }, [configured, user, dekUnlocked, file, replaceFile, setSyncState, markSynced]);
+    }, [configured, user, dekUnlocked, Boolean(file), replaceFile, setSyncState, markSynced]);
 
     useEffect(() => {
         if (!configured || !user || !dekUnlocked || !file) return;
