@@ -27,7 +27,6 @@ const CaseRoutes = () => {
 
     return (
         <Routes>
-            <Route path="retrieve" element={<RetrieveCaseScreen />} />
             <Route path="settings" element={<SettingsScreen />} />
             <Route
                 path="*"
@@ -61,5 +60,12 @@ export const CaseModule = () => (
             <CaseAnalyticsBridge />
             <CaseRoutes />
         </CaseProvider>
+    </SyncProvider>
+);
+
+export const RetrieveCaseModule = () => (
+    <SyncProvider>
+        <PageMeta title="Retrieve your case | Fair Go" description="Retrieve your encrypted Fair Go case." noindex />
+        <RetrieveCaseScreen />
     </SyncProvider>
 );

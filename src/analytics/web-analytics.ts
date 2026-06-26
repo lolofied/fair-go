@@ -5,7 +5,7 @@ export type WebAnalyticsEventName = (typeof WEB_ANALYTICS_EVENT_NAMES)[number];
 
 export const ALLOWED_WEB_ANALYTICS_EVENTS = new Set<string>(WEB_ANALYTICS_EVENT_NAMES);
 
-const URL_PROPERTY_KEYS = ["$current_url", "$referrer"] as const;
+const URL_PROPERTY_KEYS = ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer"] as const;
 
 type AnalyticsEvent = {
     event: string;
@@ -26,8 +26,8 @@ export function sanitizeAnalyticsUrl(url: unknown): string | undefined {
     }
 }
 
-/** Remove query strings from URL fields on web analytics events before they leave the browser. */
-export function sanitizeWebAnalyticsEvent<T extends AnalyticsEvent>(event: T): T {
+/** Remove query strings from URL fields before analytics events leave the browser. */
+export function sanitizeAnalyticsEvent<T extends AnalyticsEvent>(event: T): T {
     const properties = event.properties ? { ...event.properties } : {};
 
     for (const key of URL_PROPERTY_KEYS) {
@@ -39,6 +39,8 @@ export function sanitizeWebAnalyticsEvent<T extends AnalyticsEvent>(event: T): T
 
     return { ...event, properties };
 }
+
+export const sanitizeWebAnalyticsEvent = sanitizeAnalyticsEvent;
 
 export function isAllowedAnalyticsEvent(eventName: string): boolean {
     return ALLOWED_WEB_ANALYTICS_EVENTS.has(eventName);

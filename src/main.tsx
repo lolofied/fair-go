@@ -19,6 +19,7 @@ import {
     LazyNotFound,
     LazyPrivacyPolicy,
     LazyRetrieveASavedCaseGuide,
+    LazyRetrieveCaseModule,
     LazyRunTheEligibilityCheckGuide,
     LazySupportPage,
     LazyTermsOfService,
@@ -42,6 +43,7 @@ createRoot(document.getElementById("root")!).render(
                     <Suspense fallback={<RouteLoadingFallback />}>
                         <Routes>
                             <Route path="/" element={<HomeRoute />} />
+                            <Route path="/case/retrieve" element={<LazyRetrieveCaseModule />} />
                             <Route path="/case/*" element={<LazyCaseModule />} />
                             <Route path="/privacy" element={<LazyPrivacyPolicy />} />
                             <Route path="/terms" element={<LazyTermsOfService />} />

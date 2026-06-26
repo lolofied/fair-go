@@ -1,6 +1,6 @@
 import posthog from "posthog-js";
 import { ALLOWED_PRODUCT_EVENTS } from "@/analytics/product-events";
-import { ALLOWED_WEB_ANALYTICS_EVENTS, sanitizeWebAnalyticsEvent } from "@/analytics/web-analytics";
+import { ALLOWED_WEB_ANALYTICS_EVENTS, sanitizeAnalyticsEvent } from "@/analytics/web-analytics";
 
 const key = import.meta.env.VITE_POSTHOG_KEY;
 const defaultHost = import.meta.env.PROD ? "/ingest" : "https://us.i.posthog.com";
@@ -39,11 +39,7 @@ export function initPostHog(): void {
                 return null;
             }
 
-            if (ALLOWED_WEB_ANALYTICS_EVENTS.has(event.event)) {
-                return sanitizeWebAnalyticsEvent(event);
-            }
-
-            return event;
+            return sanitizeAnalyticsEvent(event);
         },
 
         property_denylist: ["email", "name", "salary", "employer", "passphrase", "abn"],
