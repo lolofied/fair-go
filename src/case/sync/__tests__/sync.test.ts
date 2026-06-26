@@ -3,7 +3,7 @@ import { deadlineDateForDays } from "@/checker/logic";
 import { getLegalConstants } from "@/config/legal-constants";
 import { bytesToPgBytea, pgByteaToBytes } from "@/case/sync/encoding";
 import { deadlineMetadataFromCase } from "@/case/sync/deadline-metadata";
-import { chooseLoginSyncAction } from "@/case/sync/engine";
+import { assertLocalCanPush, chooseLoginSyncAction, remoteCaseUpdatedAt, SyncEngineError } from "@/case/sync/engine";
 import { profileInsertFromSignup } from "@/case/sync/profile";
 import { createSignupBundle } from "@/case/crypto";
 import { seedCaseFromChecker } from "@/case/seed";
@@ -85,5 +85,21 @@ describe("login sync action", () => {
         };
 
         expect(chooseLoginSyncAction(edited, "2025-06-01T00:00:00.000Z")).toBe("push_local");
+    });
+});
+
+describe("sync push safety", () => {
+    it("uses the decrypted case timestamp instead of server row time for LWW", () => {
+        const local = seedCaseFromChecker({} as CheckerAnswers);
+        const rowUpdatedAt = new Date(Date.parse(local.meta.updatedAt) + 10_000).toISOString();
+
+        expect(remoteCaseUpdatedAt(local, rowUpdatedAt)).toBe(local.meta.updatedAt);
+    });
+
+    it("blocks stale local pushes when the remote case is newer", () => {
+        const local = seedCaseFromChecker({} as CheckerAnswers);
+        const remoteUpdatedAt = new Date(Date.parse(local.meta.updatedAt) + 1_000).toISOString();
+
+        expect(() => assertLocalCanPush(local, remoteUpdatedAt)).toThrow(SyncEngineError);
     });
 });

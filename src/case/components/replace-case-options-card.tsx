@@ -13,7 +13,7 @@ import { useSync } from "@/case/sync/sync-provider";
 export const ReplaceCaseOptionsCard = () => {
     const navigate = useNavigate();
     const { file, startNewCase } = useCase();
-    const { configured, user, dekUnlocked } = useSync();
+    const { configured, user, dekUnlocked, signOut } = useSync();
     const [warnOpen, setWarnOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState<CaseReplaceAction | null>(null);
 
@@ -31,9 +31,13 @@ export const ReplaceCaseOptionsCard = () => {
             return;
         }
 
-        void startNewCase().then(() => {
+        void (async () => {
+            if (synced) {
+                await signOut();
+            }
+            await startNewCase();
             navigate("/", { replace: true, state: { forceChecker: true } });
-        });
+        })();
     };
 
     const requestAction = (action: CaseReplaceAction) => {

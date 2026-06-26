@@ -46,6 +46,16 @@ export function chooseLoginSyncAction(local: CaseFile, remoteUpdatedAt: string):
     return "none";
 }
 
+export function remoteCaseUpdatedAt(caseFile: CaseFile, rowUpdatedAt: string): string {
+    return caseFile.meta.updatedAt || rowUpdatedAt;
+}
+
+export function assertLocalCanPush(local: CaseFile, remoteUpdatedAt: string): void {
+    if (remoteUpdatedAt > local.meta.updatedAt) {
+        throw new SyncEngineError("This device is behind a newer synced case. Retrieve the latest case before syncing again.");
+    }
+}
+
 async function updateProfileDeadlines(userId: string, caseFile: CaseFile): Promise<void> {
     const deadlines = deadlineMetadataFromCase(caseFile);
     const { error } = await getSupabaseClient()
@@ -81,13 +91,14 @@ async function upsertCaseBlob(userId: string, caseFile: CaseFile, dek: Uint8Arra
     }
 }
 
-async function syncFileRows(userId: string, caseFile: CaseFile, dek: Uint8Array): Promise<void> {
+async function uploadActiveFileRows(userId: string, caseFile: CaseFile, dek: Uint8Array): Promise<void> {
     const supabase = getSupabaseClient();
-    const activeRefs = new Set(caseFile.documents.map((doc) => doc.fileRef));
 
     for (const doc of caseFile.documents) {
         const blob = await getFile(doc.fileRef);
-        if (!blob) continue;
+        if (!blob) {
+            throw new SyncEngineError(`Could not find the local file for "${doc.fileName}" to sync.`);
+        }
 
         const encrypted = await encryptBytes(new Uint8Array(await blob.arrayBuffer()), dek);
         const storagePath = caseFileStoragePath(userId, doc.fileRef);
@@ -119,6 +130,11 @@ async function syncFileRows(userId: string, caseFile: CaseFile, dek: Uint8Array)
             throw new SyncEngineError(rowError.message);
         }
     }
+}
+
+async function deleteInactiveFileRows(userId: string, caseFile: CaseFile): Promise<void> {
+    const supabase = getSupabaseClient();
+    const activeRefs = new Set(caseFile.documents.map((doc) => doc.fileRef));
 
     const { data: remoteRows, error: listError } = await supabase.from("files").select("local_ref, storage_path").eq("user_id", userId);
     if (listError) {
@@ -134,9 +150,15 @@ async function syncFileRows(userId: string, caseFile: CaseFile, dek: Uint8Array)
 
 /** Push the local case blob, encrypted files, and plaintext deadline metadata. */
 export async function pushLocalCase(caseFile: CaseFile, dek: Uint8Array, userId: string): Promise<void> {
+    const remote = await fetchRemoteCase(dek, userId);
+    if (remote) {
+        assertLocalCanPush(caseFile, remote.updatedAt);
+    }
+
+    await uploadActiveFileRows(userId, caseFile, dek);
     await upsertCaseBlob(userId, caseFile, dek);
-    await syncFileRows(userId, caseFile, dek);
     await updateProfileDeadlines(userId, caseFile);
+    await deleteInactiveFileRows(userId, caseFile);
 }
 
 export async function fetchRemoteCase(dek: Uint8Array, userId: string): Promise<RemoteCaseSnapshot | null> {
@@ -163,7 +185,7 @@ export async function fetchRemoteCase(dek: Uint8Array, userId: string): Promise<
 
     return {
         caseFile,
-        updatedAt: blobRow.updated_at as string,
+        updatedAt: remoteCaseUpdatedAt(caseFile, blobRow.updated_at as string),
         fileRows: (fileRows ?? []) as FileRow[],
     };
 }
@@ -184,7 +206,9 @@ async function downloadRemoteFiles(caseFile: CaseFile, dek: Uint8Array, fileRows
 
     for (const doc of caseFile.documents) {
         const row = rowByRef.get(doc.fileRef);
-        if (!row) continue;
+        if (!row) {
+            throw new SyncEngineError(`The synced case is missing the encrypted file for "${doc.fileName}".`);
+        }
 
         const { data, error } = await supabase.storage.from(CASE_FILES_BUCKET).download(row.storage_path);
         if (error || !data) {
