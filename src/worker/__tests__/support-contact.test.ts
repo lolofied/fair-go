@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { handleSupportContactRequest, SupportRateLimiter } from "../support-contact";
+import { handleSupportContactRequest, SupportRateLimiter } from "../../../worker/support-contact";
 
 class MemoryStorage {
     private readonly values = new Map<string, unknown>();
