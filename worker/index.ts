@@ -1,6 +1,8 @@
 import { handleSupportContactRequest } from "./support-contact";
 import { LEGACY_GUIDE_REDIRECTS } from "../src/config/site-seo";
 
+export { SupportRateLimiter } from "./support-contact";
+
 const API_HOST = "us.i.posthog.com";
 const ASSET_HOST = "us-assets.i.posthog.com";
 const INGEST_PREFIX = "/ingest";

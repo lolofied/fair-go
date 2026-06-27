@@ -7,11 +7,42 @@ import {
 
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
+const RATE_LIMIT_WINDOW_MS = RATE_LIMIT_WINDOW_SECONDS * 1000;
+const RATE_LIMIT_STORAGE_KEY = "support-contact";
+const RATE_LIMIT_CHECK_URL = "https://rate-limit.internal/support";
+
+interface DurableObjectIdLike {}
+
+interface DurableObjectStubLike {
+    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
+
+interface DurableObjectNamespaceLike {
+    idFromName(name: string): DurableObjectIdLike;
+    get(id: DurableObjectIdLike): DurableObjectStubLike;
+}
+
+interface DurableObjectStorageLike {
+    get<T>(key: string): Promise<T | undefined>;
+    put<T>(key: string, value: T): Promise<void>;
+    delete(key: string): Promise<void>;
+    setAlarm?(scheduledTime: number | Date): Promise<void>;
+}
+
+interface DurableObjectStateLike {
+    storage: DurableObjectStorageLike;
+}
+
+interface RateLimitRecord {
+    count: number;
+    resetAt: number;
+}
 
 interface SupportContactEnv {
     RESEND_API_KEY?: string;
     SUPPORT_TO_EMAIL?: string;
     SUPPORT_FROM_EMAIL?: string;
+    SUPPORT_RATE_LIMITER?: DurableObjectNamespaceLike;
 }
 
 function jsonResponse(body: Record<string, unknown>, status = 200): Response {
@@ -24,34 +55,72 @@ function jsonResponse(body: Record<string, unknown>, status = 200): Response {
     });
 }
 
-async function isRateLimited(ip: string): Promise<boolean> {
+export class SupportRateLimiter {
+    private pending = Promise.resolve();
+
+    constructor(private readonly state: DurableObjectStateLike) {}
+
+    async fetch(): Promise<Response> {
+        const result = this.pending.then(() => this.checkLimit());
+        this.pending = result.then(
+            () => undefined,
+            () => undefined,
+        );
+
+        return result;
+    }
+
+    async alarm(): Promise<void> {
+        const record = await this.state.storage.get<RateLimitRecord>(RATE_LIMIT_STORAGE_KEY);
+
+        if (record && record.resetAt <= Date.now()) {
+            await this.state.storage.delete(RATE_LIMIT_STORAGE_KEY);
+        }
+    }
+
+    private async checkLimit(): Promise<Response> {
+        const now = Date.now();
+        const existing = await this.state.storage.get<RateLimitRecord>(RATE_LIMIT_STORAGE_KEY);
+
+        if (!existing || existing.resetAt <= now) {
+            const resetAt = now + RATE_LIMIT_WINDOW_MS;
+
+            await this.state.storage.put(RATE_LIMIT_STORAGE_KEY, { count: 1, resetAt });
+            await this.state.storage.setAlarm?.(resetAt);
+
+            return new Response(null, { status: 204 });
+        }
+
+        if (existing.count >= RATE_LIMIT_MAX) {
+            return new Response(null, { status: 429 });
+        }
+
+        await this.state.storage.put(RATE_LIMIT_STORAGE_KEY, { ...existing, count: existing.count + 1 });
+        await this.state.storage.setAlarm?.(existing.resetAt);
+
+        return new Response(null, { status: 204 });
+    }
+}
+
+async function isRateLimited(ip: string, env: SupportContactEnv): Promise<boolean> {
     if (!ip) {
         return false;
     }
 
-    const cache = caches.default;
-    const cacheKey = new Request(`https://rate-limit.internal/support/${encodeURIComponent(ip)}`);
-    const existing = await cache.match(cacheKey);
+    const limiter = env.SUPPORT_RATE_LIMITER;
 
-    if (existing) {
-        const count = Number.parseInt(await existing.text(), 10);
-
-        if (Number.isNaN(count) || count >= RATE_LIMIT_MAX) {
-            return true;
-        }
-
-        await cache.put(cacheKey, new Response(String(count + 1)), {
-            expirationTtl: RATE_LIMIT_WINDOW_SECONDS,
-        });
-
-        return false;
+    if (!limiter) {
+        return true;
     }
 
-    await cache.put(cacheKey, new Response("1"), {
-        expirationTtl: RATE_LIMIT_WINDOW_SECONDS,
-    });
+    try {
+        const id = limiter.idFromName(ip);
+        const response = await limiter.get(id).fetch(RATE_LIMIT_CHECK_URL);
 
-    return false;
+        return response.status === 429 || !response.ok;
+    } catch {
+        return true;
+    }
 }
 
 async function sendSupportEmail(data: ValidatedSupportContact, env: SupportContactEnv): Promise<boolean> {
@@ -115,7 +184,7 @@ export async function handleSupportContactRequest(request: Request, env: Support
 
     const ip = request.headers.get("CF-Connecting-IP") ?? "";
 
-    if (await isRateLimited(ip)) {
+    if (await isRateLimited(ip, env)) {
         return jsonResponse({ ok: false, error: "rate_limited" }, 429);
     }
 

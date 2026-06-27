@@ -7,6 +7,20 @@
     "SUPPORT_TO_EMAIL": "support@fair-go.ai",
     "SUPPORT_FROM_EMAIL": "Fair Go <noreply@fair-go.ai>"
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SUPPORT_RATE_LIMITER",
+        "class_name": "SupportRateLimiter"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1_support_rate_limiter",
+      "new_sqlite_classes": ["SupportRateLimiter"]
+    }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
